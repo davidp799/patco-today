@@ -1,2 +1,2 @@
 # patco-today
-Android application which utilises a python scripting to show most recent schedules for PATCO
+Android application which utilises python scripting to show most recent schedules for PATCO Transit
