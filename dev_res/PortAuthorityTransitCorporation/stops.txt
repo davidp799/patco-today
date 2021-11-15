@@ -1,0 +1,14 @@
+stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,wheelchair_boarding
+1,,Lindenwold,,39.833809,-75.000325,1,http://www.ridepatco.org/stations/lindenwold.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,1
+10,,8th and Market,,39.951152,-75.153587,6,http://www.ridepatco.org/stations/8th.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,1
+11,,9-10th and Locust,,39.947352,-75.157642,6,http://www.ridepatco.org/stations/9th.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,1
+12,,12-13th and Locust,,39.947944,-75.162363,6,http://www.ridepatco.org/stations/12th.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,2
+13,,15-16th and Locust,,39.948635,-75.167792,6,http://www.ridepatco.org/stations/15th.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,1
+2,,Ashland,,39.858698,-75.009198,1,http://www.ridepatco.org/stations/ashland.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,2
+3,,Woodcrest,,39.870157,-75.011247,1,http://www.ridepatco.org/stations/woodcrest.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,1
+4,,Haddonfield,,39.897609,-75.037141,2,http://www.ridepatco.org/stations/haddonfield.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,2
+5,,Westmont,,39.907086,-75.046545,2,http://www.ridepatco.org/stations/westmont.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,2
+6,,Collingswood,,39.913588,-75.064559,2,http://www.ridepatco.org/stations/collingswood.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,2
+7,,Ferry Avenue,,39.922869,-75.092025,3,http://www.ridepatco.org/stations/ferryave.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,1
+8,,Broadway,,39.94261,-75.119217,4,http://www.ridepatco.org/stations/broadway.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,1
+9,,City Hall,,39.945686,-75.1211,5,http://www.ridepatco.org/stations/cityhall.asp?utm_source=AddTransit&utm_medium=GTFS,0,,,2

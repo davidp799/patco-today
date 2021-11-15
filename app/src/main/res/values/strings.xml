@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">PATCO Today</string>
+    <string name="title_home">Schedules</string>
+    <string name="title_map">Station Map</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_info">Information</string>
+    <string name="station_map">Station Map</string>
+
+    <string-array name="stations_list">
+        <item>15-16th &amp; Locust</item>
+        <item>12-13th &amp; Locust</item>
+        <item>9-10th &amp; Locust</item>
+        <item>8th &amp; Market</item>
+        <item>City Hall</item>
+        <item>Broadway</item>
+        <item>Ferry Avenue</item>
+        <item>Collingswood</item>
+        <item>Westmont</item>
+        <item>Haddonfield</item>
+        <item>Woodcrest</item>
+        <item>Ashland</item>
+        <item>Lindenwold</item>
+
+    </string-array>
+
 </resources>
