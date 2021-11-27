@@ -97,11 +97,24 @@ def service_id():
         Returns: int object
     """
     weekday = currentWkday()
-    if weekday <= 4:
-        return 66
-    elif weekday == 5:
-        return 67
-    else: return 68
+    stdIdx = 0
+    dateCode = ''
+    storage = []
+    # open calendar data and find service_ids
+    f = open("calendar.txt", "r")
+    line = f.readline()
+    while line != '':
+        stdIdx = line.index(',')+1
+        dateCode = line[stdIdx:stdIdx+13] # date code
+        if weekday <= 4 and dateCode == '1,1,1,1,1,0,0':
+            storage.append(int(line[:stdIdx-1]))
+        elif weekday == 5 and dateCode == '0,0,0,0,0,1,0':
+            storage.append(int(line[:stdIdx-1]))
+        elif weekday == 6 and dateCode == '0,0,0,0,0,0,1':
+            storage.append(int(line[:stdIdx-1]))
+        line = f.readline()
+    f.close()
+    return storage
 
 def stop_id( source ):
     """ Function which determines the stop_id based on provided stop name and
@@ -117,8 +130,7 @@ def trip_id( source, destination ):
         Returns: list object
     """
     # initialize variables
-    routeID, serviceID = route_id(source, destination), service_id()
-    term = f"{routeID},{serviceID},"
+    routeID, serviceIDs = route_id(source, destination), service_id()
     trips = []
 
     # open trips.txt file as read-only data
@@ -127,12 +139,12 @@ def trip_id( source, destination ):
     # read data line-by-line and append relevant data to a list
     line = f.readline()
     while line != '':
-        if line[:5] == term:
-            splitLine = line.split(',')
-            trips.append(splitLine[2])
-        line = f.readline()
+        for i in serviceIDs:
+            if line[:5] == f"{routeID},{i},":
+                splitLine = line.split(',')
+                trips.append(splitLine[2])
+            line = f.readline()
     f.close()
-
     return trips
 
 def listSchedules( source, destination ):
@@ -167,6 +179,12 @@ def listSchedules( source, destination ):
             result.append(i)
     return result
 
+def sortedSchedules( schedulesList ):
+    """ Function which sorts list of trip by calling trip_id() and utilizes
+        RADIX sort method to sort arrival times in ascending order.
+    """
+    return sorted(schedulesList)
+
 
 ###   DIRECT CALL   ###
 if __name__ == '__main__':
@@ -200,7 +218,7 @@ if __name__ == '__main__':
             else:
                 print(f"Westbound schedule from {beginTime} selected.")
                 print("__________________________")
-            allSchedules = listSchedules(stopCodes[source-1], stopCodes[destination-1])
+            allSchedules = sortedSchedules(listSchedules(stopCodes[source-1], stopCodes[destination-1]))
             print(f"Arrival times".center(26))
             for i in allSchedules:
                 print(i)
