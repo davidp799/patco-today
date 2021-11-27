@@ -10,10 +10,21 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 import re
 
+
 # List of stations (trip_id = idx+1)
 stopCodes = ["Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont",
              "Collingswood", "Ferry Avenue", "Broadway", "City Hall", "8th and Market",
              "9-10th and Locust", "12-13th and Locust", "15-16th and Locust"]
+
+def isInternetConnected():
+    """ Function which utilizes urllib and a default ping address to check for
+        a valid internet connection.
+    """
+    try:
+        response = urlopen('http://www.ridepatco.org/schedules/schedules.asp', timeout=1)
+        return True
+    except:
+        return False
 
 def isSpecial():
     """ Function which utilizes urllib to determine if a special schedule is
@@ -29,11 +40,13 @@ def isSpecial():
 
     srch_date = f", {today.month}/{today.day}"
 
-    finding = re.findall(srch_date, html)
+    finding1 = re.findall(srch_date, html)
+    finding2 = re.findall(f"({today.month}/{today.day})", html)
 
-    if len(finding) > 0:
+    if len(finding1) > 0 or len(finding2) > 0:
         return True
     return False
+    
 
 def readGTFS():
     """ Function which utilizes urllib and ZipFile to download the latest
@@ -60,16 +73,13 @@ def showFromTime( source ):
         Returns: string object
     """
     stop_id = stopCodes.index(source)+1
-    now = currentTime()
-    if now[1] - 15 < 0:
-        if now[0] - 1 < 0:
-            showFrom = ["11", str(now[1]-15)]
-        else:
-            showFrom = [str(now[0]-1), "00"]
-    elif now[1] - 15 >= 0:
-        showFrom = [str(now[0]), str(now[1]-15)]
-    fromTime = f"{showFrom[0]}:{showFrom[1]}:00"
-    return fromTime
+    now, converted = currentTime(), []
+    for part in now:
+        part = str(part)
+        if len(part) == 1:
+            part = "0"+part
+        converted.append(part)
+    return f"{converted[0]}:{converted[1]}:00"
 
 def route_id( source, destination ):
     """ Function which determines the route_id based on the source stop_id
@@ -87,7 +97,7 @@ def service_id():
         Returns: int object
     """
     weekday = currentWkday()
-    if weekday < 4:
+    if weekday <= 4:
         return 66
     elif weekday == 5:
         return 67
@@ -129,35 +139,73 @@ def listSchedules( source, destination ):
     """ Function which utilizes urllib to determine if a special schedule is
         present for the current date. """
     # initialize variables
-    trips, stopID = trip_id(source, destination), stop_id(source)
+    trip_ids, stopID = trip_id(source, destination), stop_id(source)
     arrivalTime = showFromTime(source)
-    # concatenate serach term from data
-    term = f"{tripID},{arrivalTime},{arrivalTime},{stopID},"
+
+    # open stop_times dataset and search for arrival times
+    temp, allTimes, result = [], [], []
+    append = False
+    f = open("stop_times.txt", "r")
+    line = f.readline()
+    while line != '':
+        for i in trip_ids:
+            if line[:4] == i:
+                temp.append(line)
+        line = f.readline()
+    f.close()
+
+    # extract arrival time from strings
+    for i in temp:
+        if i[23:25] == str(stopID) or i[23] == str(stopID):
+            allTimes.append(i[5:13])
+    # extract arrival times beginning at current time from allTimes
+    for i in allTimes:
+        if int(i[:2]) >= int(arrivalTime[:2]): # check for next train
+            if int(i[3:5]) >= int(arrivalTime[3:5]):
+                append = True
+        if append: # append from next train onward
+            result.append(i)
+    return result
 
 
 ###   DIRECT CALL   ###
 if __name__ == '__main__':
-    status = isSpecial()
-    if status == True:
-        print("Special schedules found for today.")
-        act = input("Download special schedules? [y/n]: ")
-        if act == 'y':
-            print("Visit www.ridepatco.org/ for more info.")
-    elif status == False:
-        print("No special schedules found for today.")
-    print("\nStations:" + " "*12 + "ID:")
-    print("__________________________")
-    for stop in stopCodes:
-        leftString = f"{stop} "
-        rightString = f": {stopCodes.index(stop)+1}"
-        spacing = " "*(18-len(stop))
-        print(leftString + spacing + rightString)
-    print("__________________________\n")
-    source = int(input("Enter source ID: "))
-    destination = int(input("Enter destination ID: "))
-    beginTime = showFromTime(stopCodes[source-1])
-    direction = route_id(stopCodes[source-1], stopCodes[destination-1])
-    if direction == 1: print(f"Eastbound schedules from {beginTime} selected.")
-    else: print(f"Westbound schedules from {beginTime} selected.")
-        
+    doWhat = input("Run default program? [y/n]: ")
+    if doWhat == "y":
+        internet = isInternetConnected()
+        if internet:
+            status = isSpecial()
+            if status == True:
+                print("Special schedules found for today.")
+                act = input("Download special schedules? [y/n]: ")
+                if act == 'y':
+                    print("Visit www.ridepatco.org/ for more info.")
+            elif status == False:
+                print("No special schedules found for today.")
+            print("\nStations:" + " "*12 + "ID:")
+            print("__________________________")
+            for stop in stopCodes:
+                leftString = f"{stop} "
+                rightString = f": {stopCodes.index(stop)+1}"
+                spacing = " "*(18-len(stop))
+                print(leftString + spacing + rightString)
+            print("__________________________\n")
+            source = int(input("Enter source ID: "))
+            destination = int(input("Enter destination ID: "))
+            beginTime = showFromTime(stopCodes[source-1])
+            direction = route_id(stopCodes[source-1], stopCodes[destination-1])
+            if direction == 1:
+                print(f"Eastbound schedule from {beginTime} selected.")
+                print("__________________________")
+            else:
+                print(f"Westbound schedule from {beginTime} selected.")
+                print("__________________________")
+            allSchedules = listSchedules(stopCodes[source-1], stopCodes[destination-1])
+            print(f"Arrival times".center(26))
+            for i in allSchedules:
+                print(i)
+            print("__________________________")
+        else:
+            print("ERROR: No Internet Connection!")
+    
 
