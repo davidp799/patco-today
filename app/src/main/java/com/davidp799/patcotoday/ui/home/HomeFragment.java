@@ -1,5 +1,7 @@
 package com.davidp799.patcotoday.ui.home;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -7,10 +9,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -35,6 +42,11 @@ public class HomeFragment extends Fragment {
         initPython(); // initialize python3
         View root = binding.getRoot();
 
+        // temporary list object (will contain arrival times)
+        String[]  arrivals = {"1", "2", "3", "4", "5", "6",
+                "7", "8", "9", "10"};
+
+
         // allow button in action bar
         setHasOptionsMenu(true);
 
@@ -47,16 +59,6 @@ public class HomeFragment extends Fragment {
         ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stations); // create array adapter and pass parameters (context, dropdown layout, array)
         AutoCompleteTextView autocompleteTV2= root.findViewById(R.id.toTextView); // get reference to autocomplete text view
         autocompleteTV2.setAdapter(arrayAdapter2); // set adapter to autocomplete tv to arrayAdapter
-
-
-
-
-        /* // Initialize webview for bottom sheet
-        WebView webView = (WebView) root.findViewById(R.id.webview);
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setBuiltInZoomControls(true);
-        webSettings.setDisplayZoomControls(false);
-        webView.loadUrl("http://www.ridepatco.org/schedules/schedules.asp"); */
 
         // Initialize Bottom Sheet Parameters
         LinearLayout mBottomSheetLayout = root.findViewById(R.id.bottom_sheet_layout);
@@ -87,29 +89,61 @@ public class HomeFragment extends Fragment {
                 header_Arrow_Image.setRotation(slideOffset * 180);
             }
         });
-
         // Determine if special schedule is present for current date
-        boolean specialSchedule = isSpecial();
-        if (!specialSchedule) {
+        if (!internetIsConnected()) {
+            Toast.makeText(getActivity(),
+                    "Unable to Check for Special Schedules!\n          NO INTERNET CONNECTION",
+                    Toast.LENGTH_LONG).show();
             sheetBehavior.setPeekHeight(0);
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        } else if (internetIsConnected()) {
+            boolean specialSchedule = isSpecial();
+            // Initialize webview for bottom sheet
+            WebView webView = (WebView) root.findViewById(R.id.webview);
+            WebSettings webSettings = webView.getSettings();
+            webSettings.setBuiltInZoomControls(true);
+            webSettings.setDisplayZoomControls(false);
+            webView.loadUrl("http://www.ridepatco.org/schedules/schedules.asp");
+
+
+
+            if (!specialSchedule) {
+                sheetBehavior.setPeekHeight(0);
+                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+
         }
 
         return root;
     }
 
+    public boolean internetIsConnected() {
+        try {
+            String command = "ping -c 1 google.com";
+            return (Runtime.getRuntime().exec(command).waitFor() == 0);
+        } catch (Exception e) {
+            return false;
+        }
+    }
     // Callable function to initialize python3
     private void initPython() {
         if (!Python.isStarted()) { Python.start(new AndroidPlatform(getActivity())); }
     }
 
-    // Python function which determines whether there is a special schedule
-    private boolean isSpecial() {
+    // Python functions: check for internet connection, special schedule, and list schedules
+    private boolean isInternetConnected() {
+        Python python = Python.getInstance();
+        PyObject pythonFile = python.getModule("gtfs");
+        return pythonFile.callAttr("isInternetConnected").toBoolean();
+    } private boolean isSpecial() {
         Python python = Python.getInstance();
         PyObject pythonFile = python.getModule("gtfs");
         return pythonFile.callAttr("isSpecial").toBoolean();
+    } private PyObject listSchedules() {
+        Python python = Python.getInstance();
+        PyObject pythonFile = python.getModule("gtfs");
+        return pythonFile.callAttr("listSchedules");
     }
-
     // initialize button in action bar
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
