@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet_layout"
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="wrap_content"
     app:behavior_hideable="true"
     app:behavior_peekHeight="140dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+    android:elevation="8dp">
 
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
 
     <LinearLayout
         android:id="@+id/bottom_sheet_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="@drawable/drawable_round_bottom_sheet"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
@@ -27,8 +29,8 @@
             android:layout_weight="3"
             android:padding="20dp"
             android:textSize="18sp"
-            android:text="Special Schedules Available"
-            android:textColor="@android:color/white" />
+            android:text="@string/specialSchedules"
+            android:textColor="?android:textColorPrimary" />
 
         <ImageView
             android:id="@+id/bottom_sheet_arrow"
@@ -36,11 +38,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_baseline_keyboard_arrow_up_24" />
+            app:srcCompat="@drawable/ic_baseline_keyboard_arrow_up_24"
+            tools:ignore="ContentDescription" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="@color/white"
+        android:background="?android:attr/windowBackground"
         android:layout_width="match_parent"
         android:layout_height="500dp">
 

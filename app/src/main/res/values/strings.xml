@@ -5,6 +5,9 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_info">Information</string>
     <string name="station_map">Station Map</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="specialSchedules">Special Schedules Available</string>
 
     <string-array name="stations_list">
         <item>15-16th &amp; Locust</item>

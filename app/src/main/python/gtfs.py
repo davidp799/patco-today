@@ -8,8 +8,8 @@ from datetime import date
 from io import BytesIO
 from urllib.request import urlopen
 from zipfile import ZipFile
+from os.path import dirname, join
 import re
-
 
 # List of stations (trip_id = idx+1)
 stopCodes = ["Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont",
@@ -100,8 +100,9 @@ def service_id():
     stdIdx = 0
     dateCode = ''
     storage = []
+    filename = join(dirname(__file__), "calendar.txt")
     # open calendar data and find service_ids
-    f = open("calendar.txt", "r")
+    f = open(filename, "r")
     line = f.readline()
     while line != '':
         stdIdx = line.index(',')+1
@@ -132,9 +133,10 @@ def trip_id( source, destination ):
     # initialize variables
     routeID, serviceIDs = route_id(source, destination), service_id()
     trips = []
+    filename = join(dirname(__file__), "trips.txt")
 
     # open trips.txt file as read-only data
-    f = open("trips.txt", "r")
+    f = open(filename, "r")
 
     # read data line-by-line and append relevant data to a list
     line = f.readline()
@@ -150,6 +152,7 @@ def trip_id( source, destination ):
 def listSchedules( source, destination ):
     """ Function which utilizes urllib to determine if a special schedule is
         present for the current date. """
+    source, destination = stopCodes[source], stopCodes[destination]
     # initialize variables
     trip_ids, stopID = trip_id(source, destination), stop_id(source)
     arrivalTime = showFromTime(source)
@@ -157,7 +160,8 @@ def listSchedules( source, destination ):
     # open stop_times dataset and search for arrival times
     temp, allTimes, result = [], [], []
     append = False
-    f = open("stop_times.txt", "r")
+    filename = join(dirname(__file__), "stop_times.txt")
+    f = open(filename, "r")
     line = f.readline()
     while line != '':
         for i in trip_ids:

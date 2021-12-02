@@ -14,6 +14,15 @@
         <!-- Navigation bar color. -->
         <item name="android:navigationBarColor" tools:targetApi="l">?attr/useMaterialThemeColors</item>
         <!-- Customize your theme here. -->
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+    </style>
+
+    <style name="AppBottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
+    </style>
+
+    <style name="CustomBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/drawable_round_bottom_sheet</item>
     </style>
 
 </resources>

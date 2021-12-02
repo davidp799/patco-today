@@ -8,4 +8,6 @@
     <color name="blackish">#FF231F20</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="dynamicText">#FFFFFFFF</color>
+    <color name="bottomSheetBackground">#FF231F20</color>
 </resources>
