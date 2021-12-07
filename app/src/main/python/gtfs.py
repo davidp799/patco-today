@@ -47,147 +47,132 @@ def isSpecial():
         return True
     return False
     
-
-def readGTFS():
-    """ Function which utilizes urllib and ZipFile to download the latest
+class Schedules:
+    """ Class which utilizes urllib and ZipFile to download the latest
         PortAuthorityTransitCorporation (PATCO) GTFS package.
         Returns: ZipFile object
     """
-    resp = urlopen("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip")
-    zipfile = ZipFile(BytesIO(resp.read()))
-    return zipfile
-
-def currentWkday():
-    return datetime.today().weekday()
-
-def currentTime():
-    """ Function which utilizes urllib to determine if a special schedule is
-        present for the current date. """
-    now = datetime.now().time()
-    hour, minute, second = now.hour, now.minute, now.second
-    return [hour, minute, second]
-
-def showFromTime( source ):
-    """ Function which uses the current time to determine where to begin
-        fetching train arrival times.
-        Returns: string object
-    """
-    stop_id = stopCodes.index(source)+1
-    now, converted = currentTime(), []
-    for part in now:
-        part = str(part)
-        if len(part) == 1:
-            part = "0"+part
-        converted.append(part)
-    return f"{converted[0]}:{converted[1]}:00"
-
-def route_id( source, destination ):
-    """ Function which determines the route_id based on the source stop_id
-        and the destination stop_id.
-        Returns: int object
-    """
-    sourceID, destinationID = stopCodes.index(source)+1, stopCodes.index(destination)+1
-    if destinationID < sourceID:
-        return 1
-    else: return 2
-
-def service_id():
-    """ Function which utilizes currentWkday() function to determine the service_id
-        based on day of week.
-        Returns: int object
-    """
-    weekday = currentWkday()
-    stdIdx = 0
-    dateCode = ''
-    storage = []
-    filename = join(dirname(__file__), "calendar.txt")
-    # open calendar data and find service_ids
-    f = open(filename, "r")
-    line = f.readline()
-    while line != '':
-        stdIdx = line.index(',')+1
-        dateCode = line[stdIdx:stdIdx+13] # date code
-        if weekday <= 4 and dateCode == '1,1,1,1,1,0,0':
-            storage.append(int(line[:stdIdx-1]))
-        elif weekday == 5 and dateCode == '0,0,0,0,0,1,0':
-            storage.append(int(line[:stdIdx-1]))
-        elif weekday == 6 and dateCode == '0,0,0,0,0,0,1':
-            storage.append(int(line[:stdIdx-1]))
-        line = f.readline()
-    f.close()
-    return storage
-
-def stop_id( source ):
-    """ Function which determines the stop_id based on provided stop name and
-        index relative to stopCodes list.
-        Returns: int object
-    """
-    return stopCodes.index(source)+1
-    
+    def __init__(self, source_id, destination_id):
+        # get data from source
+        self.resp = urlopen("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip")
+        self.zipfile = ZipFile(BytesIO(self.resp.read()))
+        # get weekday index
+        self.weekday = datetime.today().weekday()
+        # initialize variables
+        self.src, self.dsn = stopCodes[source_id-1], stopCodes[destination_id-1]
+        self.stop_id = stopCodes.index(self.src)+1
+        self.src_id = source_id
+        self.dsn_id = destination_id
+        # determine route_id
+        if self.dsn_id < self.src_id: self.route_id = 1
+        else: self.route_id = 2
         
-def trip_id( source, destination ):
-    """ Function which determines the trip_id based on the given route_id and service_id
-        by reading the trips data file.
-        Returns: list object
-    """
-    # initialize variables
-    routeID, serviceIDs = route_id(source, destination), service_id()
-    trips = []
-    filename = join(dirname(__file__), "trips.txt")
+    def time(self):
+        """ Function which utilizes urllib to determine if a special schedule is
+            present for the current date. """
+        now = datetime.now().time()
+        hour, minute, second = now.hour, now.minute, now.second
+        return [hour, minute, second]
 
-    # open trips.txt file as read-only data
-    f = open(filename, "r")
+    def startTime(self):
+        """ Function which uses the current time to determine where to begin
+            fetching train arrival times.
+            Returns: string object
+        """
+        stop_id = stopCodes.index(self.src)+1
+        now, converted = self.time(), []
+        for part in now:
+            part = str(part)
+            if len(part) == 1:
+                part = "0"+part
+            converted.append(part)
+        return f"{converted[0]}:{converted[1]}:00"
 
-    # read data line-by-line and append relevant data to a list
-    line = f.readline()
-    while line != '':
-        for i in serviceIDs:
-            if line[:5] == f"{routeID},{i},":
-                splitLine = line.split(',')
-                trips.append(splitLine[2])
-            line = f.readline()
-    f.close()
-    return trips
-
-def listSchedules( source, destination ):
-    """ Function which utilizes urllib to determine if a special schedule is
-        present for the current date. """
-    source, destination = stopCodes[source], stopCodes[destination]
-    # initialize variables
-    trip_ids, stopID = trip_id(source, destination), stop_id(source)
-    arrivalTime = showFromTime(source)
-
-    # open stop_times dataset and search for arrival times
-    temp, allTimes, result = [], [], []
-    append = False
-    filename = join(dirname(__file__), "stop_times.txt")
-    f = open(filename, "r")
-    line = f.readline()
-    while line != '':
-        for i in trip_ids:
-            if line[:4] == i:
-                temp.append(line)
+    def service_id(self):
+        """ Function which utilizes currentWkday() function to determine the service_id
+            based on day of week.
+            Returns: int object
+        """
+        stdIdx, dateCode, storage = 0, '', []
+        filename = join(dirname(__file__), "calendar.txt")
+        # open calendar data and find service_ids
+        f = open(filename, "r")
         line = f.readline()
-    f.close()
+        while line != '':
+            stdIdx = line.index(',')+1
+            dateCode = line[stdIdx:stdIdx+13] # date code
+            if self.weekday <= 4 and dateCode == '1,1,1,1,1,0,0':
+                storage.append(int(line[:stdIdx-1]))
+            elif self.weekday == 5 and dateCode == '0,0,0,0,0,1,0':
+                storage.append(int(line[:stdIdx-1]))
+            elif self.weekday == 6 and dateCode == '0,0,0,0,0,0,1':
+                storage.append(int(line[:stdIdx-1]))
+            line = f.readline()
+        f.close()
+        return storage
+            
+    def trip_id(self):
+        """ Function which determines the trip_id based on the given route_id and service_id
+            by reading the trips data file.
+            Returns: list object
+        """
+        # initialize variables
+        serviceIDs = self.service_id()
+        trips = []
+        filename = join(dirname(__file__), "trips.txt")
 
-    # extract arrival time from strings
-    for i in temp:
-        if i[23:25] == str(stopID) or i[23] == str(stopID):
-            allTimes.append(i[5:13])
-    # extract arrival times beginning at current time from allTimes
-    for i in allTimes:
-        if int(i[:2]) >= int(arrivalTime[:2]): # check for next train
-            if int(i[3:5]) >= int(arrivalTime[3:5]):
-                append = True
-        if append: # append from next train onward
-            result.append(i)
-    return result
+        # open trips.txt file as read-only data
+        f = open(filename, "r")
 
-def sortedSchedules( schedulesList ):
-    """ Function which sorts list of trip by calling trip_id() and utilizes
-        RADIX sort method to sort arrival times in ascending order.
-    """
-    return sorted(schedulesList)
+        # read data line-by-line and append relevant data to a list
+        line = f.readline()
+        while line != '':
+            for i in serviceIDs:
+                if line[:5] == f"{self.route_id},{i},":
+                    splitLine = line.split(',')
+                    trips.append(splitLine[2])
+                line = f.readline()
+        f.close()
+        return trips
+
+    def listSchedules(self):
+        """ Function which utilizes urllib to determine if a special schedule is
+            present for the current date. """
+        # initialize variables
+        trip_ids = self.trip_id()
+        arrivalTime = self.startTime()
+
+        # open stop_times dataset and search for arrival times
+        temp, allTimes, result = [], [], []
+        append = False
+        filename = join(dirname(__file__), "stop_times.txt")
+        f = open(filename, "r")
+        line = f.readline()
+        while line != '':
+            for i in trip_ids:
+                if line[:4] == i:
+                    temp.append(line)
+            line = f.readline()
+        f.close()
+
+        # extract arrival time from strings
+        for i in temp:
+            if i[23:25] == str(self.stop_id) or i[23] == str(self.stop_id):
+                allTimes.append(i[5:13])
+        # extract arrival times beginning at current time from allTimes
+        for i in allTimes:
+            if int(i[:2]) >= int(arrivalTime[:2]): # check for next train
+                if int(i[3:5]) >= int(arrivalTime[3:5]):
+                    append = True
+            if append: # append from next train onward
+                result.append(i)
+        return result
+
+    def sortedSchedules(self):
+        """ Function which sorts list of trip by calling trip_id() and utilizes
+            RADIX sort method to sort arrival times in ascending order.
+        """
+        return sorted(self.listSchedules())
 
 
 ###   DIRECT CALL   ###
@@ -214,15 +199,17 @@ if __name__ == '__main__':
             print("__________________________\n")
             source = int(input("Enter source ID: "))
             destination = int(input("Enter destination ID: "))
-            beginTime = showFromTime(stopCodes[source-1])
-            direction = route_id(stopCodes[source-1], stopCodes[destination-1])
+            s = Schedules(source, destination)
+            
+            beginTime = s.startTime()
+            direction = s.route_id
             if direction == 1:
                 print(f"Eastbound schedule from {beginTime} selected.")
                 print("__________________________")
             else:
                 print(f"Westbound schedule from {beginTime} selected.")
                 print("__________________________")
-            allSchedules = sortedSchedules(listSchedules(stopCodes[source-1], stopCodes[destination-1]))
+            allSchedules = s.sortedSchedules()
             print(f"Arrival times".center(26))
             for i in allSchedules:
                 print(i)
