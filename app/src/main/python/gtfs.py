@@ -46,7 +46,10 @@ def isSpecial():
     if len(finding1) > 0 or len(finding2) > 0:
         return True
     return False
-    
+
+def forJava(source_id, destination_id):
+    return Schedules(source_id, destination_id).listSchedules()
+
 class Schedules:
     """ Class which utilizes urllib and ZipFile to download the latest
         PortAuthorityTransitCorporation (PATCO) GTFS package.
