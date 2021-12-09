@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_schedules">
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.davidp799.patcotoday.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_schedules"
+        android:name="com.davidp799.patcotoday.ui.schedules.SchedulesFragment"
+        android:label="@string/title_schedules"
+        tools:layout="@layout/fragment_schedules" />
 
     <fragment
         android:id="@+id/navigation_map"
@@ -17,14 +17,14 @@
         tools:layout="@layout/fragment_map" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.davidp799.patcotoday.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
-
-    <fragment
         android:id="@+id/navigation_info"
         android:name="com.davidp799.patcotoday.ui.info.InfoFragment"
         android:label="@string/title_info"
         tools:layout="@layout/fragment_info" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.davidp799.patcotoday.ui.settings.SettingsFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

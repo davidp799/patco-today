@@ -48,7 +48,10 @@ def isSpecial():
     return False
 
 def forJava(source_id, destination_id):
-    return Schedules(source_id, destination_id).listSchedules()
+    """ Function which calls Schedules class and listSchedules() method.
+        Temporary work-around for inability to use classes with chaquopy.
+    """
+    return Schedules(source_id, destination_id).sortedSchedules()
 
 class Schedules:
     """ Class which utilizes urllib and ZipFile to download the latest

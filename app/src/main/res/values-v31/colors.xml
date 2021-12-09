@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="red_200">#FFD11241</color>
+    <color name="red_200">@color/material_dynamic_primary20</color>
     <color name="red_500">#FFD11241</color>
     <color name="red_700">#FFA70E34</color>
     <color name="gold_200">#FFF5CE70</color>
