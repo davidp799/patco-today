@@ -46,9 +46,6 @@ public class SchedulesFragment extends Fragment {
         initPython(); // initialize python3
         View root = binding.getRoot();
 
-        // temporary list object (will contain arrival times)
-        //String[] arrivals = { "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL", "NULL" };
-
         // allow button in action bar
         setHasOptionsMenu(true);
         //public void onClick(Object reverseButton) { Toast.makeText(getActivity(),"REVERSE DIRECTION", Toast.LENGTH_LONG).show(); }

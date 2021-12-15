@@ -10,7 +10,7 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 from os.path import dirname, join
 import re
-
+import math
 # List of stations (trip_id = idx+1)
 stopCodes = ["Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont",
              "Collingswood", "Ferry Avenue", "Broadway", "City Hall", "8th and Market",
@@ -51,16 +51,28 @@ def forJava(source_id, destination_id):
     """ Function which calls Schedules class and listSchedules() method.
         Temporary work-around for inability to use classes with chaquopy.
     """
+    source_id = abs(13 - source_id) # accomodate for selection indexing in app
+    destination_id = abs(13 - destination_id) # ^^^
     return Schedules(source_id, destination_id).sortedSchedules()
 
+def updateFiles():
+        """
+        """
+        resp = urlopen("https://transitfeeds.com/p/patco/533/latest/download")
+        zipfile = ZipFile(BytesIO(resp.read()))
+        zipfile.extractall()
+        
 class Schedules:
     """ Class which utilizes urllib and ZipFile to download the latest
         PortAuthorityTransitCorporation (PATCO) GTFS package.
         Returns: ZipFile object
     """
     def __init__(self, source_id, destination_id):
+        # reference lists
+        self.calCodes = ["1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
+                         "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1"                  ]
         # get data from source
-        self.resp = urlopen("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip")
+        self.resp = urlopen("https://transitfeeds.com/p/patco/533/latest/download")
         self.zipfile = ZipFile(BytesIO(self.resp.read()))
         # get weekday index
         self.weekday = datetime.today().weekday()
@@ -72,6 +84,7 @@ class Schedules:
         # determine route_id
         if self.dsn_id < self.src_id: self.route_id = 1
         else: self.route_id = 2
+        
         
     def time(self):
         """ Function which utilizes urllib to determine if a special schedule is
@@ -98,12 +111,19 @@ class Schedules:
         """ Function which determines the service_id based on day of week.
             Returns: int object
         """
-        if self.weekday <= 4:
-            return 66
-        elif self.weekday == 5:
-            return 67
-        elif self.weekday == 6:
-            return 68
+        result = 0
+        filename = join(dirname(__file__), "calendar.txt")
+
+        # open calendar.txt file as read-only data
+        f = open(filename, "r")
+        # read each line and check for latest service_id
+        line = f.readline()
+        while line != '':
+            c = line.split(",")
+            if f"{c[1]},{c[2]},{c[3]},{c[4]},{c[5]},{c[6]},{c[7]}" == self.calCodes[self.weekday]:
+                result = int(c[0])
+            line = f.readline()            
+        return result
     
     def trip_id(self):
         """ Function which determines the trip_id based on the given route_id and service_id
@@ -150,24 +170,35 @@ class Schedules:
             if i[3] == str(self.stop_id):
                 allTimes.append(i[1])
         # extract arrival times beginning at current time from allTimes
-        # boolean for found begin time
-        minMinute = False
         for i in allTimes:
-            if int(i[:2]) >= int(arrivalTime[:2]): # check for next train
-                #if minMinute == False: # check for trains after current minute // probably wrong
-                    #if int(i[3:5]) >= int(arrivalTime[3:5]):
-                        #minMinute = True
+            # if cur hour and >= cur min-5
+            if int(i[:2]) == int(arrivalTime[:2]) and int(i[3:5]) >= (int(arrivalTime[3:5])-5):
                 result.append(i)
-                #else: result.append(i)
-            #if append: # append from next train onward
-                #result.append(i)
+            # elif > cur hour
+            elif int(i[:2]) > int(arrivalTime[:2]):
+                result.append(i)
         return result
 
     def sortedSchedules(self):
         """ Function which sorts list of trip by calling trip_id() and utilizes
             RADIX sort method to sort arrival times in ascending order.
         """
-        return sorted(self.listSchedules())
+        scheds = self.listSchedules()
+        temp, result = [], []
+        for i in scheds:
+            i = i[:-3]
+            temp.append(i)
+        temp = sorted(temp)
+        for i in temp:
+            i = i.split(":")
+            if int(i[0]) == 12:
+                result.append(f"{i[0]}:{i[1]} PM")
+            elif int(i[0]) > 12:
+                result.append(f"{int(i[0])-12}:{i[1]} PM")
+            else:
+                result.append(f"{i[0]}:{i[1]} AM")
+        return result
+        
 
 
 ###   DIRECT CALL   ###
@@ -195,7 +226,6 @@ if __name__ == '__main__':
             source = int(input("Enter source ID: "))
             destination = int(input("Enter destination ID: "))
             s = Schedules(source, destination)
-            
             beginTime = s.startTime()
             direction = s.route_id
             if direction == 1:
