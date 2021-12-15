@@ -95,49 +95,33 @@ class Schedules:
         return f"{converted[0]}:{converted[1]}:00"
 
     def service_id(self):
-        """ Function which utilizes currentWkday() function to determine the service_id
-            based on day of week.
+        """ Function which determines the service_id based on day of week.
             Returns: int object
         """
-        stdIdx, dateCode, storage = 0, '', []
-        filename = join(dirname(__file__), "calendar.txt")
-        # open calendar data and find service_ids
-        f = open(filename, "r")
-        line = f.readline()
-        while line != '':
-            stdIdx = line.index(',')+1
-            dateCode = line[stdIdx:stdIdx+13] # date code
-            if self.weekday <= 4 and dateCode == '1,1,1,1,1,0,0':
-                storage.append(int(line[:stdIdx-1]))
-            elif self.weekday == 5 and dateCode == '0,0,0,0,0,1,0':
-                storage.append(int(line[:stdIdx-1]))
-            elif self.weekday == 6 and dateCode == '0,0,0,0,0,0,1':
-                storage.append(int(line[:stdIdx-1]))
-            line = f.readline()
-        f.close()
-        return storage
-            
+        if self.weekday <= 4:
+            return 66
+        elif self.weekday == 5:
+            return 67
+        elif self.weekday == 6:
+            return 68
+    
     def trip_id(self):
         """ Function which determines the trip_id based on the given route_id and service_id
             by reading the trips data file.
             Returns: list object
         """
         # initialize variables
-        serviceIDs = self.service_id()
         trips = []
         filename = join(dirname(__file__), "trips.txt")
-
         # open trips.txt file as read-only data
         f = open(filename, "r")
-
         # read data line-by-line and append relevant data to a list
         line = f.readline()
         while line != '':
-            for i in serviceIDs:
-                if line[:5] == f"{self.route_id},{i},":
-                    splitLine = line.split(',')
-                    trips.append(splitLine[2])
-                line = f.readline()
+            current = line.split(",")
+            if current[0] == str(self.route_id) and current[1] == str(self.service_id()):
+                trips.append(int(current[2]))
+            line = f.readline()
         f.close()
         return trips
 
@@ -145,33 +129,38 @@ class Schedules:
         """ Function which utilizes urllib to determine if a special schedule is
             present for the current date. """
         # initialize variables
-        trip_ids = self.trip_id()
         arrivalTime = self.startTime()
+        allTrips = [str(i) for i in self.trip_id()]
 
         # open stop_times dataset and search for arrival times
         temp, allTimes, result = [], [], []
-        append = False
         filename = join(dirname(__file__), "stop_times.txt")
         f = open(filename, "r")
         line = f.readline()
         while line != '':
-            for i in trip_ids:
-                if line[:4] == i:
+            current = line.split(",")
+            if current[0] in allTrips:
                     temp.append(line)
             line = f.readline()
         f.close()
 
         # extract arrival time from strings
         for i in temp:
-            if i[23:25] == str(self.stop_id) or i[23] == str(self.stop_id):
-                allTimes.append(i[5:13])
+            i = i.split(",")
+            if i[3] == str(self.stop_id):
+                allTimes.append(i[1])
         # extract arrival times beginning at current time from allTimes
+        # boolean for found begin time
+        minMinute = False
         for i in allTimes:
             if int(i[:2]) >= int(arrivalTime[:2]): # check for next train
-                if int(i[3:5]) >= int(arrivalTime[3:5]):
-                    append = True
-            if append: # append from next train onward
+                #if minMinute == False: # check for trains after current minute // probably wrong
+                    #if int(i[3:5]) >= int(arrivalTime[3:5]):
+                        #minMinute = True
                 result.append(i)
+                #else: result.append(i)
+            #if append: # append from next train onward
+                #result.append(i)
         return result
 
     def sortedSchedules(self):

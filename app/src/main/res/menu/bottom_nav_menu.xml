@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_home"
+        android:id="@+id/navigation_schedules"
         android:icon="@drawable/ic_schedules_black_24dp"
         android:title="@string/title_schedules" />
 
