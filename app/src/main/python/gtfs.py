@@ -68,12 +68,9 @@ class Schedules:
         Returns: ZipFile object
     """
     def __init__(self, source_id, destination_id):
-        # reference lists
+        # calendar codes
         self.calCodes = ["1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
                          "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1"                  ]
-        # get data from source
-        self.resp = urlopen("https://transitfeeds.com/p/patco/533/latest/download")
-        self.zipfile = ZipFile(BytesIO(self.resp.read()))
         # get weekday index
         self.weekday = datetime.today().weekday()
         # initialize variables

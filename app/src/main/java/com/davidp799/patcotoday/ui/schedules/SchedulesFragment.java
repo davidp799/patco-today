@@ -1,6 +1,7 @@
 package com.davidp799.patcotoday.ui.schedules;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,12 +17,14 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
+import com.davidp799.patcotoday.MainActivity;
 import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -35,6 +38,9 @@ public class SchedulesFragment extends Fragment {
 
     private FragmentSchedulesBinding binding;
 
+    // progress bar
+    private Handler handler = new Handler();
+
     // global variables for arrivals and from and to selections
     int fromSelection, toSelection;
     ArrayList<String> arrivals = new ArrayList<String>();
@@ -46,9 +52,8 @@ public class SchedulesFragment extends Fragment {
         initPython(); // initialize python3
         View root = binding.getRoot();
 
-        // allow button in action bar
+        // allow button in action bar and initialize progress bar
         setHasOptionsMenu(true);
-        //public void onClick(Object reverseButton) { Toast.makeText(getActivity(),"REVERSE DIRECTION", Toast.LENGTH_LONG).show(); }
 
         // from exposed-dropdown-menu
         ArrayList<String> stationsList = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.stations_list)));
@@ -71,6 +76,7 @@ public class SchedulesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toSelection = position;
                 Toast.makeText(getActivity(), stationsList.get(position), Toast.LENGTH_LONG).show();
+                // populate list
                 List<PyObject> travelTimes = listSchedules(fromSelection, toSelection).asList();
                 // populate list from pyObject listSchedules
                 for (int i=0; i<travelTimes.size(); i++) {
@@ -87,11 +93,10 @@ public class SchedulesFragment extends Fragment {
                 arrivalTimes.setAdapter(arrivalsGeneralAdapter);
             }
         });
-
         // Initialize Bottom Sheet Parameters
         LinearLayout mBottomSheetLayout = root.findViewById(R.id.bottom_sheet_layout);
         BottomSheetBehavior<LinearLayout> sheetBehavior;
-        ImageView header_Arrow_Image;
+        ImageView header_Arrow_Image; // header arrow
         sheetBehavior = BottomSheetBehavior.from(mBottomSheetLayout);
         header_Arrow_Image = root.findViewById(R.id.bottom_sheet_arrow);
         // Header arrow implementation for bottom sheet
@@ -105,7 +110,6 @@ public class SchedulesFragment extends Fragment {
                 }
             }
         });
-
         // Implement bottom sheet call
         sheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -116,14 +120,14 @@ public class SchedulesFragment extends Fragment {
                 header_Arrow_Image.setRotation(slideOffset * 180);
             }
         });
-        // Determine if special schedule is present for current date
-        if (!internetIsConnected()) {
+        // Check for internet connection
+        if (MainActivity.Global.internet == false) {
             Toast.makeText(getActivity(),
-                    "Unable to Check for Special Schedules!\n          NO INTERNET CONNECTION",
+                    "Unable to Check for Special Schedules!\nNO INTERNET CONNECTION",
                     Toast.LENGTH_LONG).show();
             sheetBehavior.setPeekHeight(0);
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        } else if (internetIsConnected()) {
+        } else if (MainActivity.Global.internet == true) {
             boolean specialSchedule = isSpecial();
             // Initialize web view for bottom sheet
             WebView webView = (WebView) root.findViewById(R.id.webview);
@@ -131,38 +135,19 @@ public class SchedulesFragment extends Fragment {
             webSettings.setBuiltInZoomControls(true);
             webSettings.setDisplayZoomControls(false);
             webView.loadUrl("http://www.ridepatco.org/schedules/schedules.asp");
-
             if (!specialSchedule) {
                 sheetBehavior.setPeekHeight(0);
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
-
         }
-
-
         return root;
-    }
-
-
-    public boolean internetIsConnected() {
-        try {
-            String command = "ping -c 1 google.com";
-            return (Runtime.getRuntime().exec(command).waitFor() == 0);
-        } catch (Exception e) {
-            return false;
-        }
     }
     // Callable function to initialize python3
     private void initPython() {
         if (!Python.isStarted()) { Python.start(new AndroidPlatform(getActivity())); }
     }
-
     // Python functions: check for internet connection, special schedule, and list schedules
-    private boolean isInternetConnected() {
-        Python python = Python.getInstance();
-        PyObject pythonFile = python.getModule("gtfs");
-        return pythonFile.callAttr("isInternetConnected").toBoolean();
-    } private boolean isSpecial() {
+    private boolean isSpecial() {
         Python python = Python.getInstance();
         PyObject pythonFile = python.getModule("gtfs");
         return pythonFile.callAttr("isSpecial").toBoolean();
@@ -187,11 +172,16 @@ public class SchedulesFragment extends Fragment {
             int temp = fromSelection;
             fromSelection = toSelection;
             toSelection = temp;
+            List<PyObject> travelTimes = listSchedules(fromSelection, toSelection).asList();
+            // populate list from pyObject listSchedules
+            for (int i=0; i<travelTimes.size(); i++) {
+                String res = travelTimes.get(i).toJava(String.class);
+                arrivals.add(res);
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
