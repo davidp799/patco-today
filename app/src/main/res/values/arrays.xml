@@ -1,12 +1,26 @@
 <resources>
-    <!-- Reply Preference -->
-    <string-array name="reply_entries">
-        <item>Reply</item>
-        <item>Reply to all</item>
+    <!-- Preferences -->
+    <string-array name="pref_default_source_entries">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Follow device theme</item>
     </string-array>
 
-    <string-array name="reply_values">
-        <item>reply</item>
-        <item>reply_all</item>
+    <string-array name="pref_default_source_values">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Follow device theme</item>
+    </string-array>
+
+    <string-array name="pref_default_destination_entries">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Follow device theme</item>
+    </string-array>
+
+    <string-array name="pref_default_destination_values">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Follow device theme</item>
     </string-array>
 </resources>

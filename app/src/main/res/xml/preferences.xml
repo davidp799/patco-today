@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="Display">
+        <ListPreference
+            android:key="list_prefs"
+            android:title="Choose Theme"
+            android:entries="@array/pref_themeOptions_entries"
+            android:entryValues="@array/pref_themeOptions_values"
+            app:defaultValue="DEFAULT"
+            android:summary="%s"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Travel">
+        <ListPreference
+            android:key="default_source"
+            android:title="Source Station"
+            android:entries="@array/stations_list"
+            android:entryValues="@array/stations_list"
+            app:defaultValue="Lindenwold"
+            android:summary="%s"/>
+        <ListPreference
+            android:key="default_dest"
+            android:title="Destination Station"
+            android:entries="@array/stations_list"
+            android:entryValues="@array/stations_list"
+            app:defaultValue="15/16th &amp; Locust"
+            android:summary="%s"/>
+        <Preference
+            android:key="pref_commuter"
+            android:title="Commuter Mode"
+            android:summary="Automatically reverse travel direction">
+
+        </Preference>
+
+        <Preference
+            android:key="pref_notifications"
+            android:title="Arrival Notifications"
+            android:summary="Set train notifications">
+        </Preference>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="More">
+        <Preference
+            android:title="@string/pref_title_feedback"
+            android:summary="@string/pref_summary_feedback">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="mailto:david.r.pape@gmail.com">
+                <extra
+                    android:name="android.intent.extra.SUBJECT"
+                    android:value="Feedback"/>
+                <extra
+                    android:name="android.intent.extra.TEXT"
+                    android:value="Text of Feedback"/>
+            </intent>
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Temporary Items">
+        <CheckBoxPreference
+            android:key="theme_prefs"
+            android:title="Checkbox"
+            android:summary="@string/pref_theme_summary"
+            android:defaultValue="true"/>
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="switch_preference_1"
+            android:title="Switch preference" />
+        <EditTextPreference
+            android:defaultValue="Default value"
+            android:key="edit_text_preference_1"
+            android:icon="@drawable/ic_short_text_24"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Edit text preference" />
+        <SeekBarPreference
+            android:key="pref_seekbar"
+            android:title="SeekBar Preference" />
+        <MultiSelectListPreference
+            android:key="pref_multiselect"
+            android:title="MultiSelect List"
+            android:entries="@array/stations_list"
+            android:entryValues="@array/stations_list"
+            app:defaultValue="15/16th &amp; Locust"
+            android:summary="Hehe Multiple Options"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

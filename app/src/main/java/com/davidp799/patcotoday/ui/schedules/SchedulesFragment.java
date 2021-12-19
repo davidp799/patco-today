@@ -123,7 +123,7 @@ public class SchedulesFragment extends Fragment {
         // Check for internet connection
         if (MainActivity.Global.internet == false) {
             Toast.makeText(getActivity(),
-                    "Unable to Check for Special Schedules!\nNO INTERNET CONNECTION",
+                    "NO INTERNET CONNECTION",
                     Toast.LENGTH_LONG).show();
             sheetBehavior.setPeekHeight(0);
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);

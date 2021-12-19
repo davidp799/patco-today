@@ -174,7 +174,7 @@ class Schedules:
             # elif > cur hour
             elif int(i[:2]) > int(arrivalTime[:2]):
                 result.append(i)
-        return result
+        return allTimes # show all times for now
 
     def sortedSchedules(self):
         """ Function which sorts list of trip by calling trip_id() and utilizes

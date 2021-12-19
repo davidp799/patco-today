@@ -1,6 +1,7 @@
 package com.davidp799.patcotoday;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
     public static boolean internetIsConnected() {
         try {
             String command = "ping -c 1 www.ridepatco.org";
@@ -71,11 +73,13 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.your_item_id) {
-            Toast.makeText(this, "SETTINGS HAHA", Toast.LENGTH_LONG).show();
-            return true;
+        switch (item.getItemId()) {
+            case R.id.settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
     public static class Global {
         public static boolean internet = internetIsConnected();
