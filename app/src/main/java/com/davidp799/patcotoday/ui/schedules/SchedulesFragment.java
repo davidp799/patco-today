@@ -29,9 +29,13 @@ import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 public class SchedulesFragment extends Fragment {
@@ -64,7 +68,7 @@ public class SchedulesFragment extends Fragment {
             @Override // save from selection as variable
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 fromSelection = position;
-                Toast.makeText(getActivity(), stationsList.get(position), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getActivity(), stationsList.get(position), Toast.LENGTH_LONG).show();
             }
         });
         // to exposed-dropdown-menu
@@ -75,7 +79,7 @@ public class SchedulesFragment extends Fragment {
             @Override // save to selection as variable
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toSelection = position;
-                Toast.makeText(getActivity(), stationsList.get(position), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getActivity(), stationsList.get(position), Toast.LENGTH_LONG).show();
                 // populate list
                 List<PyObject> travelTimes = listSchedules(fromSelection, toSelection).asList();
                 // populate list from pyObject listSchedules
@@ -91,6 +95,30 @@ public class SchedulesFragment extends Fragment {
                         arrivals
                 );
                 arrivalTimes.setAdapter(arrivalsGeneralAdapter);
+
+                // scroll to next train PARTIALLY FUNCTIONAL
+                Date date = new Date() ;
+                SimpleDateFormat dateFormat = new SimpleDateFormat("h:mm aa") ;
+                dateFormat.format(date);
+                System.out.println(dateFormat.format(date));
+
+                int value = 0;
+                for (int i = 0; i < arrivalTimes.getCount(); i++) {
+                    String v = String.valueOf(travelTimes.get(i));
+                    try {
+                        if ((dateFormat.parse(dateFormat.format(date)).equals(dateFormat.parse(v)))) { // curTime == varTime
+                            break;
+                        } if (dateFormat.parse(dateFormat.format(date)).before(dateFormat.parse(v))) { // curTime < varTime
+                            break;
+                        }
+                        value = i+1;
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                arrivalTimes.smoothScrollToPositionFromTop(value,0,10);
+                arrivalTimes.setSelection(value);
+                Toast.makeText(getActivity(), String.format("Next train arrives at %s", arrivalTimes.getItemAtPosition(value).toString()), Toast.LENGTH_LONG).show(); //debug
             }
         });
         // Initialize Bottom Sheet Parameters

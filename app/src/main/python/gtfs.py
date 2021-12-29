@@ -197,7 +197,6 @@ class Schedules:
             else:
                 result.append(f"{int(i[0])}:{i[1]} AM")
         return result
-        
 
 
 ###   DIRECT CALL   ###
