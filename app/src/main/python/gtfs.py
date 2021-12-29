@@ -190,10 +190,12 @@ class Schedules:
             i = i.split(":")
             if int(i[0]) == 12:
                 result.append(f"{i[0]}:{i[1]} PM")
+            elif i[0] == "00":
+                result.append(f"12:{i[1]} AM")
             elif int(i[0]) > 12:
                 result.append(f"{int(i[0])-12}:{i[1]} PM")
             else:
-                result.append(f"{i[0]}:{i[1]} AM")
+                result.append(f"{int(i[0])}:{i[1]} AM")
         return result
         
 
