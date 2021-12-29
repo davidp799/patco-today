@@ -18,10 +18,16 @@ import android.widget.Toast;
 
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
+import com.davidp799.patcotoday.ui.info.InfoFragment;
+import com.davidp799.patcotoday.ui.map.MapFragment;
+import com.davidp799.patcotoday.ui.schedules.SchedulesFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -34,6 +40,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    int position;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,16 +54,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
-
-
 
     }
 
@@ -76,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
+                overridePendingTransition(R.anim.slide_out_bottom, R.anim.slide_in_bottom);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -83,8 +91,6 @@ public class MainActivity extends AppCompatActivity {
     }
     public static class Global {
         public static boolean internet = internetIsConnected();
-        //public String svar1, svar2;
-        //public int[] myarray1 = new int[10];
     }
 
 }

@@ -1,5 +1,6 @@
 package com.davidp799.patcotoday.ui.schedules;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -55,9 +56,48 @@ public class SchedulesFragment extends Fragment {
         binding = FragmentSchedulesBinding.inflate(inflater, container, false);
         initPython(); // initialize python3
         View root = binding.getRoot();
-
-        // allow button in action bar and initialize progress bar
         setHasOptionsMenu(true);
+
+        /// . . . List View START . . . ///
+        ListView arrivalTimes = (ListView) root.findViewById(R.id.arrivalTimes); // init arrivals listview
+        ArrayAdapter<String> arrivalsGeneralAdapter = new ArrayAdapter<>(
+                getActivity(),
+                android.R.layout.simple_list_item_1,
+                arrivals
+        );
+        arrivalTimes.setAdapter(arrivalsGeneralAdapter);
+
+        List<PyObject> travelTimes = listSchedules(fromSelection, toSelection).asList(); // populate list
+        // populate list from pyObject listSchedules
+        for (int i=0; i<travelTimes.size(); i++) {
+            String res = travelTimes.get(i).toJava(String.class);
+            arrivals.add(res);
+        }
+
+        // scroll to next train PARTIALLY FUNCTIONAL
+        Date date = new Date() ;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("h:mm aa") ;
+        dateFormat.format(date);
+        System.out.println(dateFormat.format(date));
+
+        int value = 0;
+        for (int i = 0; i < arrivalTimes.getCount(); i++) {
+            String v = String.valueOf(travelTimes.get(i));
+            try {
+                if ((dateFormat.parse(dateFormat.format(date)).equals(dateFormat.parse(v)))) { // curTime == varTime
+                    break;
+                } if (dateFormat.parse(dateFormat.format(date)).before(dateFormat.parse(v))) { // curTime < varTime
+                    break;
+                } value = i+1;
+            } catch (ParseException e) { e.printStackTrace(); }
+        }
+        arrivalTimes.smoothScrollToPositionFromTop(value,0,10);
+        arrivalTimes.setSelection(value);
+        Toast.makeText(getActivity(), String.format("Next train arrives at %s", arrivalTimes.getItemAtPosition(value).toString()), Toast.LENGTH_LONG).show(); //debug
+        /// . . . List View END . . . ///
+
+
+
 
         // from exposed-dropdown-menu
         ArrayList<String> stationsList = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.stations_list)));
@@ -68,7 +108,7 @@ public class SchedulesFragment extends Fragment {
             @Override // save from selection as variable
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 fromSelection = position;
-                //Toast.makeText(getActivity(), stationsList.get(position), Toast.LENGTH_LONG).show();
+                arrivalsGeneralAdapter.notifyDataSetChanged();
             }
         });
         // to exposed-dropdown-menu
@@ -79,22 +119,21 @@ public class SchedulesFragment extends Fragment {
             @Override // save to selection as variable
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toSelection = position;
-                //Toast.makeText(getActivity(), stationsList.get(position), Toast.LENGTH_LONG).show();
-                // populate list
-                List<PyObject> travelTimes = listSchedules(fromSelection, toSelection).asList();
-                // populate list from pyObject listSchedules
-                for (int i=0; i<travelTimes.size(); i++) {
-                    String res = travelTimes.get(i).toJava(String.class);
-                    arrivals.add(res);
-                }
-                // arrivals ListView
-                ListView arrivalTimes = (ListView) root.findViewById(R.id.arrivalTimes);
+                /// . . . List View START . . . ///
+                ListView arrivalTimes = (ListView) root.findViewById(R.id.arrivalTimes); // init arrivals listview
                 ArrayAdapter<String> arrivalsGeneralAdapter = new ArrayAdapter<>(
                         getActivity(),
                         android.R.layout.simple_list_item_1,
                         arrivals
                 );
                 arrivalTimes.setAdapter(arrivalsGeneralAdapter);
+
+                List<PyObject> travelTimes = listSchedules(fromSelection, toSelection).asList(); // populate list
+                // populate list from pyObject listSchedules
+                for (int i=0; i<travelTimes.size(); i++) {
+                    String res = travelTimes.get(i).toJava(String.class);
+                    arrivals.add(res);
+                }
 
                 // scroll to next train PARTIALLY FUNCTIONAL
                 Date date = new Date() ;
@@ -110,17 +149,20 @@ public class SchedulesFragment extends Fragment {
                             break;
                         } if (dateFormat.parse(dateFormat.format(date)).before(dateFormat.parse(v))) { // curTime < varTime
                             break;
-                        }
-                        value = i+1;
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+                        } value = i+1;
+                    } catch (ParseException e) { e.printStackTrace(); }
                 }
                 arrivalTimes.smoothScrollToPositionFromTop(value,0,10);
                 arrivalTimes.setSelection(value);
                 Toast.makeText(getActivity(), String.format("Next train arrives at %s", arrivalTimes.getItemAtPosition(value).toString()), Toast.LENGTH_LONG).show(); //debug
+                /// . . . List View END . . . ///
+                arrivalsGeneralAdapter.notifyDataSetChanged();
             }
         });
+
+
+
+
         // Initialize Bottom Sheet Parameters
         LinearLayout mBottomSheetLayout = root.findViewById(R.id.bottom_sheet_layout);
         BottomSheetBehavior<LinearLayout> sheetBehavior;

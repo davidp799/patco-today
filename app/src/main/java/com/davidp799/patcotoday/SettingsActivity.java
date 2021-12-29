@@ -37,6 +37,7 @@ public class SettingsActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.slide_out_bottom, R.anim.slide_in_bottom);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
