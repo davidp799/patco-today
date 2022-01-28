@@ -23,8 +23,8 @@
         <item>Woodcrest</item>
         <item>Ashland</item>
         <item>Lindenwold</item>
-
     </string-array>
+
     <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Settings Preferences -->

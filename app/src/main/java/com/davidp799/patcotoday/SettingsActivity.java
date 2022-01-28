@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.google.android.material.transition.MaterialFadeThrough;
+
 public class SettingsActivity extends AppCompatActivity {
 
     @Override
@@ -22,6 +24,8 @@ public class SettingsActivity extends AppCompatActivity {
         // action bar: back button, title
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle("Settings");
+        getSupportActionBar().setElevation(0);
+
 
         if(findViewById(R.id.settings_fragment_container) != null) {
             if(savedInstanceState != null) {
@@ -37,7 +41,6 @@ public class SettingsActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
-                overridePendingTransition(R.anim.slide_out_bottom, R.anim.slide_in_bottom);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

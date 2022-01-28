@@ -2,19 +2,17 @@
     <!-- Base application theme. -->
     <style name="Theme.PATCOToday" parent="Theme.Material3.DayNight">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/material_dynamic_primary80</item>
-        <item name="colorPrimaryVariant">@color/material_dynamic_primary30</item>
-        <item name="colorOnPrimary">@color/material_dynamic_primary90</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/material_dynamic_secondary80</item>
-        <item name="colorSecondaryVariant">@color/material_dynamic_secondary30</item>
-        <item name="colorOnSecondary">@color/material_dynamic_secondary20</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/useMaterialThemeColors</item>
-        <!-- Navigation bar color. -->
-        <item name="android:navigationBarColor" tools:targetApi="l">?attr/useMaterialThemeColors</item>
+        <item name="colorPrimary">@color/material_dynamic_primary60</item>
+        <item name="colorOnPrimary">@color/material_dynamic_primary40</item>
+        <item name="colorSecondary">@color/material_dynamic_secondary60</item>
+        <item name="colorOnSecondary">@color/material_dynamic_secondary40</item>
+        <item name="colorTertiary">@color/material_dynamic_tertiary60</item>
+        <item name="colorOnTertiary">@color/material_dynamic_tertiary40</item>
         <!-- Customize your theme here. -->
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <item name="android:statusBarColor">@color/material_dynamic_primary0</item>
+        <item name="android:navigationBarColor">@color/material_dynamic_primary0</item>
+        <!-- Custom Splash Screen -->
     </style>
 
     <style name="AppBottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">

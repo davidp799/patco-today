@@ -51,12 +51,11 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <ListView
-        android:id="@+id/arrivalTimes"
+        android:id="@+id/arrivalsListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="76dp"
         android:layout_marginBottom="76dp">
-
     </ListView>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

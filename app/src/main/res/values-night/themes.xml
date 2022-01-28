@@ -2,15 +2,7 @@
     <!-- Base application theme. -->
     <style name="Theme.PATCOToday" parent="Theme.Material3.DayNight">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/red_500</item>
-        <item name="colorPrimaryVariant">@color/red_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/gold_200</item>
-        <item name="colorSecondaryVariant">@color/gold_200</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/useMaterialThemeColors</item>
+
         <!-- Navigation bar color. -->
         <item name="android:navigationBarColor" tools:targetApi="l">?attr/useMaterialThemeColors</item>
         <!-- Customize your theme here. -->

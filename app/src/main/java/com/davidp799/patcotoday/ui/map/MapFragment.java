@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.databinding.FragmentMapBinding;
+import com.google.android.material.transition.MaterialFadeThrough;
 
 public class MapFragment extends Fragment {
 
@@ -46,6 +47,8 @@ public class MapFragment extends Fragment {
 
         binding = FragmentMapBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        setEnterTransition(new MaterialFadeThrough());
+
 
         // image view lineMap
         ImageView image = (ImageView) root.findViewById(R.id.lineMap);
@@ -62,7 +65,7 @@ public class MapFragment extends Fragment {
                 android.R.layout.simple_list_item_1,
                 stationsList
         );
-
+        stationsMap.setTransitionGroup(true);
         stationsMap.setAdapter(listGeneralAdapter);
         stationsMap.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
