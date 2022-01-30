@@ -5,7 +5,7 @@
     <PreferenceCategory
         android:title="Display">
         <ListPreference
-            android:key="list_prefs"
+            android:key="deviceTheme"
             android:title="Choose Theme"
             android:entries="@array/pref_themeOptions_entries"
             android:entryValues="@array/pref_themeOptions_values"
@@ -17,14 +17,14 @@
         android:title="Travel">
         <ListPreference
             android:key="default_source"
-            android:title="Source Station"
+            android:title="Default Source Station"
             android:entries="@array/stations_list"
             android:entryValues="@array/stations_list"
             app:defaultValue="Lindenwold"
             android:summary="%s"/>
         <ListPreference
             android:key="default_dest"
-            android:title="Destination Station"
+            android:title="Default Destination Station"
             android:entries="@array/stations_list"
             android:entryValues="@array/stations_list"
             app:defaultValue="15/16th &amp; Locust"
@@ -90,6 +90,15 @@
             android:entryValues="@array/stations_list"
             app:defaultValue="15/16th &amp; Locust"
             android:summary="Hehe Multiple Options"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Other">
+        <Preference
+            android:title="@string/pref_title_about"
+            android:summary="@string/pref_summary_about">
+
+        </Preference>
     </PreferenceCategory>
 
 </PreferenceScreen>

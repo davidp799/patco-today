@@ -74,7 +74,7 @@ public class Schedules {
                 List c = Arrays.asList(line.split(",", 16));
                 String str = String.format("%s,%s,%s,%s,%s,%s,%s", c.get(1),c.get(2),c.get(3),
                                            c.get(4), c.get(5),c.get(6),c.get(7));
-                if (str.equals(calCodes.get(weekday))) {
+                if (str.equals(calCodes.get(weekday-1))) {
                     result = Integer.parseInt(String.valueOf(c.get(0)));
                 } line = reader.readLine();
             } reader.close();

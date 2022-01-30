@@ -35,6 +35,10 @@
     <string name="pref_sys">Follow device theme</string>
     <string name="pref_title_feedback">Send App Feedback</string>
     <string name="pref_summary_feedback">Email developer</string>
+    <string name="pref_title_about">Application Version</string>
+    <string name="pref_summary_about">1.0</string>
+
+
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>

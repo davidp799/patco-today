@@ -1,10 +1,15 @@
 package com.davidp799.patcotoday.ui.schedules;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +17,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.AdapterView;
@@ -63,15 +70,16 @@ public class SchedulesFragment extends Fragment {
     // BINDING //
     private FragmentSchedulesBinding binding;
     // LIST VIEW DEFAULT VALUES //
+
     private int fromSelection=1, toSelection=11;
     private Schedules schedules = new Schedules();
     private ArrayList<String> arrivals = schedules.main(fromSelection, toSelection);
     // BACKGROUND THREAD VALUES //
     private Document doc;
-    private boolean internet;
-    private boolean special;
-    private boolean downloaded;
-    private boolean extracted;
+    private volatile boolean internet;
+    private static boolean special;
+    private static boolean downloaded;
+    private static boolean extracted;
     // BEGIN HANDLERS //
     Handler downloadHandler = new Handler() {
         @Override
@@ -126,6 +134,7 @@ public class SchedulesFragment extends Fragment {
         // DOWNLOAD ZIP //
         File fileDir = new File("/data/data/" + getActivity().getPackageName() + "/files/gtfs");
         fileDir.mkdirs();
+        checkInternet(getView());
         // http://transitfeeds.com/p/patco/533/latest/download
         downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip",
                 "/data/data/" + getActivity().getPackageName() + "/files/gtfs/gtfs.zip");
@@ -288,6 +297,7 @@ public class SchedulesFragment extends Fragment {
             } else {
                 Toast.makeText(getActivity(), "Now Going: Eastbound", Toast.LENGTH_LONG).show();
             }
+            Toast.makeText(getActivity(), String.valueOf(internet), Toast.LENGTH_LONG).show();
             int temp = fromSelection;
             fromSelection = toSelection;
             toSelection = temp;
