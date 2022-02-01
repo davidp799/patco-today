@@ -60,44 +60,25 @@
                     android:value="Text of Feedback"/>
             </intent>
         </Preference>
-    </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="Temporary Items">
-        <CheckBoxPreference
-            android:key="theme_prefs"
-            android:title="Checkbox"
-            android:summary="@string/pref_theme_summary"
-            android:defaultValue="true"/>
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="switch_preference_1"
-            android:title="Switch preference" />
-        <EditTextPreference
-            android:defaultValue="Default value"
-            android:key="edit_text_preference_1"
-            android:icon="@drawable/ic_short_text_24"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="Edit text preference" />
-        <SeekBarPreference
-            android:key="pref_seekbar"
-            android:title="SeekBar Preference" />
-        <MultiSelectListPreference
-            android:key="pref_multiselect"
-            android:title="MultiSelect List"
-            android:entries="@array/stations_list"
-            android:entryValues="@array/stations_list"
-            app:defaultValue="15/16th &amp; Locust"
-            android:summary="Hehe Multiple Options"/>
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="Other">
         <Preference
-            android:title="@string/pref_title_about"
-            android:summary="@string/pref_summary_about">
+            android:key="check_updates"
+            android:title="@string/pref_title_updates"
+            android:summary="@string/pref_summary_updates">
+        </Preference>
+    </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="About">
+        <Preference
+            android:title="@string/pref_title_version"
+            android:summary="@string/pref_summary_version">
+        </Preference>
+
+        <Preference
+            android:key="open_licenses"
+            android:title="@string/pref_title_licenses"
+            android:summary="@string/pref_summary_licenses">
         </Preference>
     </PreferenceCategory>
 

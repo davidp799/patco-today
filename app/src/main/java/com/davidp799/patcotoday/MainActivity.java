@@ -62,24 +62,36 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         // Set Status bar & Navigation bar Colors //
-        int nightModeFlags =
-                this.getResources().getConfiguration().uiMode &
-                        Configuration.UI_MODE_NIGHT_MASK;
-        Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        switch (nightModeFlags) {
-            case Configuration.UI_MODE_NIGHT_YES:
-                window.setStatusBarColor(this.getResources().getColor(R.color.material_dynamic_neutral_variant10));
-                window.setNavigationBarColor(this.getResources().getColor(R.color.material_dynamic_neutral_variant10));
-                break;
-            case Configuration.UI_MODE_NIGHT_NO:
-                window.setStatusBarColor(this.getResources().getColor(R.color.material_dynamic_primary95));
-                window.setNavigationBarColor(this.getResources().getColor(R.color.material_dynamic_primary95));
-                break;
-            case Configuration.UI_MODE_NIGHT_UNDEFINED:
-                break;
+        if (Build.VERSION.SDK_INT >= 21) {
+            int nightModeFlags =
+                    this.getResources().getConfiguration().uiMode &
+                            Configuration.UI_MODE_NIGHT_MASK;
+            Window window = this.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            switch (nightModeFlags) {
+                case Configuration.UI_MODE_NIGHT_YES:
+                    if (Build.VERSION.SDK_INT >= 31) {
+                        window.setStatusBarColor(this.getResources().getColor(R.color.material_dynamic_neutral_variant10, getTheme()));
+                        window.setNavigationBarColor(this.getResources().getColor(R.color.material_dynamic_neutral_variant10, getTheme()));
+
+                    } else {
+                        window.setStatusBarColor(this.getResources().getColor(R.color.blackish));
+                        window.setNavigationBarColor(this.getResources().getColor(R.color.blackish));
+                    } break;
+                case Configuration.UI_MODE_NIGHT_NO:
+                    if (Build.VERSION.SDK_INT >= 31) {
+                        window.setStatusBarColor(this.getResources().getColor(R.color.material_dynamic_primary95, getTheme()));
+                        window.setNavigationBarColor(this.getResources().getColor(R.color.material_dynamic_primary95, getTheme()));
+                    } else {
+                        window.setStatusBarColor(this.getResources().getColor(R.color.blackish));
+                        window.setNavigationBarColor(this.getResources().getColor(R.color.blackish));
+                    } break;
+                case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                    break;
+            }
         }
+
         // Bottom Navigation View //
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(

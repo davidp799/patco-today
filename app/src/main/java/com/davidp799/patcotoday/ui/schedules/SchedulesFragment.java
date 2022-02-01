@@ -1,15 +1,11 @@
 package com.davidp799.patcotoday.ui.schedules;
 
-import static android.content.Context.MODE_PRIVATE;
-
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,23 +13,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.Schedules;
@@ -46,11 +36,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,27 +58,30 @@ public class SchedulesFragment extends Fragment {
     // BINDING //
     private FragmentSchedulesBinding binding;
     // LIST VIEW DEFAULT VALUES //
+    private ListView myListView;
 
-    private int fromSelection=1, toSelection=11;
+    private int fromSelection, toSelection;
     private Schedules schedules = new Schedules();
-    private ArrayList<String> arrivals = schedules.main(fromSelection, toSelection);
     // BACKGROUND THREAD VALUES //
     private Document doc;
     private volatile boolean internet;
     private static boolean special;
     private static boolean downloaded;
     private static boolean extracted;
+    // Files List //
+    private List<String> dataFiles = Arrays.asList( "agency.txt", "calendar.txt", "calendar_dates.txt", "fare_attributes.txt", "fare_rules.txt",
+            "feed_info.txt", "frequencies.txt", "routes.txt", "shapes.txt", "stop_times.txt", "stops.txt", "transfers.txt", "trips.txt" );
     // BEGIN HANDLERS //
-    Handler downloadHandler = new Handler() {
+    Handler downloadHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             Bundle downloadBundle = msg.getData();
             boolean myMessage = downloadBundle.getBoolean("MSG_KEY");
 
-            downloaded = msg.getData().getBoolean("MSG_KEY");
+            downloaded = myMessage;
         }
-    }; Handler extractHandler = new Handler() {
+    }; Handler extractHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -99,10 +90,10 @@ public class SchedulesFragment extends Fragment {
 
             extracted = msg.getData().getBoolean("MSG_KEY");
             if (extracted) {
-                Toast.makeText(getActivity(), String.format("Files up to Date", extracted), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Files up to Date", Toast.LENGTH_SHORT).show();
             }
         }
-    }; Handler internetHandler = new Handler() {
+    }; Handler internetHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -110,9 +101,8 @@ public class SchedulesFragment extends Fragment {
             boolean myMessage = internetBundle.getBoolean("MSG_KEY");
 
             internet = msg.getData().getBoolean("MSG_KEY");
-            Toast.makeText(getActivity(), String.format("Internet: %s", internet), Toast.LENGTH_SHORT).show();
         }
-    }; Handler specialHandler = new Handler() {
+    }; Handler specialHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -127,115 +117,141 @@ public class SchedulesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentSchedulesBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        // UI Options //
         setHasOptionsMenu(true);
         setEnterTransition(new MaterialFadeThrough());
-        // BACKGROUND THREAD //
-        //
-        // DOWNLOAD ZIP //
-        File fileDir = new File("/data/data/" + getActivity().getPackageName() + "/files/gtfs");
+        // Download Background Thread //
+        File fileDir = new File("/data/data/com.davidp799.patcotoday/files/data/");
         fileDir.mkdirs();
         checkInternet(getView());
         // http://transitfeeds.com/p/patco/533/latest/download
-        downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip",
-                "/data/data/" + getActivity().getPackageName() + "/files/gtfs/gtfs.zip");
-        // EXTRACT ZIP //
-        extractZip("/data/data/" + getActivity().getPackageName() + "/files/gtfs/gtfs.zip");
-        if (extracted) {
-            Toast.makeText(getContext(), "Files up to Date", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getContext(), "Unable to Update Files", Toast.LENGTH_SHORT).show();
+        // Check for data files // ?put in background thread?
+        int notFound = 0;
+        for (String fileName : dataFiles) {
+            File tempFile = new File(String.format("/data/data/com.davidp799.patcotoday/files/data/"+fileName));
+            if (!tempFile.exists()) {
+                notFound++;
+            }
+        } if (notFound > 0) { // DEBUG REMOVE WHEN FINISHED
+            Toast.makeText(getActivity(), String.format("Files Not Found: %s", notFound), Toast.LENGTH_SHORT).show();
+            downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip",
+                    "/data/data/" + getActivity().getPackageName() + "/files/data/gtfs.zip");
+            // EXTRACT ZIP //
+            extractZip("/data/data/" + getActivity().getPackageName() + "/files/data/gtfs.zip");
+            if (extracted) {
+                Toast.makeText(getContext(), "Files up to Date", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Unable to Update Files", Toast.LENGTH_SHORT).show();
+            }
         }
-        //
-        // LIST VIEW
-        ListView arrivalsListView = (ListView) root.findViewById(R.id.arrivalsListView);
-        ArrayAdapter<String> arrivalsGeneralAdapter = new ArrayAdapter<>( getActivity(), android.R.layout.simple_list_item_1, arrivals );
-        arrivalsListView.setAdapter(arrivalsGeneralAdapter);
-        ArrayList<String> travelTimes = schedules.main(fromSelection, toSelection); // populate list
-        // populate list from pyObject listSchedules
-        arrivals.addAll(travelTimes);
-        // scroll to next train PARTIALLY FUNCTIONAL
+        // array list //
+        ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);
+        // list view //
+        ListView myListView = root.findViewById(R.id.arrivalsListView);
+        ArrayAdapter<String> myGeneralAdapter = new ArrayAdapter<String>(
+                getContext(), android.R.layout.simple_list_item_1, myArrayList);
+        myListView.setAdapter(myGeneralAdapter);
+        myListView.setTransitionGroup(true);
+        // scroll to next train //
         Date date = new Date() ;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("h:mm aa") ;
-        dateFormat.format(date);
-        //
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa") ;
+        timeFormat.format(date);
         int value = 0;
-        for (int i = 0; i < arrivalsListView.getCount(); i++) {
-            String v = String.valueOf(travelTimes.get(i));
+        for (int i = 0; i < myListView.getCount(); i++) {
+            String v = String.valueOf(myArrayList.get(i));
             try {
-                if ((dateFormat.parse(dateFormat.format(date)).equals(dateFormat.parse(v)))) { // curTime == varTime
+                if ((timeFormat.parse(timeFormat.format(date)).equals(timeFormat.parse(v)))) { // curTime == varTime
                     break;
-                } if (dateFormat.parse(dateFormat.format(date)).before(dateFormat.parse(v))) { // curTime < varTime
+                } if (timeFormat.parse(timeFormat.format(date)).before(timeFormat.parse(v))) { // curTime < varTime
                     break;
                 } value = i+1;
             } catch (ParseException e) { e.printStackTrace(); }
+        } myListView.smoothScrollToPositionFromTop(value,0,10);
+        myListView.setSelection(value);
+        myGeneralAdapter.notifyDataSetChanged();
+        if (value > 0) {
+            Toast.makeText(getActivity(),
+                    String.format("Next train arrives at %s",
+                            myListView.getItemAtPosition(value).toString()),
+                    Toast.LENGTH_SHORT).show(); //debug
         }
-        arrivalsListView.smoothScrollToPositionFromTop(value,0,10);
-        arrivalsListView.setSelection(value);
-        /// . . . List View END . . . ///
-        //
-        // from exposed-dropdown-menu
-        ArrayList<String> stationsList = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.stations_list)));
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationsList); // create array adapter and pass parameters (context, dropdown layout, array)
-        AutoCompleteTextView autocompleteTV = root.findViewById(R.id.fromTextView); // get reference to autocomplete text view
-        autocompleteTV.setAdapter(arrayAdapter); // set adapter to autocomplete tv to arrayAdapter
-        autocompleteTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        // exposed dropdown menus //
+        ArrayList<String> stationOptionsList = new ArrayList<String>(
+                Arrays.asList(getResources().getStringArray(R.array.stations_list)));
+
+        ArrayAdapter<String> fromArrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter and pass parameters (context, dropdown layout, array)
+        AutoCompleteTextView fromAutoCompleteTV = root.findViewById(R.id.fromTextView); // get reference to autocomplete text view
+        fromAutoCompleteTV.setAdapter(fromArrayAdapter); // set adapter to autocomplete tv to arrayAdapter
+        fromAutoCompleteTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override // save from selection as variable
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                fromSelection = position;
-                arrivalsGeneralAdapter.notifyDataSetChanged();
-            }
-        });
-        // to exposed-dropdown-menu
-        ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationsList); // create array adapter and pass parameters (context, dropdown layout, array)
-        AutoCompleteTextView autocompleteTV2= root.findViewById(R.id.toTextView); // get reference to autocomplete text view
-        autocompleteTV2.setAdapter(arrayAdapter2); // set adapter to autocomplete tv to arrayAdapter
-        autocompleteTV2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override // save to selection as variable
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                toSelection = position;
-                /// . . . List View START . . . ///
-                ListView arrivalsListView = (ListView) root.findViewById(R.id.arrivalsListView); // init arrivals listview
-                ArrayAdapter<String> arrivalsGeneralAdapter = new ArrayAdapter<>(
-                        getActivity(),
-                        android.R.layout.simple_list_item_1,
-                        arrivals
-                );
-                arrivalsListView.setAdapter(arrivalsGeneralAdapter);
-
-                ArrayList<String> travelTimes = schedules.main(fromSelection, toSelection); // populate list
-                // populate list from pyObject listSchedules
-                arrivals.addAll(travelTimes);
-
-                // scroll to next train PARTIALLY FUNCTIONAL
+                fromSelection = position; // account for positioning in array
+                // reload listview with new array and adapter //
+                ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);
+                ArrayAdapter<String> myGeneralAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, myArrayList);
+                myListView.setAdapter(myGeneralAdapter);
+                myGeneralAdapter.notifyDataSetChanged();
+                // scroll to next train //
                 Date date = new Date() ;
-                SimpleDateFormat dateFormat = new SimpleDateFormat("h:mm aa") ;
-                dateFormat.format(date);
-
+                SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa") ;
+                timeFormat.format(date);
                 int value = 0;
-/*                for (int i = 0; i < arrivalsListView.getCount(); i++) {
-                    String v = String.valueOf(travelTimes.get(i));
+                for (int i = 0; i < myListView.getCount(); i++) {
+                    String v = String.valueOf(myArrayList.get(i));
                     try {
-                        if ((dateFormat.parse(dateFormat.format(date)).equals(dateFormat.parse(v)))) { // curTime == varTime
+                        if ((timeFormat.parse(timeFormat.format(date)).equals(timeFormat.parse(v)))) { // curTime == varTime
                             break;
-                        } if (dateFormat.parse(dateFormat.format(date)).before(dateFormat.parse(v))) { // curTime < varTime
+                        } if (timeFormat.parse(timeFormat.format(date)).before(timeFormat.parse(v))) { // curTime < varTime
                             break;
                         } value = i+1;
                     } catch (ParseException e) { e.printStackTrace(); }
-                }*/
-                arrivalsListView.smoothScrollToPositionFromTop(value,0,10);
-                arrivalsListView.setSelection(value);
-                arrivalsGeneralAdapter.notifyDataSetChanged();
-
-                if (value > 0) {
-                    Toast.makeText(getActivity(), String.format("Next train arrives at %s", arrivalsListView.getItemAtPosition(value).toString()), Toast.LENGTH_LONG).show(); //debug
-                }
-
-                // DEBUG //
-                Toast.makeText(getActivity(), String.format("DEBUG: travelTimes.size is %s", travelTimes.size()), Toast.LENGTH_LONG).show();
-                // DEBUG //
+                } myListView.smoothScrollToPositionFromTop(value,0,10);
+                myListView.setSelection(value);
+                myGeneralAdapter.notifyDataSetChanged();
             }
         });
-        // Initialize Bottom Sheet Parameters
+
+        // to exposed-dropdown-menu
+        ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter and pass parameters (context, dropdown layout, array)
+        AutoCompleteTextView toAutoCompleteTV= root.findViewById(R.id.toTextView); // get reference to autocomplete text view
+        toAutoCompleteTV.setAdapter(toArrayAdapter); // set adapter to autocomplete tv to arrayAdapter
+        toAutoCompleteTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override // save from selection as variable
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                toSelection = position; // account for positioning in array
+                // reload listview with new array and adapter //
+                ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);
+                ArrayAdapter<String> myGeneralAdapter = new ArrayAdapter<String>(
+                        getActivity(), android.R.layout.simple_list_item_1, myArrayList);
+                myListView.setAdapter(myGeneralAdapter);
+                myGeneralAdapter.notifyDataSetChanged();
+                // scroll to next train //
+                Date date = new Date() ;
+                SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa") ;
+                timeFormat.format(date);
+                int value = 0;
+                for (int i = 0; i < myListView.getCount(); i++) {
+                    String v = String.valueOf(myArrayList.get(i));
+                    try {
+                        if ((timeFormat.parse(timeFormat.format(date)).equals(timeFormat.parse(v)))) { // curTime == varTime
+                            break;
+                        } if (timeFormat.parse(timeFormat.format(date)).before(timeFormat.parse(v))) { // curTime < varTime
+                            break;
+                        } value = i+1;
+                    } catch (ParseException e) { e.printStackTrace(); }
+                } myListView.smoothScrollToPositionFromTop(value,0,10);
+                myListView.setSelection(value);
+                myGeneralAdapter.notifyDataSetChanged();
+                if (value > 0) {
+                    Toast.makeText(getActivity(),
+                            String.format("Next train arrives at %s",
+                                    myListView.getItemAtPosition(value).toString()),
+                            Toast.LENGTH_SHORT).show(); //debug
+                }
+            }
+        });
+        // Initialize Bottom Sheet Parameters //
         LinearLayout mBottomSheetLayout = root.findViewById(R.id.bottom_sheet_layout);
         BottomSheetBehavior<LinearLayout> sheetBehavior;
         ImageView header_Arrow_Image; // header arrow
@@ -264,12 +280,11 @@ public class SchedulesFragment extends Fragment {
         });
         // Check for internet connection
         if (!internet) {
-            Toast.makeText(getActivity(),
-                    "NO INTERNET CONNECTION",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Working Offline", Toast.LENGTH_SHORT).show();
             sheetBehavior.setPeekHeight(0);
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        } else if (internet) {
+        } else {
             // Initialize web view for bottom sheet
             WebView webView = (WebView) root.findViewById(R.id.webview);
             WebSettings webSettings = webView.getSettings();
@@ -280,7 +295,9 @@ public class SchedulesFragment extends Fragment {
                 sheetBehavior.setPeekHeight(0);
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
-        } return root;
+        }
+
+         return root;
     }
     // initialize button in action bar
     @Override
@@ -297,13 +314,10 @@ public class SchedulesFragment extends Fragment {
             } else {
                 Toast.makeText(getActivity(), "Now Going: Eastbound", Toast.LENGTH_LONG).show();
             }
-            Toast.makeText(getActivity(), String.valueOf(internet), Toast.LENGTH_LONG).show();
             int temp = fromSelection;
             fromSelection = toSelection;
             toSelection = temp;
             ArrayList<String> travelTimes = schedules.main(fromSelection, toSelection);
-            // populate list from pyObject listSchedules
-            arrivals.addAll(travelTimes);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -369,6 +383,11 @@ public class SchedulesFragment extends Fragment {
             }
         };
         Thread specialBgThread = new Thread(specialRunnable);
+        try {
+            specialBgThread.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         specialBgThread.start();
     } public void downloadZip(String urlStr, String destinationFilePath) {
         Context context = getContext();

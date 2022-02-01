@@ -48,6 +48,7 @@
             android:text="@string/to"
             android:textColor="#757575"
             tools:ignore="TextContrastCheck" />
+
     </com.google.android.material.textfield.TextInputLayout>
 
     <ListView
@@ -55,8 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="76sp"
-        android:layout_marginBottom="76sp">
-    </ListView>
+        android:layout_marginBottom="76sp"></ListView>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"

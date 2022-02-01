@@ -1,6 +1,11 @@
 package com.davidp799.patcotoday;
 
-import java.io.*;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,9 +17,9 @@ public class Schedules {
     /* Class which utilizes urllib and ZipFile to download the latest
        PortAuthorityTransitCorporation (PATCO) GTFS package.
        Returns: ZipFile object */
-    File fileDir = new File("/data/data/com.davidp799.patcotoday" + "/files/gtfs");
+    File fileDir = new File("/data/data/com.davidp799.patcotoday/files/data");
     public ArrayList<String> main(int source_id, int destination_id) {
-        List<String> stopCodes = Arrays.asList( "Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont",
+        List<String> stopCodes = Arrays.asList( "Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont", //b5 c7
                 "Collingswood", "Ferry Avenue", "Broadway", "City Hall", "8th and Market",
                 "9-10th and Locust", "12-13th and Locust", "15-16th and Locust" );
         List<String> calCodes = Arrays.asList("1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
@@ -30,8 +35,8 @@ public class Schedules {
         // create dependent variables
         int stop_id = stopCodes.indexOf(source)+1;
         String time = startTime(stop_id);
-        List tripID = trip_id(route_id, service_id(calCodes, weekday), weekday);
-        List schedules = listSchedules(time, tripID, stop_id);
+        List<Integer> tripID = trip_id(route_id, service_id(calCodes, weekday), weekday);
+        List<String> schedules = listSchedules(time, tripID, stop_id);
         ArrayList<String> sortedSchedules = sortedSchedules(schedules);
         return sortedSchedules;
     }
@@ -73,13 +78,13 @@ public class Schedules {
                 // do something
                 List c = Arrays.asList(line.split(",", 16));
                 String str = String.format("%s,%s,%s,%s,%s,%s,%s", c.get(1),c.get(2),c.get(3),
-                                           c.get(4), c.get(5),c.get(6),c.get(7));
+                        c.get(4), c.get(5),c.get(6),c.get(7));
                 if (str.equals(calCodes.get(weekday-1))) {
                     result = Integer.parseInt(String.valueOf(c.get(0)));
                 } line = reader.readLine();
             } reader.close();
         } catch (IOException e) {
-            System.out.println("Error cannot read file! Something went wrong.");
+            Log.d("READ ERROR", "calendar.txt");
             e.printStackTrace();
         }
         return result;
@@ -104,7 +109,7 @@ public class Schedules {
                 } line = reader.readLine();
             } reader.close();
         } catch (IOException e) {
-            System.out.println("Error cannot read file! Something went wrong.");
+            Log.d("READ ERROR", "trips.txt");
             e.printStackTrace();
         }
         return trips;
@@ -135,7 +140,7 @@ public class Schedules {
                 } line = reader.readLine();
             } reader.close();
         } catch (IOException e) {
-            System.out.println("Error cannot read file! Something went wrong.");
+            Log.d("READ ERROR", "stop_times.txt");
             e.printStackTrace();
         } for (Object i : temp) { // extract arrival times from strings
             List split = Arrays.asList(String.valueOf(i).split(",", 16));
