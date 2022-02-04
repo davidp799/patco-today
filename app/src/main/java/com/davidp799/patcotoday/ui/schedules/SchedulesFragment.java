@@ -1,5 +1,7 @@
 package com.davidp799.patcotoday.ui.schedules;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.preference.ListPreference;
 
 import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.Schedules;
@@ -59,15 +62,12 @@ public class SchedulesFragment extends Fragment {
     private FragmentSchedulesBinding binding;
     // LIST VIEW DEFAULT VALUES //
     private ListView myListView;
-
+    // INITIALIZE VARS & SCHEDS //
     private int fromSelection, toSelection;
     private Schedules schedules = new Schedules();
     // BACKGROUND THREAD VALUES //
     private Document doc;
-    private volatile boolean internet;
-    private static boolean special;
-    private static boolean downloaded;
-    private static boolean extracted;
+    private static boolean internet, special, downloaded, extracted;
     // Files List //
     private List<String> dataFiles = Arrays.asList( "agency.txt", "calendar.txt", "calendar_dates.txt", "fare_attributes.txt", "fare_rules.txt",
             "feed_info.txt", "frequencies.txt", "routes.txt", "shapes.txt", "stop_times.txt", "stops.txt", "transfers.txt", "trips.txt" );
@@ -120,6 +120,14 @@ public class SchedulesFragment extends Fragment {
         // UI Options //
         setHasOptionsMenu(true);
         setEnterTransition(new MaterialFadeThrough());
+        // Shared Preferences //
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("com.davidp799.patcotoday_preferences", MODE_PRIVATE);
+        // Initialize Lists //
+        ArrayList<String> stationOptionsList = new ArrayList<String>(
+                Arrays.asList(getResources().getStringArray(R.array.stations_list)));
+        // Initialize default stations //
+        fromSelection = stationOptionsList.indexOf(sharedPreferences.getString("default_source", ""));
+        toSelection = stationOptionsList.indexOf(sharedPreferences.getString("default_dest", ""));
         // Download Background Thread //
         File fileDir = new File("/data/data/com.davidp799.patcotoday/files/data/");
         fileDir.mkdirs();
@@ -144,9 +152,8 @@ public class SchedulesFragment extends Fragment {
                 Toast.makeText(getContext(), "Unable to Update Files", Toast.LENGTH_SHORT).show();
             }
         }
-        // array list //
-        ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);
         // list view //
+        ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);
         ListView myListView = root.findViewById(R.id.arrivalsListView);
         ArrayAdapter<String> myGeneralAdapter = new ArrayAdapter<String>(
                 getContext(), android.R.layout.simple_list_item_1, myArrayList);
@@ -172,14 +179,10 @@ public class SchedulesFragment extends Fragment {
         if (value > 0) {
             Toast.makeText(getActivity(),
                     String.format("Next train arrives at %s",
-                            myListView.getItemAtPosition(value).toString()),
+                            myListView.getItemAtPosition(value-1).toString()),
                     Toast.LENGTH_SHORT).show(); //debug
         }
-
         // exposed dropdown menus //
-        ArrayList<String> stationOptionsList = new ArrayList<String>(
-                Arrays.asList(getResources().getStringArray(R.array.stations_list)));
-
         ArrayAdapter<String> fromArrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter and pass parameters (context, dropdown layout, array)
         AutoCompleteTextView fromAutoCompleteTV = root.findViewById(R.id.fromTextView); // get reference to autocomplete text view
         fromAutoCompleteTV.setAdapter(fromArrayAdapter); // set adapter to autocomplete tv to arrayAdapter
@@ -246,7 +249,7 @@ public class SchedulesFragment extends Fragment {
                 if (value > 0) {
                     Toast.makeText(getActivity(),
                             String.format("Next train arrives at %s",
-                                    myListView.getItemAtPosition(value).toString()),
+                                    myListView.getItemAtPosition(value-1).toString()),
                             Toast.LENGTH_SHORT).show(); //debug
                 }
             }
@@ -280,7 +283,7 @@ public class SchedulesFragment extends Fragment {
         });
         // Check for internet connection
         if (!internet) {
-            Toast.makeText(getActivity(), "NO INTERNET CONNECTION", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
             Toast.makeText(getActivity(), "Working Offline", Toast.LENGTH_SHORT).show();
             sheetBehavior.setPeekHeight(0);
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);

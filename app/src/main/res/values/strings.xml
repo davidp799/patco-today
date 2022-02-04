@@ -29,7 +29,6 @@
 
     <!-- Settings Preferences -->
     <string name="pref_theme">Choose Theme</string>
-    <string name="pref_theme_summary">Change the look!</string>
     <string name="pref_light">Light</string>
     <string name="pref_dark">Dark</string>
     <string name="pref_sys">Follow device theme</string>
@@ -41,8 +40,7 @@
     <string name="pref_summary_licenses">More information</string>
     <string name="pref_title_updates">Check for Updates</string>
     <string name="pref_summary_updates">Check for new transit schedules</string>
-
-
+    <string name="version">Application Version</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
@@ -56,7 +54,6 @@
         <item>Follow device theme</item>
     </string-array>
 
-    <string name="version">Application Version</string>
 
 
 </resources>

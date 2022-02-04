@@ -32,7 +32,7 @@
         <Preference
             android:key="pref_commuter"
             android:title="Commuter Mode"
-            android:summary="Automatically reverse travel direction">
+            android:summary="Reverse travel direction at a given time">
 
         </Preference>
 

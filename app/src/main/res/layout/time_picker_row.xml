@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/timePicker"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="2sp"
+    android:paddingVertical="10sp"
+    android:hapticFeedbackEnabled="false"
+    android:background="?attr/selectableItemBackground">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/timePickerTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TEXT"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/timePickerDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DESCRIPTION"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+            android:textSize="11sp"/>
+
+</LinearLayout>

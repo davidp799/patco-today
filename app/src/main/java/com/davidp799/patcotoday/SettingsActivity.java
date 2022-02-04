@@ -1,5 +1,6 @@
 package com.davidp799.patcotoday;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -41,7 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
                 case Configuration.UI_MODE_NIGHT_YES:
                     if (Build.VERSION.SDK_INT >= 31) {
                         window.setStatusBarColor(this.getResources().getColor(R.color.material_dynamic_neutral_variant10));
-                        window.setNavigationBarColor(this.getResources().getColor(R.color.gm3_ref_palette_dynamic_neutral10));
+                        window.setNavigationBarColor(this.getResources().getColor(R.color.transparent));
 
                     } else {
                         window.setStatusBarColor(this.getResources().getColor(R.color.blackish));
@@ -50,7 +51,7 @@ public class SettingsActivity extends AppCompatActivity {
                 case Configuration.UI_MODE_NIGHT_NO:
                     if (Build.VERSION.SDK_INT >= 31) {
                         window.setStatusBarColor(this.getResources().getColor(R.color.material_dynamic_primary95));
-                        window.setNavigationBarColor(this.getResources().getColor(R.color.material_dynamic_primary99));
+                        window.setNavigationBarColor(this.getResources().getColor(R.color.transparent));
                     } else {
                         window.setStatusBarColor(this.getResources().getColor(R.color.blackish));
                         window.setNavigationBarColor(this.getResources().getColor(R.color.blackish));
@@ -69,6 +70,8 @@ public class SettingsActivity extends AppCompatActivity {
             }
             getFragmentManager().beginTransaction().add(R.id.settings_fragment_container, new SettingsFragment()).commit();
         }
+
+
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
