@@ -10,8 +10,11 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="180sp"
         android:layout_height="wrap_content"
-        android:layout_margin="10sp"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="10sp"
+        android:layout_marginTop="30sp"
+        android:layout_marginEnd="10sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -22,18 +25,21 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:inputType="none"
-            android:textSize="14.5sp"
             android:text="@string/from"
             android:textColor="#757575"
-            tools:ignore="TextContrastCheck" />
+            android:textSize="14.5sp"
+            tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="180sp"
         android:layout_height="wrap_content"
-        android:layout_margin="10sp"
+        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
+        android:layout_marginStart="10sp"
+        android:layout_marginTop="30sp"
+        android:layout_marginEnd="10sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -44,9 +50,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:inputType="none"
-            android:textSize="14.5sp"
             android:text="@string/to"
             android:textColor="#757575"
+            android:textSize="14.5sp"
             tools:ignore="TextContrastCheck" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -55,8 +61,10 @@
         android:id="@+id/arrivalsListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="76sp"
-        android:layout_marginBottom="76sp"></ListView>
+        android:layout_marginTop="100sp"
+        android:layout_marginBottom="100sp">
+
+    </ListView>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"

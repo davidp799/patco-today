@@ -63,11 +63,24 @@ public class Schedules {
             } converted.add(str);
         } return String.format("%s:%s:00", converted.get(0), converted.get(1));
     }
-    public Integer service_id(List<String> calCodes, int weekday) {
+    public ArrayList service_id(List<String> calCodes, int weekday) {
         /* Function which determines the service_id based on day of week.
            Returns: int object */
-        int result = 0;
-        String filename = String.valueOf(fileDir) + "/calendar.txt";
+        String code = calCodes.get(weekday);
+        ArrayList result = new ArrayList();
+        if (code.equals("1,1,1,1,1,0,0")) {
+            result.add(18);
+            result.add(69);
+        } else if (code.equals("0,0,0,0,0,1,0")) {
+            result.add(19);
+            result.add(70);
+        } else {
+            result.add(20);
+            result.add(71);
+        } return result;
+
+
+        /*String filename = String.valueOf(fileDir) + "/calendar.txt";
 
         // open calendar.txt file as r/o data
         BufferedReader reader;
@@ -81,15 +94,16 @@ public class Schedules {
                         c.get(4), c.get(5),c.get(6),c.get(7));
                 if (str.equals(calCodes.get(weekday-1))) {
                     result = Integer.parseInt(String.valueOf(c.get(0)));
+                    results.add(Integer.parseInt(String.valueOf(c.get(0))));
                 } line = reader.readLine();
             } reader.close();
         } catch (IOException e) {
             Log.d("READ ERROR", "calendar.txt");
             e.printStackTrace();
-        }
-        return result;
+        }*/
+//        return result;
     }
-    public List<Integer> trip_id(int route_id, int service_id, int weekday) {
+    public List<Integer> trip_id(int route_id, ArrayList service_ids, int weekday) {
         /* Function which determines the trip_id based on the given route_id and service_id
            by reading the trips data file.
            Returns: list object */
@@ -102,10 +116,11 @@ public class Schedules {
             reader = new BufferedReader(new FileReader(filename));
             String line = reader.readLine();
             while (line != null) {
-                // do something
                 List c = Arrays.asList(line.split(",", 128));
-                if (c.get(0).equals(String.valueOf(route_id)) && c.get(1).equals(String.valueOf(service_id))) {
-                    trips.add(Integer.parseInt(String.valueOf(c.get(2))));
+                for (int i=0; i<service_ids.size(); i++) {
+                    if (c.get(0).equals(String.valueOf(route_id)) && c.get(1).equals(String.valueOf(service_ids.get(i)))) {
+                        trips.add(Integer.parseInt(String.valueOf(c.get(2))));
+                    }
                 } line = reader.readLine();
             } reader.close();
         } catch (IOException e) {
@@ -147,7 +162,7 @@ public class Schedules {
             if (split.get(3).equals(String.valueOf(stop_id))) {
                 allTimes.add(split.get(1));
             }
-        } for (Object i : allTimes ) { // extract arrival times beginning at current time from allTimes
+        } /*for (Object i : allTimes ) { // extract arrival times beginning at current time from allTimes
             // initialize long variables
             int iHour = Integer.parseInt(String.valueOf(i).substring(0,1));
             int startHour = Integer.parseInt(String.valueOf(startTime).substring(0,1));
@@ -159,7 +174,8 @@ public class Schedules {
             } else if ( iHour >= startHour ) {
                 result.add(i);
             }
-        } return allTimes;
+        }*/
+        return allTimes;
     }
     public ArrayList<String> sortedSchedules(List schedules) {
         /* Function which sorts list of trip by calling trip_id() and utilizes

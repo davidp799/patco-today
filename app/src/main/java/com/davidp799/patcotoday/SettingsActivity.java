@@ -19,17 +19,27 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.WindowCompat;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
+import com.davidp799.patcotoday.helper.ThemeHelper;
 import com.google.android.material.transition.MaterialFadeThrough;
 
 public class SettingsActivity extends AppCompatActivity {
+    static final String PREFERENCE_NOT_FOUND = "preference not found";
+    static final String PREF_DEVICE_THEME = "deviceTheme";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
+        // Edge to Edge //
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        // Change theme //
+        ThemeHelper.applyTheme(this);
         // Set Status bar & Navigation bar Colors //
         if (Build.VERSION.SDK_INT >= 21) {
             int nightModeFlags =

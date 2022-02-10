@@ -320,7 +320,29 @@ public class SchedulesFragment extends Fragment {
             int temp = fromSelection;
             fromSelection = toSelection;
             toSelection = temp;
-            ArrayList<String> travelTimes = schedules.main(fromSelection, toSelection);
+            // reload listview with new array and adapter //
+            ListView myListView = getActivity().findViewById(R.id.arrivalsListView);
+            ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);
+            ArrayAdapter<String> myGeneralAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, myArrayList);
+            myListView.setAdapter(myGeneralAdapter);
+            myGeneralAdapter.notifyDataSetChanged();
+            // scroll to next train //
+            Date date = new Date() ;
+            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa") ;
+            timeFormat.format(date);
+            int value = 0;
+            for (int i = 0; i < myListView.getCount(); i++) {
+                String v = String.valueOf(myArrayList.get(i));
+                try {
+                    if ((timeFormat.parse(timeFormat.format(date)).equals(timeFormat.parse(v)))) { // curTime == varTime
+                        break;
+                    } if (timeFormat.parse(timeFormat.format(date)).before(timeFormat.parse(v))) { // curTime < varTime
+                        break;
+                    } value = i+1;
+                } catch (ParseException e) { e.printStackTrace(); }
+            } myListView.smoothScrollToPositionFromTop(value,0,10);
+            myListView.setSelection(value);
+            myGeneralAdapter.notifyDataSetChanged();
             return true;
         }
         return super.onOptionsItemSelected(item);

@@ -3,6 +3,8 @@ package com.davidp799.patcotoday;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
+import static com.davidp799.patcotoday.SettingsActivity.PREF_DEVICE_THEME;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -56,7 +58,7 @@ import java.util.Calendar;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     private ActivityMainBinding binding;
     private String currentTheme;
     @Override
@@ -64,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        // Edge to Edge //
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         // Shared Preferences //
         SharedPreferences sharedPreferences = getSharedPreferences("com.davidp799.patcotoday_preferences", MODE_PRIVATE);
         currentTheme = sharedPreferences.getString("deviceTheme", "");
@@ -87,24 +91,16 @@ public class MainActivity extends AppCompatActivity {
                     if (Build.VERSION.SDK_INT >= 31) {
                         window.setStatusBarColor(this.getResources().getColor(R.color.material_dynamic_neutral_variant10, getTheme()));
                         window.setNavigationBarColor(this.getResources().getColor(R.color.material_dynamic_neutral_variant10, getTheme()));
-
-                    } else {
-                        window.setStatusBarColor(this.getResources().getColor(R.color.blackish));
-                        window.setNavigationBarColor(this.getResources().getColor(R.color.blackish));
                     } break;
                 case Configuration.UI_MODE_NIGHT_NO:
                     if (Build.VERSION.SDK_INT >= 31) {
                         window.setStatusBarColor(this.getResources().getColor(R.color.material_dynamic_primary95, getTheme()));
                         window.setNavigationBarColor(this.getResources().getColor(R.color.material_dynamic_primary95, getTheme()));
-                    } else {
-                        window.setStatusBarColor(this.getResources().getColor(R.color.blackish));
-                        window.setNavigationBarColor(this.getResources().getColor(R.color.blackish));
                     } break;
                 case Configuration.UI_MODE_NIGHT_UNDEFINED:
                     break;
             }
         }
-
         // Bottom Navigation View //
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(

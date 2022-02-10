@@ -4,9 +4,9 @@
         <!-- Primary brand color. -->
         <item name="android:colorBackground">@color/material_dynamic_primary99</item>
         <item name="colorOnBackground">@color/material_dynamic_primary10</item>
-        <item name="colorPrimary">@color/material_dynamic_primary60</item>
-        <item name="colorPrimaryDark">@color/material_dynamic_primary50</item>
-        <item name="colorPrimaryContainer">@color/material_dynamic_primary90</item>
+        <item name="colorPrimary">@color/mPrimary</item>
+        <item name="colorPrimaryDark">@color/mPrimaryDark</item>
+        <item name="colorPrimaryContainer">@color/mPrimaryContainer</item>
         <item name="colorPrimaryInverse">@color/material_dynamic_primary50</item>
         <item name="colorOnPrimary">@color/material_dynamic_primary99</item>
         <item name="colorOnPrimaryContainer">@color/material_dynamic_primary20</item>
