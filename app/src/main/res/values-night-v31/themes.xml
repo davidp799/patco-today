@@ -2,32 +2,35 @@
     <!-- Base application theme. -->
     <style name="Theme.PATCOToday" parent="Theme.Material3.DayNight">
         <!-- Primary brand color. -->
-        <item name="android:colorBackground">@color/gm3_sys_color_dynamic_dark_background</item>
-        <item name="colorOnBackground">@color/material_dynamic_primary0</item>
-        <item name="colorOnPrimary">@color/gm3_sys_color_dynamic_dark_on_primary</item>
-        <item name="colorOnPrimaryContainer">@color/gm3_sys_color_dynamic_dark_on_primary_container</item>
-        <item name="colorOnSecondary">@color/gm3_sys_color_dynamic_dark_on_secondary</item>
-        <item name="colorOnSecondaryContainer">@color/gm3_sys_color_dynamic_dark_on_secondary_container</item>
-        <item name="colorOnSurface">@color/gm3_sys_color_dynamic_dark_on_surface</item>
-        <item name="colorOnSurfaceInverse">@color/gm3_sys_color_dynamic_dark_inverse_on_surface</item>
-        <item name="colorOnSurfaceVariant">@color/gm3_sys_color_dynamic_dark_on_surface_variant</item>
-        <item name="colorOnTertiary">@color/gm3_sys_color_dynamic_dark_on_tertiary</item>
-        <item name="colorOnTertiaryContainer">@color/gm3_sys_color_dynamic_dark_on_tertiary_container</item>
-        <item name="colorOutline">@color/material_dynamic_secondary60</item>
-        <item name="colorPrimary">@color/material_dynamic_primary80</item>
-        <item name="colorPrimaryContainer">@color/gm3_sys_color_dynamic_dark_primary_container</item>
-        <item name="colorPrimaryInverse">@color/gm3_sys_color_dynamic_light_primary</item>
-        <item name="colorSecondary">@color/gm3_sys_color_dynamic_dark_secondary</item>
-        <item name="colorSecondaryContainer">@color/gm3_sys_color_dynamic_dark_secondary_container</item>
-        <item name="colorSurface">@color/gm3_sys_color_dynamic_dark_surface</item>
-        <item name="colorSurfaceInverse">@color/gm3_sys_color_dynamic_dark_inverse_surface</item>
-        <item name="colorSurfaceVariant">@color/gm3_sys_color_dynamic_dark_surface_variant</item>
-        <item name="colorTertiary">@color/gm3_sys_color_dynamic_dark_tertiary</item>
-        <item name="colorTertiaryContainer">@color/gm3_sys_color_dynamic_dark_tertiary_container</item>
+        <item name="android:colorBackground">@android:color/system_neutral1_900</item>
+        <item name="colorOnBackground">@android:color/system_neutral1_900</item>
+        <item name="colorPrimary">@android:color/system_accent1_200</item>
+        <item name="colorPrimaryDark">@color/material_dynamic_primary50</item>
+        <item name="colorPrimaryContainer">@android:color/system_accent1_100</item>
+        <item name="colorPrimaryInverse">@color/material_dynamic_primary50</item>
+        <item name="colorOnPrimary">@android:color/system_accent1_800</item>
+        <item name="colorOnPrimaryContainer">@android:color/system_accent1_100</item>
+        <item name="colorSecondary">@android:color/system_accent1_10</item>
+        <item name="colorSecondaryContainer">@android:color/system_accent2_700</item>
+        <item name="colorOnSecondary">@android:color/system_accent2_800</item>
+        <item name="colorOnSecondaryContainer">@android:color/system_accent2_100</item>
+        <item name="colorSurface">@android:color/system_neutral1_900</item>
+        <item name="colorSurfaceInverse">@color/material_dynamic_primary10</item>
+        <item name="colorSurfaceVariant">@android:color/system_neutral2_700</item>
+        <item name="colorOnSurface">@android:color/system_neutral1_100</item>
+        <item name="colorOnSurfaceInverse">@color/material_dynamic_primary90</item>
+        <item name="colorOnSurfaceVariant">@android:color/system_neutral2_200</item>
+        <item name="colorTertiary">@android:color/system_accent3_200</item>
+        <item name="colorTertiaryContainer">@android:color/system_accent3_700</item>
+        <item name="colorOnTertiary">@android:color/system_accent3_800</item>
+        <item name="colorOnTertiaryContainer">@android:color/system_accent3_100</item>
+        <item name="colorOutline">@android:color/system_neutral2_400</item>
         <item name="elevationOverlayAccentColor">@android:color/transparent</item>
         <item name="elevationOverlayColor">?colorPrimary</item>
         <!-- Customize your theme here. -->
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <item name="android:statusBarColor">@android:color/system_neutral2_900</item>
+        <item name="android:navigationBarColor">@android:color/system_neutral2_900</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
 

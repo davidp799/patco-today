@@ -29,6 +29,8 @@
         <item name="elevationOverlayColor">?colorPrimary</item>
         <!-- Additional -->
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+        <item name="android:statusBarColor">@android:color/system_accent1_50</item>
+        <item name="android:navigationBarColor">@android:color/system_accent1_50</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBlurBehindEnabled">true</item>
     </style>

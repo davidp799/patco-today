@@ -67,7 +67,7 @@ public class SchedulesFragment extends Fragment {
     private Schedules schedules = new Schedules();
     // BACKGROUND THREAD VALUES //
     private Document doc;
-    private static boolean internet, special, downloaded, extracted;
+    private boolean internet, special, downloaded, extracted;
     // Files List //
     private List<String> dataFiles = Arrays.asList( "agency.txt", "calendar.txt", "calendar_dates.txt", "fare_attributes.txt", "fare_rules.txt",
             "feed_info.txt", "frequencies.txt", "routes.txt", "shapes.txt", "stop_times.txt", "stops.txt", "transfers.txt", "trips.txt" );
@@ -126,8 +126,8 @@ public class SchedulesFragment extends Fragment {
         ArrayList<String> stationOptionsList = new ArrayList<String>(
                 Arrays.asList(getResources().getStringArray(R.array.stations_list)));
         // Initialize default stations //
-        fromSelection = stationOptionsList.indexOf(sharedPreferences.getString("default_source", ""));
-        toSelection = stationOptionsList.indexOf(sharedPreferences.getString("default_dest", ""));
+        fromSelection = stationOptionsList.indexOf(sharedPreferences.getString("default_source", "Lindenwold"));
+        toSelection = stationOptionsList.indexOf(sharedPreferences.getString("default_dest", "15-16th & Locust"));
         // Download Background Thread //
         File fileDir = new File("/data/data/com.davidp799.patcotoday/files/data/");
         fileDir.mkdirs();
@@ -143,9 +143,9 @@ public class SchedulesFragment extends Fragment {
         } if (notFound > 0) { // DEBUG REMOVE WHEN FINISHED
             Toast.makeText(getActivity(), String.format("Files Not Found: %s", notFound), Toast.LENGTH_SHORT).show();
             downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip",
-                    "/data/data/" + getActivity().getPackageName() + "/files/data/gtfs.zip");
+                    "/data/data/com.davidp799.patcotoday/files/data/gtfs.zip");
             // EXTRACT ZIP //
-            extractZip("/data/data/" + getActivity().getPackageName() + "/files/data/gtfs.zip");
+            extractZip("/data/data/com.davidp799.patcotoday/files/data/gtfs.zip");
             if (extracted) {
                 Toast.makeText(getContext(), "Files up to Date", Toast.LENGTH_SHORT).show();
             } else {
@@ -283,7 +283,7 @@ public class SchedulesFragment extends Fragment {
         });
         // Check for internet connection
         if (!internet) {
-            Toast.makeText(getActivity(), "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "No Connection", Toast.LENGTH_SHORT).show();
             Toast.makeText(getActivity(), "Working Offline", Toast.LENGTH_SHORT).show();
             sheetBehavior.setPeekHeight(0);
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -320,6 +320,7 @@ public class SchedulesFragment extends Fragment {
             int temp = fromSelection;
             fromSelection = toSelection;
             toSelection = temp;
+
             // reload listview with new array and adapter //
             ListView myListView = getActivity().findViewById(R.id.arrivalsListView);
             ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);

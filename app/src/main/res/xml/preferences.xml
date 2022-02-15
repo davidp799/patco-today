@@ -27,7 +27,7 @@
             android:title="Default Destination Station"
             android:entries="@array/stations_list"
             android:entryValues="@array/stations_list"
-            app:defaultValue="15/16th &amp; Locust"
+            app:defaultValue="15-16th &amp; Locust"
             android:summary="%s"/>
         <Preference
             android:key="pref_commuter"

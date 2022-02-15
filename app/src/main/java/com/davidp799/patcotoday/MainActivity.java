@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity{
             Window window = this.getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            switch (nightModeFlags) {
+/*            switch (nightModeFlags) {
                 case Configuration.UI_MODE_NIGHT_YES:
                     if (Build.VERSION.SDK_INT >= 31) {
                         window.setStatusBarColor(this.getResources().getColor(R.color.material_dynamic_neutral_variant10, getTheme()));
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity{
                     } break;
                 case Configuration.UI_MODE_NIGHT_UNDEFINED:
                     break;
-            }
+            }*/
         }
         // Bottom Navigation View //
         BottomNavigationView navView = findViewById(R.id.nav_view);

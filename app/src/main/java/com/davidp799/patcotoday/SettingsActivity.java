@@ -1,32 +1,14 @@
 package com.davidp799.patcotoday;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.WindowCompat;
-import androidx.preference.ListPreference;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
-
-import com.davidp799.patcotoday.helper.ThemeHelper;
-import com.google.android.material.transition.MaterialFadeThrough;
 
 public class SettingsActivity extends AppCompatActivity {
     static final String PREFERENCE_NOT_FOUND = "preference not found";
@@ -38,8 +20,6 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.settings_activity);
         // Edge to Edge //
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        // Change theme //
-        ThemeHelper.applyTheme(this);
         // Set Status bar & Navigation bar Colors //
         if (Build.VERSION.SDK_INT >= 21) {
             int nightModeFlags =
