@@ -6,6 +6,5 @@
     <FrameLayout
         android:id="@+id/settings_fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="18sp"/>
+        android:layout_height="match_parent" />
 </LinearLayout>

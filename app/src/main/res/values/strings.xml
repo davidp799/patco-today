@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PATCO Today</string>
+    <string name="app_name">PyTCO Today</string>
     <string name="title_schedules">Schedules</string>
     <string name="title_map">Station Map</string>
     <string name="title_settings">Settings</string>
@@ -10,37 +10,31 @@
     <string name="specialSchedules">Special Schedules Available</string>
 
     <string-array name="stations_list">
-        <item>Lindenwold</item>
-        <item>Ashland</item>
-        <item>Woodcrest</item>
-        <item>Haddonfield</item>
-        <item>Westmont</item>
-        <item>Collingswood</item>
-        <item>Ferry Avenue</item>
-        <item>Broadway</item>
-        <item>City Hall</item>
-        <item>8th &amp; Market</item>
-        <item>9-10th &amp; Locust</item>
-        <item>12-13th &amp; Locust</item>
         <item>15-16th &amp; Locust</item>
-    </string-array>
+        <item>12-13th &amp; Locust</item>
+        <item>9-10th &amp; Locust</item>
+        <item>8th &amp; Market</item>
+        <item>City Hall</item>
+        <item>Broadway</item>
+        <item>Ferry Avenue</item>
+        <item>Collingswood</item>
+        <item>Westmont</item>
+        <item>Haddonfield</item>
+        <item>Woodcrest</item>
+        <item>Ashland</item>
+        <item>Lindenwold</item>
 
+    </string-array>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Settings Preferences -->
     <string name="pref_theme">Choose Theme</string>
+    <string name="pref_theme_summary">Change the look!</string>
     <string name="pref_light">Light</string>
     <string name="pref_dark">Dark</string>
     <string name="pref_sys">Follow device theme</string>
     <string name="pref_title_feedback">Send App Feedback</string>
     <string name="pref_summary_feedback">Email developer</string>
-    <string name="pref_title_version">Application Version</string>
-    <string name="pref_summary_version">1.0</string>
-    <string name="pref_title_licenses">Open Source Licenses</string>
-    <string name="pref_summary_licenses">More information</string>
-    <string name="pref_title_updates">Check for Updates</string>
-    <string name="pref_summary_updates">Check for new transit schedules</string>
-    <string name="version">Application Version</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
@@ -54,6 +48,7 @@
         <item>Follow device theme</item>
     </string-array>
 
+    <string name="version">Application Version</string>
 
 
 </resources>

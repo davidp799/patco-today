@@ -2,37 +2,19 @@
     <!-- Base application theme. -->
     <style name="Theme.PATCOToday" parent="Theme.Material3.DayNight">
         <!-- Primary brand color. -->
-        <item name="android:colorBackground">@color/material_dynamic_primary99</item>
-        <item name="colorOnBackground">@color/material_dynamic_primary10</item>
-        <item name="colorPrimary">@color/mPrimary</item>
-        <item name="colorPrimaryDark">@color/mPrimaryDark</item>
-        <item name="colorPrimaryContainer">@color/mPrimaryContainer</item>
-        <item name="colorPrimaryInverse">@color/material_dynamic_primary50</item>
-        <item name="colorOnPrimary">@color/material_dynamic_primary99</item>
-        <item name="colorOnPrimaryContainer">@color/material_dynamic_primary20</item>
-        <item name="colorSecondary">@color/material_dynamic_secondary50</item>
-        <item name="colorSecondaryContainer">@color/material_dynamic_secondary90</item>
-        <item name="colorOnSecondary">@color/material_dynamic_secondary99</item>
-        <item name="colorOnSecondaryContainer">@color/material_dynamic_secondary20</item>
-        <item name="colorSurface">@color/material_dynamic_primary99</item>
-        <item name="colorSurfaceInverse">@color/material_dynamic_primary10</item>
-        <item name="colorSurfaceVariant">@color/material_dynamic_secondary80</item>
-        <item name="colorOnSurface">@color/material_dynamic_tertiary0</item>
-        <item name="colorOnSurfaceInverse">@color/material_dynamic_primary90</item>
-        <item name="colorOnSurfaceVariant">@color/material_dynamic_primary10</item>
-        <item name="colorTertiary">@color/material_dynamic_tertiary80</item>
-        <item name="colorTertiaryContainer">@color/material_dynamic_tertiary90</item>
-        <item name="colorOnTertiary">@color/material_dynamic_tertiary99</item>
-        <item name="colorOnTertiaryContainer">@color/material_dynamic_tertiary20</item>
-        <item name="colorOutline">@color/material_dynamic_secondary60</item>
-        <item name="elevationOverlayAccentColor">@android:color/transparent</item>
-        <item name="elevationOverlayColor">?colorPrimary</item>
-        <!-- Additional -->
+        <item name="colorPrimary">@color/material_dynamic_primary80</item>
+        <item name="colorPrimaryVariant">@color/material_dynamic_primary30</item>
+        <item name="colorOnPrimary">@color/material_dynamic_primary90</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/material_dynamic_secondary80</item>
+        <item name="colorSecondaryVariant">@color/material_dynamic_secondary30</item>
+        <item name="colorOnSecondary">@color/material_dynamic_secondary20</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/useMaterialThemeColors</item>
+        <!-- Navigation bar color. -->
+        <item name="android:navigationBarColor" tools:targetApi="l">?attr/useMaterialThemeColors</item>
+        <!-- Customize your theme here. -->
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
-        <item name="android:statusBarColor">@android:color/system_accent1_50</item>
-        <item name="android:navigationBarColor">@android:color/system_accent1_50</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowBlurBehindEnabled">true</item>
     </style>
 
     <style name="AppBottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
