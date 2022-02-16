@@ -2,18 +2,38 @@
     <!-- Base application theme. -->
     <style name="Theme.PATCOToday" parent="Theme.Material3.DayNight">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/red_500</item>
-        <item name="colorPrimaryVariant">@color/red_700</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
+        <item name="android:colorBackground">@color/white</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@color/blackish</item>
+        <item name="android:textColorHighlight">@color/gold_700</item>
+        <item name="android:textColorHint">@color/blackish</item>
+        <item name="android:textColorTertiary">@color/black</item>
+        <item name="colorOnBackground">@color/blackish</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorOnSecondaryContainer">@color/red_700</item>
+        <item name="colorOnSurface">@color/red_700</item>
+        <item name="colorOnSurfaceInverse">@color/red_700</item>
+        <item name="colorOnSurfaceVariant">@color/red_700</item>
+        <item name="colorOnTertiary">@color/gold_200</item>
+        <item name="colorOnTertiaryContainer">@color/gold_200</item>
+        <item name="colorOutline">@color/gold_200</item>
+        <item name="colorPrimary">@color/red_700</item>
+        <item name="colorPrimaryContainer">@color/red_500</item>
+        <item name="colorPrimaryInverse">@color/red_200</item>
         <item name="colorSecondary">@color/gold_200</item>
-        <item name="colorSecondaryVariant">@color/gold_700</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/useMaterialThemeColors</item>
-        <!-- Navigation bar color. -->
-        <item name="android:navigationBarColor" tools:targetApi="l">?attr/useMaterialThemeColors</item>
+        <item name="colorSecondaryContainer">@color/gold_700</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorSurfaceInverse">@color/black</item>
+        <item name="colorSurfaceVariant">@color/blackish</item>
+        <item name="colorTertiary">@color/red_200</item>
+        <item name="colorTertiaryContainer">@color/red_200</item>
+        <item name="elevationOverlayAccentColor">@android:color/transparent</item>
+        <item name="elevationOverlayColor">?colorPrimary</item>
         <!-- Customize your theme here. -->
+        <item name="android:statusBarColor">@color/blackish</item>
+        <item name="android:navigationBarColor">@color/blackish</item>
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
     </style>
 

@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.databinding.FragmentInfoBinding;
+import com.google.android.material.transition.MaterialFadeThrough;
 
 public class InfoFragment extends Fragment {
 
@@ -37,6 +38,7 @@ public class InfoFragment extends Fragment {
 
         binding = FragmentInfoBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        setEnterTransition(new MaterialFadeThrough());
 
         String[]  general = {"Fares", "Reload Freedom Card", "Twitter", "Call", "Email", "Website",
                              "Email", "Elevator & Escalator Availability", "FAQ's", "Safety & Security"};
@@ -50,6 +52,7 @@ public class InfoFragment extends Fragment {
         );
 
         listView.setAdapter(listGeneralAdapter);
+        listView.setTransitionGroup(true);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View  view, int position, long id)
