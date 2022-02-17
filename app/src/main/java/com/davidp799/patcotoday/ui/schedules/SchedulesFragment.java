@@ -187,6 +187,7 @@ public class SchedulesFragment extends Fragment {
         // exposed dropdown menus //
         ArrayAdapter<String> fromArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter and pass parameters (context, dropdown layout, array)
         AutoCompleteTextView fromAutoCompleteTV = root.findViewById(R.id.fromTextView); // get reference to autocomplete text view
+        fromAutoCompleteTV.setText(sharedPreferences.getString("default_source", "Lindenwold"));
         fromAutoCompleteTV.setAdapter(fromArrayAdapter); // set adapter to autocomplete tv to arrayAdapter
         fromAutoCompleteTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override // save from selection as variable
@@ -220,6 +221,7 @@ public class SchedulesFragment extends Fragment {
         // to exposed-dropdown-menu
         ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter and pass parameters (context, dropdown layout, array)
         AutoCompleteTextView toAutoCompleteTV= root.findViewById(R.id.toTextView); // get reference to autocomplete text view
+        toAutoCompleteTV.setText(sharedPreferences.getString("default_dest", "15-16th & Locust" ));
         toAutoCompleteTV.setAdapter(toArrayAdapter); // set adapter to autocomplete tv to arrayAdapter
         toAutoCompleteTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override // save from selection as variable
@@ -314,32 +316,39 @@ public class SchedulesFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.reverseButton){
-            if (fromSelection > toSelection) {
-                Toast.makeText(getActivity(), "Now Going: Westbound", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(getActivity(), "Now Going: Eastbound", Toast.LENGTH_LONG).show();
-            }
+            ArrayList<String> stationOptionsList = new ArrayList<>(
+                    Arrays.asList(getResources().getStringArray(R.array.stations_list)));
             int temp = fromSelection;
             fromSelection = toSelection;
             toSelection = temp;
 
+            // change textview values
+            ArrayAdapter<String> itemsArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationOptionsList);
+            AutoCompleteTextView fromAutoCompleteTV= getActivity().findViewById(R.id.fromTextView); // get reference to autocomplete text view
+            fromAutoCompleteTV.setText(stationOptionsList.get(fromSelection));
+            fromAutoCompleteTV.setAdapter(itemsArrayAdapter); // set adapter to autocomplete tv to arrayAdapter
+            AutoCompleteTextView toAutoCompleteTV= getActivity().findViewById(R.id.toTextView); // get reference to autocomplete text view
+            toAutoCompleteTV.setText(stationOptionsList.get(toSelection));
+            toAutoCompleteTV.setAdapter(itemsArrayAdapter); // set adapter to autocomplete tv to arrayAdapter
+
             // reload listview with new array and adapter //
             ListView myListView = getActivity().findViewById(R.id.arrivalsListView);
             ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);
-            ArrayAdapter<String> myGeneralAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, myArrayList);
+            ArrayAdapter<String> myGeneralAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, myArrayList);
             myListView.setAdapter(myGeneralAdapter);
             myGeneralAdapter.notifyDataSetChanged();
             // scroll to next train //
-            Date date = new Date() ;
-            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa") ;
-            timeFormat.format(date);
+            Date currentDateTime = new Date() ;
+            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa", Locale.US) ;
+            timeFormat.format(currentDateTime);
+
             int value = 0;
             for (int i = 0; i < myListView.getCount(); i++) {
                 String v = String.valueOf(myArrayList.get(i));
                 try {
-                    if ((timeFormat.parse(timeFormat.format(date)).equals(timeFormat.parse(v)))) { // curTime == varTime
+                    if ((timeFormat.parse(timeFormat.format(currentDateTime)).equals(timeFormat.parse(v)))) { // curTime == varTime
                         break;
-                    } if (timeFormat.parse(timeFormat.format(date)).before(timeFormat.parse(v))) { // curTime < varTime
+                    } if (timeFormat.parse(timeFormat.format(currentDateTime)).before(timeFormat.parse(v))) { // curTime < varTime
                         break;
                     } value = i+1;
                 } catch (ParseException e) { e.printStackTrace(); }

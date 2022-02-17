@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -138,7 +139,7 @@ public class Schedules {
             String aTime = schedules.get(i);
             String[] split = aTime.split(":",8);
             int curMin = Integer.parseInt(split[1]);
-
+            // remove duplicates
             if (i < schedules.size()-1) {
                 String nextTime = schedules.get(i+1);
                 String[] nextSplit = nextTime.split(":", 8);
@@ -146,14 +147,16 @@ public class Schedules {
                 if (nextMin < curMin+3 && nextMin > curMin-3) {
                     schedules.remove(i+1);
                 }
-            } if (Integer.parseInt(String.valueOf(split[0])) == 12) {
-                schedules.set(i, String.format("%s:%s PM", split[0], split[1]));
-            } else if (String.valueOf(split[0]).equals("00")) {
-                schedules.set(i, String.format("12:%s AM", split[1]));
-            } else if (Integer.parseInt(String.valueOf(split[0])) > 12) {
-                schedules.set(i, String.format("%s:%s PM", Integer.parseInt(String.valueOf(split[0]))-12, split[1]));
-            } else {
-                schedules.set(i, String.format("%s:%s AM", Integer.parseInt(String.valueOf(split[0])), split[1]));
+            }
+            // format to 12hour time
+            try {
+                String _24HourTime = schedules.get(i);
+                SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm", Locale.US);
+                SimpleDateFormat _12HourSDF = new SimpleDateFormat("h:mm a", Locale.US);
+                Date _24HourDt = _24HourSDF.parse(_24HourTime);
+                schedules.set(i, _12HourSDF.format(_24HourDt));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         } return schedules;
     }
