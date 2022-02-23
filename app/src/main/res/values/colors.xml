@@ -3,10 +3,13 @@
     <color name="red_200">#FFD11241</color>
     <color name="red_500">#FFD11241</color>
     <color name="red_700">#FFA70E34</color>
+    <color name="pink">#F7EBEE</color>
+    <color name="less_pink">#D6CCCE</color>
     <color name="gold_200">#FFF5CE70</color>
     <color name="gold_700">#FFF0DBAD</color>
     <color name="blackish">#FF231F20</color>
     <color name="black">#FF000000</color>
+    <color name="grayish">#AEAEAE</color>
     <color name="white">#FFFFFFFF</color>
     <color name="transparent">#0000FFFF</color>
 

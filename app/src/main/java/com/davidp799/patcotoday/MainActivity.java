@@ -5,6 +5,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 import static com.davidp799.patcotoday.SettingsActivity.PREF_DEVICE_THEME;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -59,50 +60,30 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class MainActivity extends AppCompatActivity{
-    private ActivityMainBinding binding;
-    private String currentTheme;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        // Edge to Edge //
+        // enable edge to edge display
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        // Shared Preferences //
+
+        // initialize shared preference variables
         SharedPreferences sharedPreferences = getSharedPreferences("com.davidp799.patcotoday_preferences", MODE_PRIVATE);
-        currentTheme = sharedPreferences.getString("deviceTheme", "");
-        // Set Device Theme //
+        String currentTheme = sharedPreferences.getString("deviceTheme", "");
+
+        // set device theme
         if (currentTheme.equals("Dark")) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else if (currentTheme.equals("Light")) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         } else { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM); }
-        // Set Status bar & Navigation bar Colors //
-        if (Build.VERSION.SDK_INT >= 21) {
 
-            int nightModeFlags =
-                    this.getResources().getConfiguration().uiMode &
-                            Configuration.UI_MODE_NIGHT_MASK;
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-/*            switch (nightModeFlags) {
-                case Configuration.UI_MODE_NIGHT_YES:
-                    if (Build.VERSION.SDK_INT >= 31) {
-                        window.setStatusBarColor(this.getResources().getColor(R.color.material_dynamic_neutral_variant10, getTheme()));
-                        window.setNavigationBarColor(this.getResources().getColor(R.color.material_dynamic_neutral_variant10, getTheme()));
-                    } break;
-                case Configuration.UI_MODE_NIGHT_NO:
-                    if (Build.VERSION.SDK_INT >= 31) {
-                        window.setStatusBarColor(this.getResources().getColor(R.color.material_dynamic_primary95, getTheme()));
-                        window.setNavigationBarColor(this.getResources().getColor(R.color.material_dynamic_primary95, getTheme()));
-                    } break;
-                case Configuration.UI_MODE_NIGHT_UNDEFINED:
-                    break;
-            }*/
-        }
+        // Set Status bar & Navigation bar Colors //
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         // Bottom Navigation View //
-        BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info)
                 .build();
@@ -110,9 +91,7 @@ public class MainActivity extends AppCompatActivity{
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
         // ACTION BAR //
-        ActionBar actionBar;
-        actionBar = getSupportActionBar();
-        getSupportActionBar().setElevation(0);
+        if (getSupportActionBar() != null) { getSupportActionBar().setElevation(0); }
     }
     @Override // action bar settings button
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -121,12 +100,10 @@ public class MainActivity extends AppCompatActivity{
         return true;
     } @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -1,5 +1,6 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
     <style name="Theme.PATCOToday" parent="Theme.Material3.DayNight">
         <!-- Primary brand color. -->
         <item name="android:colorBackground">@color/white</item>
@@ -32,17 +33,9 @@
         <item name="elevationOverlayAccentColor">@android:color/transparent</item>
         <item name="elevationOverlayColor">?colorPrimary</item>
         <!-- Customize your theme here. -->
-        <item name="android:statusBarColor">@color/grayish</item>
-        <item name="android:navigationBarColor">@color/less_pink</item>
+        <item name="android:statusBarColor">@color/pink</item>
+        <item name="android:navigationBarColor">@color/pink</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
     </style>
-
-    <style name="AppBottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
-    </style>
-
-    <style name="CustomBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@drawable/drawable_round_bottom_sheet</item>
-    </style>
-
 </resources>
