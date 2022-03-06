@@ -37,7 +37,7 @@
     <string name="pref_title_version">Application Version</string>
     <string name="pref_summary_version">1.0</string>
     <string name="pref_title_licenses">Open Source Licenses</string>
-    <string name="pref_summary_licenses">More information</string>
+    <string name="pref_summary_licenses">More information\n</string>
     <string name="pref_title_updates">Check for Updates</string>
     <string name="pref_summary_updates">Check for new transit schedules</string>
     <string name="version">Application Version</string>

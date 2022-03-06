@@ -4,6 +4,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,6 +24,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -33,6 +35,7 @@ import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.Schedules;
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.color.DynamicColors;
 import com.google.android.material.transition.MaterialFadeThrough;
 
 import org.jsoup.Jsoup;
@@ -119,6 +122,7 @@ public class SchedulesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentSchedulesBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
         // UI Options //
         setHasOptionsMenu(true);
         setEnterTransition(new MaterialFadeThrough());

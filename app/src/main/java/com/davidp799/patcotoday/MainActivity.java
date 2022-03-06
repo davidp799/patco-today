@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.davidp799.patcotoday.databinding.ActivityMainBinding;
+import com.google.android.material.color.DynamicColors;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -67,7 +69,6 @@ public class MainActivity extends AppCompatActivity{
         setContentView(binding.getRoot());
         // enable edge to edge display
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-
         // initialize shared preference variables
         SharedPreferences sharedPreferences = getSharedPreferences("com.davidp799.patcotoday_preferences", MODE_PRIVATE);
         String currentTheme = sharedPreferences.getString("deviceTheme", "");
@@ -80,9 +81,34 @@ public class MainActivity extends AppCompatActivity{
         } else { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM); }
 
         // Set Status bar & Navigation bar Colors //
+        int nightModeFlags =
+                this.getResources().getConfiguration().uiMode &
+                        Configuration.UI_MODE_NIGHT_MASK;
         Window window = this.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        switch (nightModeFlags) {
+            case Configuration.UI_MODE_NIGHT_YES:
+                if (Build.VERSION.SDK_INT >= 31) {
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
+                    window.setNavigationBarColor(ContextCompat.getColor(this, R.color.transparent));
+
+                } else {
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
+                    window.setNavigationBarColor(ContextCompat.getColor(this, R.color.transparent));
+                } break;
+            case Configuration.UI_MODE_NIGHT_NO:
+                if (Build.VERSION.SDK_INT >= 31) {
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
+                    window.setNavigationBarColor(ContextCompat.getColor(this, R.color.transparent));
+                } else {
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
+                    window.setNavigationBarColor(ContextCompat.getColor(this, R.color.transparent));
+                } break;
+            case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                break;
+        }
+
         // Bottom Navigation View //
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info)
@@ -91,7 +117,11 @@ public class MainActivity extends AppCompatActivity{
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
         // ACTION BAR //
-        if (getSupportActionBar() != null) { getSupportActionBar().setElevation(0); }
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setElevation(0);
+            ColorDrawable colorDrawable = new ColorDrawable(ContextCompat.getColor(this, R.color.transparent));
+            getSupportActionBar().setBackgroundDrawable(colorDrawable);
+        }
     }
     @Override // action bar settings button
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -31,19 +31,19 @@ public class SettingsActivity extends AppCompatActivity {
         switch (nightModeFlags) {
             case Configuration.UI_MODE_NIGHT_YES:
                 if (Build.VERSION.SDK_INT >= 31) {
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.material_dynamic_neutral_variant10));
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
                     window.setNavigationBarColor(ContextCompat.getColor(this, R.color.transparent));
 
                 } else {
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.grayish));
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
                     window.setNavigationBarColor(ContextCompat.getColor(this, R.color.transparent));
                 } break;
             case Configuration.UI_MODE_NIGHT_NO:
                 if (Build.VERSION.SDK_INT >= 31) {
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.material_dynamic_primary95));
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
                     window.setNavigationBarColor(ContextCompat.getColor(this, R.color.transparent));
                 } else {
-                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.grayish));
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.transparent));
                     window.setNavigationBarColor(ContextCompat.getColor(this, R.color.transparent));
                 } break;
             case Configuration.UI_MODE_NIGHT_UNDEFINED:

@@ -29,6 +29,7 @@
             android:entryValues="@array/stations_list"
             app:defaultValue="15-16th &amp; Locust"
             android:summary="%s"/>
+        <!-- // debug, will add later when functional
         <Preference
             android:key="pref_commuter"
             android:title="Commuter Mode"
@@ -40,7 +41,7 @@
             android:key="pref_notifications"
             android:title="Arrival Notifications"
             android:summary="Set train notifications">
-        </Preference>
+        </Preference>-->
 
     </PreferenceCategory>
 
@@ -80,6 +81,7 @@
             android:title="@string/pref_title_licenses"
             android:summary="@string/pref_summary_licenses">
         </Preference>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

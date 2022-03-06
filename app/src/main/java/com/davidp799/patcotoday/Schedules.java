@@ -27,7 +27,7 @@ public class Schedules {
         List<String> calCodes = Arrays.asList("1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
                 "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1");
         Calendar cal = Calendar.getInstance();
-        int weekday = cal.get(Calendar.DAY_OF_WEEK)-2; // weekday in java starts on sunday
+        int weekday = cal.get(Calendar.DAY_OF_WEEK)-1; // weekday in java starts on sunday
         String source = stopCodes.get(source_id);//source_id-1
         String destination = stopCodes.get(destination_id);//destination_id-1
         int route_id;
@@ -144,7 +144,7 @@ public class Schedules {
                 String nextTime = schedules.get(i+1);
                 String[] nextSplit = nextTime.split(":", 8);
                 int nextMin = Integer.parseInt(nextSplit[1]);
-                if (nextMin < curMin+3 && nextMin > curMin-3) {
+                if (nextMin < curMin+3 && nextMin > curMin-3) { // not sure of acceptance interval yet
                     schedules.remove(i+1);
                 }
             }

@@ -28,7 +28,7 @@ public class InfoFragment extends Fragment {
             "https://www.patcofreedomcard.org/front/account/login.jsp",
             "https://twitter.com/RidePATCO", "tel:+1-856-772-6900",
             "patco@ridepatco.org", "http://www.ridepatco.org/index.asp",
-            "david.r.pape@gmail.com", "http://www.ridepatco.org/schedules/alerts_more.asp?page=25",
+            "http://www.ridepatco.org/schedules/alerts_more.asp?page=25",
             "http://www.ridepatco.org/travel/faqs.html", "http://www.ridepatco.org/safety/how_do_i.html"};
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -41,7 +41,7 @@ public class InfoFragment extends Fragment {
         setEnterTransition(new MaterialFadeThrough());
 
         String[]  general = {"Fares", "Reload Freedom Card", "Twitter", "Call", "Email", "Website",
-                             "Email", "Elevator & Escalator Availability", "FAQ's", "Safety & Security"};
+                             "Elevator & Escalator Availability", "FAQ's", "Safety & Security"};
 
         // FIRST LISTVIEW ITEM
         ListView listView = (ListView) root.findViewById(R.id.listView);
