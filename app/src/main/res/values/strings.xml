@@ -41,6 +41,7 @@
     <string name="pref_title_updates">Check for Updates</string>
     <string name="pref_summary_updates">Check for new transit schedules</string>
     <string name="version">Application Version</string>
+    <string name="line_map_desc">PATCO Line Map</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>

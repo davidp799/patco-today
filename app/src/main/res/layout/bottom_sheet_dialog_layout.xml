@@ -7,11 +7,9 @@
     android:orientation="vertical"
     android:layout_height="wrap_content"
     app:behavior_hideable="true"
-    app:behavior_peekHeight="140dp"
+    app:behavior_peekHeight="155sp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     android:elevation="8dp">
-
-
 
     <LinearLayout
         android:id="@+id/bottom_sheet_header"

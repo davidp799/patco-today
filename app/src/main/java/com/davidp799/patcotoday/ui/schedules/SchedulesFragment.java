@@ -3,6 +3,7 @@ package com.davidp799.patcotoday.ui.schedules;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -64,20 +65,20 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class SchedulesFragment extends Fragment {
-    // BINDING //
     private FragmentSchedulesBinding binding;
-    // LIST VIEW DEFAULT VALUES //
-    private ListView myListView;
-    // INITIALIZE VARS & SCHEDS //
+
+    // Initialize Variables
+    static final String directory = "/data/data/com.davidp799.patcotoday/files/data/";
     private int fromSelection, toSelection;
-    private final Schedules schedules = new Schedules();
-    // BACKGROUND THREAD VALUES //
-    private Document doc;
     private boolean internet, special, downloaded, extracted;
-    // Files List //
+
+    private Document doc;
+    private final Schedules schedules = new Schedules();
+
     private final List<String> dataFiles = Arrays.asList( "agency.txt", "calendar.txt", "calendar_dates.txt", "fare_attributes.txt", "fare_rules.txt",
             "feed_info.txt", "frequencies.txt", "routes.txt", "shapes.txt", "stop_times.txt", "stops.txt", "transfers.txt", "trips.txt" );
-    // BEGIN HANDLERS //
+
+    // Initialize Thread Handlers
     Handler downloadHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
@@ -90,9 +91,6 @@ public class SchedulesFragment extends Fragment {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            Bundle extractBundle = msg.getData();
-            boolean myMessage = extractBundle.getBoolean("MSG_KEY");
-
             extracted = msg.getData().getBoolean("MSG_KEY");
             if (extracted) {
                 Toast.makeText(getActivity(), "Files up to Date", Toast.LENGTH_SHORT).show();
@@ -102,76 +100,70 @@ public class SchedulesFragment extends Fragment {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            Bundle internetBundle = msg.getData();
-            boolean myMessage = internetBundle.getBoolean("MSG_KEY");
-
             internet = msg.getData().getBoolean("MSG_KEY");
         }
     }; Handler specialHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            Bundle objBundle = msg.getData();
-            boolean myMessage = objBundle.getBoolean("MSG_KEY");
-
             special = msg.getData().getBoolean("MSG_KEY");
             Toast.makeText(getActivity(), String.format("Special: %s", special), Toast.LENGTH_SHORT).show();
         }
     };
-    // ON CREATE VIEW //
+
+    /* Initialize onCreate */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentSchedulesBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // UI Options //
+        // User Interface
         setHasOptionsMenu(true);
         setEnterTransition(new MaterialFadeThrough());
-        // Shared Preferences //
+
+        // Shared Preferences
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("com.davidp799.patcotoday_preferences", MODE_PRIVATE);
-        // Initialize Lists //
-        ArrayList<String> stationOptionsList = new ArrayList<String>(
-                Arrays.asList(getResources().getStringArray(R.array.stations_list)));
-        // Initialize default stations //
+
+        // Initialize Variables
+        ArrayList<String> stationOptionsList = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.stations_list)));
         fromSelection = stationOptionsList.indexOf(sharedPreferences.getString("default_source", "Lindenwold"));
         toSelection = stationOptionsList.indexOf(sharedPreferences.getString("default_dest", "15-16th & Locust"));
-        // Download Background Thread //
-        File fileDir = new File("/data/data/com.davidp799.patcotoday/files/data/");
+        special = true; // DEBUG - checkSpecial();
+
+        // File Management
+        File fileDir = new File(directory);
         fileDir.mkdirs();
-        checkInternet(getView());
-        // http://transitfeeds.com/p/patco/533/latest/download
-        // Check for data files // ?put in background thread?
+
+        // Run Background Threads
+        checkInternet(getView()); // check for network connection
         int notFound = 0;
-        for (String fileName : dataFiles) {
-            File tempFile = new File(String.format("/data/data/com.davidp799.patcotoday/files/data/"+fileName));
-            if (!tempFile.exists()) {
-                notFound++;
-            }
-        } if (notFound > 0) { // DEBUG REMOVE WHEN FINISHED
-            Toast.makeText(getActivity(), String.format("Files Not Found: %s", notFound), Toast.LENGTH_SHORT).show();
-            downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip",
-                    "/data/data/com.davidp799.patcotoday/files/data/gtfs.zip");
-            // EXTRACT ZIP //
-            extractZip("/data/data/com.davidp799.patcotoday/files/data/gtfs.zip");
+        for (String fileName : dataFiles) { // Check for data files
+            File tempFile = new File(directory + fileName);
+            if (!tempFile.exists()) notFound++;
+        } if (notFound > 0) {
+            Toast.makeText(getActivity(), String.format("E: %s Files Not Found", notFound), Toast.LENGTH_SHORT).show(); // DEBUG REMOVE WHEN FINISHED
+            downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip", directory + "gtfs.zip"); // download zip file
+            extractZip(directory + "gtfs.zip"); // extract file contents
             if (extracted) {
                 Toast.makeText(getContext(), "Files up to Date", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getContext(), "Unable to Update Files", Toast.LENGTH_SHORT).show();
             }
         }
-        // list view //
-        ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);
-        ListView myListView = root.findViewById(R.id.arrivalsListView);
-        ArrayAdapter<String> myGeneralAdapter = new ArrayAdapter<String>(
-                getContext(), android.R.layout.simple_list_item_1, myArrayList);
-        myListView.setAdapter(myGeneralAdapter);
-        myListView.setTransitionGroup(true);
-        // scroll to next train //
-        Date date = new Date() ;
+
+        // Initialize Schedules ListView
+        ArrayList<String> schedulesArrayList = schedules.main(fromSelection, toSelection);
+        ListView schedulesListView = root.findViewById(R.id.arrivalsListView);
+        ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, schedulesArrayList);
+        schedulesListView.setAdapter(schedulesAdapter);
+        schedulesListView.setTransitionGroup(true);
+
+        // Scroll to Next Train in Schedules ListView
+        Date date = new Date();
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa", Locale.US) ;
         timeFormat.format(date);
         int value = 0;
-        for (int i = 0; i < myListView.getCount(); i++) {
-            String v = String.valueOf(myArrayList.get(i));
+        for (int i = 0; i < schedulesListView.getCount(); i++) { // get position value for next train
+            String v = String.valueOf(schedulesArrayList.get(i));
             try {
                 if ((timeFormat.parse(timeFormat.format(date)).equals(timeFormat.parse(v)))) { // curTime == varTime
                     break;
@@ -179,36 +171,33 @@ public class SchedulesFragment extends Fragment {
                     break;
                 } value = i+1;
             } catch (ParseException e) { e.printStackTrace(); }
-        } myListView.smoothScrollToPositionFromTop(value,0,10);
-        myListView.setSelection(value);
-        myGeneralAdapter.notifyDataSetChanged();
-        if (value > 0) {
-            Toast.makeText(getActivity(),
-                    String.format("Next train arrives at %s",
-                            myListView.getItemAtPosition(value).toString()),
-                    Toast.LENGTH_SHORT).show(); //debug
         }
-        // exposed dropdown menus //
-        ArrayAdapter<String> fromArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter and pass parameters (context, dropdown layout, array)
+        schedulesListView.smoothScrollToPositionFromTop(value,0,10);
+        schedulesListView.setSelection(value);
+        schedulesAdapter.notifyDataSetChanged();
+
+        // Initialize Exposed Dropdown Menus
+        ArrayAdapter<String> fromArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter
         AutoCompleteTextView fromAutoCompleteTV = root.findViewById(R.id.fromTextView); // get reference to autocomplete text view
         fromAutoCompleteTV.setText(sharedPreferences.getString("default_source", "Lindenwold"));
-        fromAutoCompleteTV.setAdapter(fromArrayAdapter); // set adapter to autocomplete tv to arrayAdapter
+        fromAutoCompleteTV.setAdapter(fromArrayAdapter); // populate menu for source TV
         fromAutoCompleteTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override // save from selection as variable
+            @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                fromSelection = position; // account for positioning in array
+                fromSelection = position; // save selection for source station
+
                 // reload listview with new array and adapter //
-                ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);
-                ArrayAdapter<String> myGeneralAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, myArrayList);
-                myListView.setAdapter(myGeneralAdapter);
-                myGeneralAdapter.notifyDataSetChanged();
+                ArrayList<String> schedulesArrayList = schedules.main(fromSelection, toSelection);
+                ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
+                schedulesListView.setAdapter(schedulesAdapter);
+                schedulesAdapter.notifyDataSetChanged();
                 // scroll to next train //
                 Date date = new Date() ;
                 SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa", Locale.US) ;
                 String timeFormatDate = timeFormat.format(date);
                 int value = 0;
-                for (int i = 0; i < myListView.getCount(); i++) {
-                    String v = String.valueOf(myArrayList.get(i));
+                for (int i = 0; i < schedulesListView.getCount(); i++) {
+                    String v = String.valueOf(schedulesArrayList.get(i));
                     try {
                         if ((Objects.requireNonNull(timeFormat.parse(timeFormatDate)).equals(timeFormat.parse(v)))) { // curTime == varTime
                             break;
@@ -217,13 +206,13 @@ public class SchedulesFragment extends Fragment {
                         } value = i+1;
                     } catch (ParseException e) { e.printStackTrace(); }
                 }
-                myGeneralAdapter.notifyDataSetChanged();
-                myListView.smoothScrollToPositionFromTop(value, 0, 10);
+                schedulesAdapter.notifyDataSetChanged();
+                schedulesListView.smoothScrollToPositionFromTop(value, 0, 10);
             }
         });
 
         // to exposed-dropdown-menu
-        ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<String>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter and pass parameters (context, dropdown layout, array)
+        ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter and pass parameters (context, dropdown layout, array)
         AutoCompleteTextView toAutoCompleteTV= root.findViewById(R.id.toTextView); // get reference to autocomplete text view
         toAutoCompleteTV.setText(sharedPreferences.getString("default_dest", "15-16th & Locust" ));
         toAutoCompleteTV.setAdapter(toArrayAdapter); // set adapter to autocomplete tv to arrayAdapter
@@ -232,18 +221,18 @@ public class SchedulesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toSelection = position; // account for positioning in array
                 // reload listview with new array and adapter //
-                ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);
-                ArrayAdapter<String> myGeneralAdapter = new ArrayAdapter<String>(
-                        getActivity(), android.R.layout.simple_list_item_1, myArrayList);
-                myListView.setAdapter(myGeneralAdapter);
-                myGeneralAdapter.notifyDataSetChanged();
+                ArrayList<String> schedulesArrayList = schedules.main(fromSelection, toSelection);
+                ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(
+                        getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
+                schedulesListView.setAdapter(schedulesAdapter);
+                schedulesAdapter.notifyDataSetChanged();
                 // scroll to next train //
                 Date date = new Date() ;
-                SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa") ;
+                SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa", Locale.US) ;
                 timeFormat.format(date);
                 int value = 0;
-                for (int i = 0; i < myListView.getCount(); i++) {
-                    String v = String.valueOf(myArrayList.get(i));
+                for (int i = 0; i < schedulesListView.getCount(); i++) {
+                    String v = String.valueOf(schedulesArrayList.get(i));
                     try {
                         if ((timeFormat.parse(timeFormat.format(date)).equals(timeFormat.parse(v)))) { // curTime == varTime
                             break;
@@ -252,13 +241,13 @@ public class SchedulesFragment extends Fragment {
                         } value = i+1;
                     } catch (ParseException e) { e.printStackTrace(); }
                 }
-                myGeneralAdapter.notifyDataSetChanged();
-                myListView.smoothScrollToPositionFromTop(value, 0, 10);
+                schedulesAdapter.notifyDataSetChanged();
+                schedulesListView.smoothScrollToPositionFromTop(value, 0, 10);
 
                 if (value > 0) {
                     Toast.makeText(getActivity(),
                             String.format("Next train arrives at %s",
-                                    myListView.getItemAtPosition(value).toString()),
+                                    schedulesListView.getItemAtPosition(value).toString()),
                             Toast.LENGTH_SHORT).show(); //debug
                 }
             }
@@ -290,6 +279,7 @@ public class SchedulesFragment extends Fragment {
                 header_Arrow_Image.setRotation(slideOffset * 180);
             }
         });
+
         // Check for internet connection
         if (!internet) {
             Toast.makeText(getActivity(), "No Connection: Working Offline", Toast.LENGTH_SHORT).show();
@@ -307,8 +297,7 @@ public class SchedulesFragment extends Fragment {
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         }
-
-         return root;
+        return root;
     }
     // initialize button in action bar
     @Override
@@ -336,19 +325,19 @@ public class SchedulesFragment extends Fragment {
             toAutoCompleteTV.setAdapter(itemsArrayAdapter); // set adapter to autocomplete tv to arrayAdapter
 
             // reload listview with new array and adapter //
-            ListView myListView = getActivity().findViewById(R.id.arrivalsListView);
-            ArrayList<String> myArrayList = schedules.main(fromSelection, toSelection);
-            ArrayAdapter<String> myGeneralAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, myArrayList);
-            myListView.setAdapter(myGeneralAdapter);
-            myGeneralAdapter.notifyDataSetChanged();
+            ListView schedulesListView = getActivity().findViewById(R.id.arrivalsListView);
+            ArrayList<String> schedulesArrayList = schedules.main(fromSelection, toSelection);
+            ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
+            schedulesListView.setAdapter(schedulesAdapter);
+            schedulesAdapter.notifyDataSetChanged();
             // scroll to next train //
             Date currentDateTime = new Date() ;
             SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa", Locale.US) ;
             timeFormat.format(currentDateTime);
 
             int value = 0;
-            for (int i = 0; i < myListView.getCount(); i++) {
-                String v = String.valueOf(myArrayList.get(i));
+            for (int i = 0; i < schedulesListView.getCount(); i++) {
+                String v = String.valueOf(schedulesArrayList.get(i));
                 try {
                     if ((timeFormat.parse(timeFormat.format(currentDateTime)).equals(timeFormat.parse(v)))) { // curTime == varTime
                         break;
@@ -357,8 +346,8 @@ public class SchedulesFragment extends Fragment {
                     } value = i+1;
                 } catch (ParseException e) { e.printStackTrace(); }
             }
-            myGeneralAdapter.notifyDataSetChanged();
-            myListView.smoothScrollToPositionFromTop(value, 0, 10);
+            schedulesAdapter.notifyDataSetChanged();
+            schedulesListView.smoothScrollToPositionFromTop(value, 0, 10);
             return true;
         } return super.onOptionsItemSelected(item);
     }
