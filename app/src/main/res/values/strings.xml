@@ -2,12 +2,13 @@
     <string name="app_name">PATCO Today</string>
     <string name="title_schedules">Schedules</string>
     <string name="title_map">Station Map</string>
-    <string name="title_settings">Settings</string>
     <string name="title_info">Information</string>
     <string name="station_map">Station Map</string>
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="specialSchedules">Special Schedules Available</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_settings">Settings</string>
 
     <string-array name="stations_list">
         <item>Lindenwold</item>

@@ -68,35 +68,14 @@ public class SchedulesFragment extends Fragment {
     private FragmentSchedulesBinding binding;
 
     // Initialize Variables
-    static final String directory = "/data/data/com.davidp799.patcotoday/files/data/";
+//    static final String directory = "/data/data/com.davidp799.patcotoday/files/data/";
     private int fromSelection, toSelection;
-    private boolean internet, special, downloaded, extracted;
-
+    private boolean internet, special;
     private Document doc;
     private final Schedules schedules = new Schedules();
 
-    private final List<String> dataFiles = Arrays.asList( "agency.txt", "calendar.txt", "calendar_dates.txt", "fare_attributes.txt", "fare_rules.txt",
-            "feed_info.txt", "frequencies.txt", "routes.txt", "shapes.txt", "stop_times.txt", "stops.txt", "transfers.txt", "trips.txt" );
-
     // Initialize Thread Handlers
-    Handler downloadHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            Bundle downloadBundle = msg.getData();
-
-            downloaded = downloadBundle.getBoolean("MSG_KEY");
-        }
-    }; Handler extractHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            extracted = msg.getData().getBoolean("MSG_KEY");
-            if (extracted) {
-                Toast.makeText(getActivity(), "Files up to Date", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }; Handler internetHandler = new Handler(Looper.getMainLooper()) {
+    Handler internetHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -127,28 +106,11 @@ public class SchedulesFragment extends Fragment {
         ArrayList<String> stationOptionsList = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.stations_list)));
         fromSelection = stationOptionsList.indexOf(sharedPreferences.getString("default_source", "Lindenwold"));
         toSelection = stationOptionsList.indexOf(sharedPreferences.getString("default_dest", "15-16th & Locust"));
-        special = true; // DEBUG - checkSpecial();
 
-        // File Management
-        File fileDir = new File(directory);
-        fileDir.mkdirs();
-
-        // Run Background Threads
-        checkInternet(getView()); // check for network connection
-        int notFound = 0;
-        for (String fileName : dataFiles) { // Check for data files
-            File tempFile = new File(directory + fileName);
-            if (!tempFile.exists()) notFound++;
-        } if (notFound > 0) {
-            Toast.makeText(getActivity(), String.format("E: %s Files Not Found", notFound), Toast.LENGTH_SHORT).show(); // DEBUG REMOVE WHEN FINISHED
-            downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip", directory + "gtfs.zip"); // download zip file
-            extractZip(directory + "gtfs.zip"); // extract file contents
-            if (extracted) {
-                Toast.makeText(getContext(), "Files up to Date", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Unable to Update Files", Toast.LENGTH_SHORT).show();
-            }
-        }
+        // Background Activities - network, special
+        checkInternet();
+        // checkSpecial();
+        special = true; // DEBUG
 
         // Initialize Schedules ListView
         ArrayList<String> schedulesArrayList = schedules.main(fromSelection, toSelection);
@@ -299,16 +261,16 @@ public class SchedulesFragment extends Fragment {
         }
         return root;
     }
-    // initialize button in action bar
+    /* Initialize reverse trip button in top app bar */
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.reversemenu, menu);
     }
-    // set actionbar button as reverseButton and create tasks
+    /* Reverse and reload data for listView and textViews on reverse button click */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.reverseButton){
+        if(id == R.id.menu_reverse){
             ArrayList<String> stationOptionsList = new ArrayList<>(
                     Arrays.asList(getResources().getStringArray(R.array.stations_list)));
             int temp = fromSelection;
@@ -349,16 +311,18 @@ public class SchedulesFragment extends Fragment {
             schedulesAdapter.notifyDataSetChanged();
             schedulesListView.smoothScrollToPositionFromTop(value, 0, 10);
             return true;
-        } return super.onOptionsItemSelected(item);
+        }
+        return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
 
-    // BACKGROUND THREAD TASKS //
-    public void checkInternet(View view) {
+    /* Background Threads - checkInternet, checkSpecial */
+    public void checkInternet() {
         Runnable internetRunnable = new Runnable() {
             Message internetMessage = internetHandler.obtainMessage();
             Bundle internetBundle = new Bundle();
@@ -419,93 +383,5 @@ public class SchedulesFragment extends Fragment {
             e.printStackTrace();
         }
         specialBgThread.start();
-    } public void downloadZip(String urlStr, String destinationFilePath) {
-        Context context = getContext();
-        Runnable downloadRunnable = new Runnable() {
-            Message downloadMessage = downloadHandler.obtainMessage();
-            Bundle downloadBundle = new Bundle();
-            @Override
-            public void run() {
-                InputStream input = null;
-                OutputStream output = null;
-                HttpURLConnection connection = null;
-                try {
-                    URL url = new URL(urlStr);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.connect();
-                    if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                        Log.d("downloadZipFile", "Server ResponseCode=" + connection.getResponseCode() + " ResponseMessage=" + connection.getResponseMessage());
-                    }
-                    // download the file
-                    input = connection.getInputStream();
-                    Log.d("downloadZipFile", "destinationFilePath=" + destinationFilePath);
-                    new File(destinationFilePath).createNewFile();
-                    output = new FileOutputStream(destinationFilePath);
-
-                    byte[] data = new byte[4096];
-                    int count;
-                    while ((count = input.read(data)) != -1) {
-                        output.write(data, 0, count);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return;
-                } finally {
-                    try {
-                        if (output != null) output.close();
-                        if (input != null) input.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    if (connection != null) connection.disconnect();
-                }
-                File f = new File(destinationFilePath);
-                Log.d("downloadZipFile", "f.getParentFile().getPath()=" + f.getParentFile().getPath());
-                Log.d("downloadZipFile", "f.getName()=" + f.getName().replace(".zip", ""));
-            }
-        };
-        Thread downloadBgThread = new Thread(downloadRunnable);
-        downloadBgThread.start();
-    } public void extractZip(String filePath) {
-        Context context = getContext();
-        Runnable extractRunnable = new Runnable() {
-            Message extractMessage = extractHandler.obtainMessage();
-            Bundle extractBundle = new Bundle();
-            @Override
-            public void run() {
-                InputStream is;
-                ZipInputStream zis;
-                try {
-                    File zipfile = new File(filePath);
-                    String parentFolder = zipfile.getParentFile().getPath();
-                    String filename;
-                    is = new FileInputStream(filePath);
-                    zis = new ZipInputStream(new BufferedInputStream(is));
-                    ZipEntry ze;
-                    byte[] buffer = new byte[1024];
-                    int count;
-                    while ((ze = zis.getNextEntry()) != null) {
-                        filename = ze.getName();
-                        if (ze.isDirectory()) {
-                            File fmd = new File(parentFolder + "/" + filename);
-                            fmd.mkdirs();
-                            continue;
-                        } FileOutputStream fout = new FileOutputStream(
-                                parentFolder + "/" + filename);
-                        while ((count = zis.read(buffer)) != -1) {
-                            fout.write(buffer, 0, count);
-                        }
-                        fout.close();
-                        zis.closeEntry();
-                    } zis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    extracted = false;
-                }
-                extracted = true;
-            }
-        };
-        Thread extractBgThread = new Thread(extractRunnable);
-        extractBgThread.start();
     }
 }

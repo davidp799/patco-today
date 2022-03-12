@@ -49,11 +49,6 @@ public class MapFragment extends Fragment {
         View root = binding.getRoot();
         setEnterTransition(new MaterialFadeThrough());
 
-
-        // image view lineMap
-        ImageView image = (ImageView) root.findViewById(R.id.lineMap);
-        image.setImageResource(R.drawable.patco_linemap);
-
         String[]  stationsList = {"15/16th & Locust", "12/13th & Locust", "9/10th & Locust", "8th & Market",
                              "City Hall", "Broadway", "Ferry Avenue", "Collingswood", "Westmont",
                              "Haddonfield", "Woodcrest", "Ashland", "Lindenwold"};

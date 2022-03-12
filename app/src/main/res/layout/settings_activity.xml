@@ -16,7 +16,7 @@
             android:layout_height="?attr/actionBarSize"
             android:layout_marginTop="24sp"
             app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-            app:title="@string/title_settings"/>
+            app:title="@string/menu_settings"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
