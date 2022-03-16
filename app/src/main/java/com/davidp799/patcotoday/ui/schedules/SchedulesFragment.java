@@ -188,8 +188,7 @@ public class SchedulesFragment extends Fragment {
                         getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
                 schedulesListView.setAdapter(schedulesAdapter);
                 schedulesAdapter.notifyDataSetChanged();
-                // scroll to next train //
-                Date date = new Date() ;
+                // scroll to next train //                Date date = new Date() ;
                 SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa", Locale.US) ;
                 timeFormat.format(date);
                 int value = 0;

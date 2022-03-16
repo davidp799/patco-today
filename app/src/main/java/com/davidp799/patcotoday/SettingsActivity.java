@@ -1,5 +1,6 @@
 package com.davidp799.patcotoday;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -13,8 +14,6 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 public class SettingsActivity extends AppCompatActivity {
     // Initialize Static Variables
-    static final String PREFERENCE_NOT_FOUND = "preference not found";
-    static final String PREF_DEVICE_THEME = "deviceTheme";
 
     /* Initialize onCreate */
     @Override
@@ -48,4 +47,6 @@ public class SettingsActivity extends AppCompatActivity {
             return true;
         } return super.onOptionsItemSelected(item);
     }
+    /* Manually call restart() when theme changed */
+
 }

@@ -1,8 +1,5 @@
 package com.davidp799.patcotoday;
 
-import static com.davidp799.patcotoday.SettingsActivity.PREFERENCE_NOT_FOUND;
-import static com.davidp799.patcotoday.SettingsActivity.PREF_DEVICE_THEME;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -13,6 +10,10 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 
 public class SettingsFragment extends PreferenceFragment {
+    /* Initialize static variables */
+    public static final String PREFERENCE_NOT_FOUND = "preference not found";
+    public static final String PREF_DEVICE_THEME = "deviceTheme";
+
     /* Initialize onCreate */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,19 +36,26 @@ public class SettingsFragment extends PreferenceFragment {
 
             // Change Device Theme and Apply to SharedPreferences
             if (String.valueOf(darkThemePref).equals("Light")) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 sharedPrefsEdit.putString("deviceTheme", "Light");
                 sharedPrefsEdit.apply();
-            } else if (String.valueOf(darkThemePref).equals("Dark")) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+            } else if (String.valueOf(darkThemePref).equals("Dark")) {
                 sharedPrefsEdit.putString("deviceTheme", "Dark");
                 sharedPrefsEdit.apply();
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+
             } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 sharedPrefsEdit.putString("deviceTheme", "Follow device theme");
                 sharedPrefsEdit.apply();
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+
             } return true;
         });
+
+    }
+
+    private void updateView() {
 
     }
 }

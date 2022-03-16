@@ -133,8 +133,8 @@ public class Schedules {
         return result;
     }
     public ArrayList<String> formatSchedules(ArrayList<String> schedules) {
-        /* Function which sorts list of trip by calling trip_id() and utilizes
-           RADIX sort method to sort arrival times in ascending order. */
+        /* Function which sorts list of trip by calling trip_id() and
+           sorts arrival times in ascending order. */
         for (int i=0; i<schedules.size(); i++) {
             String aTime = schedules.get(i);
             String[] split = aTime.split(":",8);

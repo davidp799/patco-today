@@ -3,6 +3,8 @@ package com.davidp799.patcotoday;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String directory = "/data/data/com.davidp799.patcotoday/files/data/";
     private final List<String> dataFiles = Arrays.asList( "agency.txt", "calendar.txt", "calendar_dates.txt", "fare_attributes.txt", "fare_rules.txt",
             "feed_info.txt", "frequencies.txt", "routes.txt", "shapes.txt", "stop_times.txt", "stops.txt", "transfers.txt", "trips.txt" );
+    ConnectivityManager connectivityManager;
 
 
     /* Handler for checking network connection */
@@ -73,9 +76,6 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             updated = msg.getData().getBoolean("MSG_KEY");
-            if (updated) {
-                Toast.makeText(MainActivity.this, "Files Up to Date", Toast.LENGTH_SHORT).show();
-            }
         }
     }; Handler internetHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
         Thread updateBgThread = new Thread(updateRunnable);
         updateBgThread.start();
     }
-    public void checkInternet() {
+    public void checkInternetOld() {
         Runnable internetRunnable = new Runnable() {
             Message internetMessage = internetHandler.obtainMessage();
             Bundle internetBundle = new Bundle();
@@ -214,7 +214,47 @@ public class MainActivity extends AppCompatActivity {
         };
         Thread internetBgThread = new Thread(internetRunnable);
         internetBgThread.start();
-    } public void downloadZip(String urlStr, String destinationFilePath) {
+    }
+    public void checkInternet() {
+        Runnable internetRunnable = new Runnable() {
+            Message internetMessage = internetHandler.obtainMessage();
+            Bundle internetBundle = new Bundle();
+            @Override
+            public void run() {
+                try {
+                    connectivityManager = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // use new connectivity manager mode if Android N
+                        connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
+                            @Override
+                            public void onAvailable(@NonNull Network network) {
+                                internet = true;
+                            }
+                            @Override
+                            public void onLost(@NonNull Network network) {
+                                internet = false;
+                            }
+                        });
+                    } else { // otherwise, ping server
+                        try {
+                            String command = "ping -c 1 www.ridepatco.org";
+                            internet = (Runtime.getRuntime().exec(command).waitFor() == 0);
+                        } catch (Exception e) {
+                            internet = false;
+                        }
+                    }
+                } catch (Exception e) {
+                    internet = false;
+                }
+                internetBundle.putBoolean("MSG_KEY", internet);
+                internetMessage.setData(internetBundle);
+                internetHandler.sendMessage(internetMessage);
+            }
+        };
+        Thread internetBgThread = new Thread(internetRunnable);
+        internetBgThread.start();
+    }
+
+    public void downloadZip(String urlStr, String destinationFilePath) {
         Context context = MainActivity.this;
         Runnable downloadRunnable = new Runnable() {
             Message downloadMessage = downloadHandler.obtainMessage();

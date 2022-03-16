@@ -28,6 +28,7 @@
         <entry key="app/src/main/res/menu/settings.xml" value="0.1" />
         <entry key="app/src/main/res/menu/top_app_bar.xml" value="0.284375" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.24351851851851852" />
+        <entry key="app/src/main/res/xml/network_security_config.xml" value="0.30694444444444446" />
         <entry key="app/src/main/res/xml/preferences.xml" value="0.1" />
       </map>
     </option>
