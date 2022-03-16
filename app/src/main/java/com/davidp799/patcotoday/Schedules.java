@@ -1,7 +1,6 @@
 package com.davidp799.patcotoday;
 
 import android.content.Context;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -34,7 +33,6 @@ public class Schedules {
         Calendar cal = Calendar.getInstance();
         int weekday = cal.get(Calendar.DAY_OF_WEEK)-1; // weekday in java starts on sunday
         String source = stopCodes.get(source_id);//source_id-1
-        String destination = stopCodes.get(destination_id);//destination_id-1
         int travelTime = Math.abs(timeBetween.get(source_id) - timeBetween.get(destination_id));
         int route_id;
         if (destination_id < source_id) {
@@ -42,34 +40,9 @@ public class Schedules {
         } else { route_id = 2; }
         // create dependent variables
         int stop_id = stopCodes.indexOf(source)+1;
-        String time = startTime(stop_id);
-        ArrayList<String> tripID = trip_id(route_id, service_id(calCodes, weekday), weekday);
-        ArrayList<String> schedules = listSchedules(time, tripID, stop_id);
-        Toast.makeText(context, String.format("TT: %s", travelTime), Toast.LENGTH_SHORT).show();
+        ArrayList<String> tripID = trip_id(route_id, service_id(calCodes, weekday));
+        ArrayList<String> schedules = listSchedules(tripID, stop_id);
         return formatSchedules(schedules, travelTime);
-    }
-    public List<Integer> time() {
-        /* Function which utilizes urllib to determine if a special schedule is
-           present for the current date. */
-        String now = new SimpleDateFormat("HH:mm:ss", Locale.US).format(new java.util.Date());
-        String[] split = now.split(":", 3);
-        List<Integer> result = new ArrayList<>();
-        for (String str : split) {
-            result.add(Integer.parseInt(str));
-        } return result;
-    }
-    public String startTime(int stop_id) {
-        /* Function which uses the current time to determine where to begin
-           fetching train arrival times.
-           Returns: string object */
-        List<Integer> now = time();
-        List<String> converted = new ArrayList<String>();
-        for (Object part : now) {
-            String str = part.toString();
-            if (str.length() == 1) {
-                str = "0"+str;
-            } converted.add(str);
-        } return String.format("%s:%s:00", converted.get(0), converted.get(1));
     }
     public ArrayList<Integer> service_id(List<String> calCodes, int weekday) {
         /* Function which determines the service_id based on day of week.
@@ -87,7 +60,7 @@ public class Schedules {
             result.add(71);
         } return result;
     }
-    public ArrayList<String> trip_id(int route_id, ArrayList<Integer> service_ids, int weekday) {
+    public ArrayList<String> trip_id(int route_id, ArrayList<Integer> service_ids) {
         /* Function which determines the trip_id based on the given route_id and service_id
            by reading the trips data file.
            Returns: list object */
@@ -112,7 +85,7 @@ public class Schedules {
         }
         return trips;
     }
-    public ArrayList<String> listSchedules(String startTime, ArrayList<String> trip_id, int stop_id) {
+    public ArrayList<String> listSchedules(ArrayList<String> trip_id, int stop_id) {
         /* Function which utilizes urllib to determine if a special schedule is
            present for the current date. */
         // init variables
@@ -164,6 +137,7 @@ public class Schedules {
                 SimpleDateFormat _12HourSDF = new SimpleDateFormat("h:mm a", Locale.US);
                 Date _24HourDt = _24HourSDF.parse(_24HourTime);
                 // compute trip finish time from train arrival time
+                assert _24HourDt != null;
                 Date arrivedDt = new Date(_24HourDt.getTime() + (travelTime * MILLISECONDS));
                 // append formatted arrival times
                 String result = String.format("%s        -        %s", _12HourSDF.format(_24HourDt), _12HourSDF.format(arrivedDt));
