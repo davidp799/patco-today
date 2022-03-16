@@ -1,11 +1,15 @@
 package com.davidp799.patcotoday;
 
+import android.content.Context;
+import android.text.format.DateUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.Math;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,16 +24,18 @@ public class Schedules {
        PortAuthorityTransitCorporation (PATCO) GTFS package.
        Returns: ZipFile object */
     File fileDir = new File("/data/data/com.davidp799.patcotoday/files/data");
-    public ArrayList<String> main(int source_id, int destination_id) {
-        List<String> stopCodes = Arrays.asList( "Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont", //b5 c7
+    public ArrayList<String> main(Context context, int source_id, int destination_id) {
+        List<String> stopCodes = Arrays.asList( "Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont",
                 "Collingswood", "Ferry Avenue", "Broadway", "City Hall", "8th and Market",
                 "9-10th and Locust", "12-13th and Locust", "15-16th and Locust" );
+        List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 24, 26, 27, 28); // |idx(src) - idx(dst)| = travelTime
         List<String> calCodes = Arrays.asList("1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
                 "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1");
         Calendar cal = Calendar.getInstance();
         int weekday = cal.get(Calendar.DAY_OF_WEEK)-1; // weekday in java starts on sunday
         String source = stopCodes.get(source_id);//source_id-1
         String destination = stopCodes.get(destination_id);//destination_id-1
+        int travelTime = Math.abs(timeBetween.get(source_id) - timeBetween.get(destination_id));
         int route_id;
         if (destination_id < source_id) {
             route_id = 1;
@@ -39,7 +45,8 @@ public class Schedules {
         String time = startTime(stop_id);
         ArrayList<String> tripID = trip_id(route_id, service_id(calCodes, weekday), weekday);
         ArrayList<String> schedules = listSchedules(time, tripID, stop_id);
-        return formatSchedules(schedules);
+        Toast.makeText(context, String.format("TT: %s", travelTime), Toast.LENGTH_SHORT).show();
+        return formatSchedules(schedules, travelTime);
     }
     public List<Integer> time() {
         /* Function which utilizes urllib to determine if a special schedule is
@@ -132,9 +139,11 @@ public class Schedules {
         } Collections.sort(result);
         return result;
     }
-    public ArrayList<String> formatSchedules(ArrayList<String> schedules) {
-        /* Function which sorts list of trip by calling trip_id() and
-           sorts arrival times in ascending order. */
+    public ArrayList<String> formatSchedules(ArrayList<String> schedules, int travelTime) {
+        /* Function which formats list of trip by removing duplicate arrivals,
+           settings arrivals to 12 hour format, and appending travel times. */
+        final long MILLISECONDS = 60000;//millisecs
+
         for (int i=0; i<schedules.size(); i++) {
             String aTime = schedules.get(i);
             String[] split = aTime.split(":",8);
@@ -148,13 +157,18 @@ public class Schedules {
                     schedules.remove(i+1);
                 }
             }
-            // format to 12hour time
             try {
+                // convert to dateTime object, format as 24hr time
                 String _24HourTime = schedules.get(i);
                 SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm", Locale.US);
                 SimpleDateFormat _12HourSDF = new SimpleDateFormat("h:mm a", Locale.US);
                 Date _24HourDt = _24HourSDF.parse(_24HourTime);
-                schedules.set(i, _12HourSDF.format(_24HourDt));
+                // compute trip finish time from train arrival time
+                Date arrivedDt = new Date(_24HourDt.getTime() + (travelTime * MILLISECONDS));
+                // append formatted arrival times
+                String result = String.format("%s        -        %s", _12HourSDF.format(_24HourDt), _12HourSDF.format(arrivedDt));
+                schedules.set(i, result);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

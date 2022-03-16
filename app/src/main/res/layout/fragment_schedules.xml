@@ -75,7 +75,6 @@
         android:layout_height="match_parent"
         android:layout_marginTop="156sp"
         android:layout_marginBottom="96sp">
-
     </ListView>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

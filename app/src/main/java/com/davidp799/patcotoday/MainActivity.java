@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String directory = "/data/data/com.davidp799.patcotoday/files/data/";
     private final List<String> dataFiles = Arrays.asList( "agency.txt", "calendar.txt", "calendar_dates.txt", "fare_attributes.txt", "fare_rules.txt",
             "feed_info.txt", "frequencies.txt", "routes.txt", "shapes.txt", "stop_times.txt", "stops.txt", "transfers.txt", "trips.txt" );
-    ConnectivityManager connectivityManager;
+    private static ConnectivityManager connectivityManager;
 
 
     /* Handler for checking network connection */
@@ -195,26 +195,6 @@ public class MainActivity extends AppCompatActivity {
         Thread updateBgThread = new Thread(updateRunnable);
         updateBgThread.start();
     }
-    public void checkInternetOld() {
-        Runnable internetRunnable = new Runnable() {
-            Message internetMessage = internetHandler.obtainMessage();
-            Bundle internetBundle = new Bundle();
-            @Override
-            public void run() {
-                try {
-                    String command = "ping -c 1 www.ridepatco.org";
-                    internet = (Runtime.getRuntime().exec(command).waitFor() == 0);
-                } catch (Exception e) {
-                    internet = false;
-                }
-                internetBundle.putBoolean("MSG_KEY", internet);
-                internetMessage.setData(internetBundle);
-                internetHandler.sendMessage(internetMessage);
-            }
-        };
-        Thread internetBgThread = new Thread(internetRunnable);
-        internetBgThread.start();
-    }
     public void checkInternet() {
         Runnable internetRunnable = new Runnable() {
             Message internetMessage = internetHandler.obtainMessage();
@@ -253,7 +233,6 @@ public class MainActivity extends AppCompatActivity {
         Thread internetBgThread = new Thread(internetRunnable);
         internetBgThread.start();
     }
-
     public void downloadZip(String urlStr, String destinationFilePath) {
         Context context = MainActivity.this;
         Runnable downloadRunnable = new Runnable() {

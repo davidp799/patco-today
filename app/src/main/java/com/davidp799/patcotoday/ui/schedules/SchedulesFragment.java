@@ -3,14 +3,14 @@ package com.davidp799.patcotoday.ui.schedules;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,54 +25,40 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.preference.ListPreference;
 
-import com.davidp799.patcotoday.MainActivity;
 import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.Schedules;
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.color.DynamicColors;
 import com.google.android.material.transition.MaterialFadeThrough;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class SchedulesFragment extends Fragment {
     private FragmentSchedulesBinding binding;
 
     // Initialize Variables
-//    static final String directory = "/data/data/com.davidp799.patcotoday/files/data/";
     private int fromSelection, toSelection;
     private boolean internet, special;
     private Document doc;
     private final Schedules schedules = new Schedules();
+    private static ConnectivityManager connectivityManager;
+
 
     // Initialize Thread Handlers
     Handler internetHandler = new Handler(Looper.getMainLooper()) {
@@ -113,7 +99,7 @@ public class SchedulesFragment extends Fragment {
         special = true; // DEBUG
 
         // Initialize Schedules ListView
-        ArrayList<String> schedulesArrayList = schedules.main(fromSelection, toSelection);
+        ArrayList<String> schedulesArrayList = schedules.main(getContext(), fromSelection, toSelection);
         ListView schedulesListView = root.findViewById(R.id.arrivalsListView);
         ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, schedulesArrayList);
         schedulesListView.setAdapter(schedulesAdapter);
@@ -149,7 +135,7 @@ public class SchedulesFragment extends Fragment {
                 fromSelection = position; // save selection for source station
 
                 // reload listview with new array and adapter //
-                ArrayList<String> schedulesArrayList = schedules.main(fromSelection, toSelection);
+                ArrayList<String> schedulesArrayList = schedules.main(getContext(), fromSelection, toSelection);
                 ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
                 schedulesListView.setAdapter(schedulesAdapter);
                 schedulesAdapter.notifyDataSetChanged();
@@ -183,7 +169,7 @@ public class SchedulesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toSelection = position; // account for positioning in array
                 // reload listview with new array and adapter //
-                ArrayList<String> schedulesArrayList = schedules.main(fromSelection, toSelection);
+                ArrayList<String> schedulesArrayList = schedules.main(getContext(), fromSelection, toSelection);
                 ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(
                         getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
                 schedulesListView.setAdapter(schedulesAdapter);
@@ -287,7 +273,7 @@ public class SchedulesFragment extends Fragment {
 
             // reload listview with new array and adapter //
             ListView schedulesListView = getActivity().findViewById(R.id.arrivalsListView);
-            ArrayList<String> schedulesArrayList = schedules.main(fromSelection, toSelection);
+            ArrayList<String> schedulesArrayList = schedules.main(getContext(), fromSelection, toSelection);
             ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
             schedulesListView.setAdapter(schedulesAdapter);
             schedulesAdapter.notifyDataSetChanged();
@@ -323,13 +309,31 @@ public class SchedulesFragment extends Fragment {
     /* Background Threads - checkInternet, checkSpecial */
     public void checkInternet() {
         Runnable internetRunnable = new Runnable() {
-            Message internetMessage = internetHandler.obtainMessage();
-            Bundle internetBundle = new Bundle();
+            final Message internetMessage = internetHandler.obtainMessage();
+            final Bundle internetBundle = new Bundle();
             @Override
             public void run() {
                 try {
-                    String command = "ping -c 1 www.ridepatco.org";
-                    internet = (Runtime.getRuntime().exec(command).waitFor() == 0);
+                    connectivityManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // use new connectivity manager mode if Android N
+                        connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
+                            @Override
+                            public void onAvailable(@NonNull Network network) {
+                                internet = true;
+                            }
+                            @Override
+                            public void onLost(@NonNull Network network) {
+                                internet = false;
+                            }
+                        });
+                    } else { // otherwise, ping server
+                        try {
+                            String command = "ping -c 1 www.ridepatco.org";
+                            internet = (Runtime.getRuntime().exec(command).waitFor() == 0);
+                        } catch (Exception e) {
+                            internet = false;
+                        }
+                    }
                 } catch (Exception e) {
                     internet = false;
                 }
@@ -342,8 +346,8 @@ public class SchedulesFragment extends Fragment {
         internetBgThread.start();
     } public void checkSpecial() {
         Runnable specialRunnable = new Runnable() {
-            Message specialMessage = specialHandler.obtainMessage();
-            Bundle specialBundle = new Bundle();
+            final Message specialMessage = specialHandler.obtainMessage();
+            final Bundle specialBundle = new Bundle();
             @Override
             public void run() {
                 try {
