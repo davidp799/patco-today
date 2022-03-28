@@ -37,6 +37,10 @@ You can help translate Lawnchair 12 [on Crowdin](https://lawnchair.crowdin.com/l
 
 [Privacy Policy](privacy-policy.md)
 
+## Terms and Conditions
+
+[Terms and Conditions](terms-conditions.md)
+
 ## License
 
 This Privacy Policy Template is licensed under the GNU General Public License, version 3 (GPLv3) and is distributed free of charge.
