@@ -37,7 +37,8 @@ You can help translate Patco Today [on Crowdin](https://crowdin.com/project/patc
 
 ## License
 Patco Today is license under the GNU General Public License, version 3 (GPLv3) and is distributed free of charge.
-Copyright (C) 2022  Davidp799
+  
+  Copyright (C) 2022  Davidp799
   
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
