@@ -1,4 +1,8 @@
 # Patco Today
+
+<img src="/readme/PatcoToday-logo.png" align="left"
+width="200" hspace="10" vspace="10">
+
 Patco Today is a free, open-source transit app for Android. Primarily utilizing the Google Transit Feed Specification (GTFS) API, it provides the most up-to-date scheduling information for PATCO Transit.
 
 Patco Today is available on the Google Play Store and F-Droid.
@@ -18,34 +22,43 @@ Patco Today is available on the Google Play Store and F-Droid.
         
 ## Features
 
-The android app lets you:
-- Connect to your self-hosted wallabag instance or connect to your [wallabag.it](https://wallabag.it) account.
-- Supports wallabag 2.0 and higher.
-- Completely ad-free.
-- Increase and decrease the size of the font and also switch between a serif or sans-serif font for a more comfortable reading experience.
-- Switch between numerous themes.
-- Possibility to cache images locally for offline reading.
-- Get articles read via Text-to-Speech feature.
-- Needs no special permissions on Android 6.0+.
+Current features of Patco Today include the following:
+- Plan transit trips between PATCO Stations ahead of time.
+- Up-to-date transit schedules at runtime.
+- Automatic updates for special schedules.
+- Caching of files for offline viewing.
+- Support for android 5.1 or higher.
+- An ad-free experience.
+- Applicaiton theming (light, dark, system).
+
+Coming Soon:
+- Ability to change date for schedule viewing.
+- Seamless implementaiton of special schedules.
+- Ability to toggle automatic commuter mode.
+- Late arrival notifications.
 
 ## Screenshots
 
-[<img src="/readme/Wallabag%20Reading%20List.png" align="left"
+[<img src="/readme/PatcoToday1.png" align="left"
 width="200"
-    hspace="10" vspace="10">](/readme/Wallabag%20Reading%20List.png)
-[<img src="/readme/Wallabag%20Article%20View.png" align="center"
+    hspace="10" vspace="10">](/readme/PatcoToday1.png)
+[<img src="/readme/PatcoToday2.png" align="center"
 width="200"
-    hspace="10" vspace="10">](/readme/Wallabag%20Article%20View.png)
+    hspace="10" vspace="10">](/readme/PatcoToday2.png)
+[<img src="/readme/PatcoToday3.png" align="center"
+width="200"
+    hspace="10" vspace="10">](/readme/PatcoToday3.png)
+[<img src="/readme/PatcoToday4.png" align="center"
+width="200"
+    hspace="10" vspace="10">](/readme/PatcoToday4.png)
 
 ## Permissions
 
-On Android versions prior to Android 6.0, wallabag requires the following permissions:
+On Android versions following Android 5.1, Patco Today requires the following permissions:
 - Full Network Access.
 - View Network Connections.
-- Run at startup.
-- Read and write access to external storage.
 
-The "Run at startup" permission is only used if Auto-Sync feature is enabled and is not utilised otherwise. The network access permissions are made use of for downloading content. The external storage permission is used to cache article images for viewing offline.
+The network access permissions are used to download scheduling data.
 
 ## Contribute code
 
