@@ -88,17 +88,15 @@ You can help translate Patco Today [on Crowdin](https://crowdin.com/project/patc
 
 ## Privacy Policy
 
-You should have received a copy of the [Privacy Policy](privacy-policy.md) along with this program. If not, see <https://www.termsfeed.com/live/7267d0fc-3b09-435a-bf45-71ead0cc1494>.
+You should have received a copy of the [Privacy Policy](privacy-policy.md) along with this program. If not, find it [here](https://www.termsfeed.com/live/7267d0fc-3b09-435a-bf45-71ead0cc1494).
 
 ## Terms and Conditions
 
-You should have received a copy of the [Terms and Conditions](terms-conditions.md) along with this program. If not, see <https://www.termsfeed.com/live/e56e7ea1-704d-45cf-9b6c-36c786290c1b>.
+You should have received a copy of the [Terms and Conditions](terms-conditions.md) along with this program. If not, find it [here](https://www.termsfeed.com/live/e56e7ea1-704d-45cf-9b6c-36c786290c1b).
 
 ## License
 Patco Today is license under the GNU General Public License, version 3 (GPLv3) and is distributed free of charge.
-  
-  Copyright (C) 2022  Davidp799
-  
+    
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
