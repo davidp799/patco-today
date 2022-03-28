@@ -40,16 +40,16 @@ Coming Soon:
 ## Screenshots
 
 [<img src="/readme/PatcoToday1.png" align="left"
-width="200"
+width="150"
     hspace="10" vspace="10">](/readme/PatcoToday1.png)
 [<img src="/readme/PatcoToday2.png" align="center"
-width="200"
+width="150"
     hspace="10" vspace="10">](/readme/PatcoToday2.png)
 [<img src="/readme/PatcoToday3.png" align="center"
-width="200"
+width="150"
     hspace="10" vspace="10">](/readme/PatcoToday3.png)
 [<img src="/readme/PatcoToday4.png" align="center"
-width="200"
+width="150"
     hspace="10" vspace="10">](/readme/PatcoToday4.png)
 
 ## Permissions
