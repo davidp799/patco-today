@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-/** Class which utilizes urllib and ZipFile to downlaod the latest
- *  PortAuthorityTransitCorporation (PATCO) GTFS package. */
+/** Class which analyzes PATCO Transit GTFS data to provide a list of upcoming arrivals
+ *  based on provided source and destination stations and day of week. */
 public class Schedules {
     // Default file directory
     File fileDir = new File("/data/data/com.davidp799.patcotoday/files/data");
