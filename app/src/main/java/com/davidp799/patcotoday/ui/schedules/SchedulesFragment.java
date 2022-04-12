@@ -58,7 +58,7 @@ public class SchedulesFragment extends Fragment {
     private Document doc;
     private final Schedules schedules = new Schedules();
     private static ConnectivityManager connectivityManager;
-
+    private int weekday = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1; // weekday in java starts on sunday
 
     // Initialize Thread Handlers
     Handler internetHandler = new Handler(Looper.getMainLooper()) {
@@ -67,7 +67,8 @@ public class SchedulesFragment extends Fragment {
             super.handleMessage(msg);
             internet = msg.getData().getBoolean("MSG_KEY");
         }
-    }; Handler specialHandler = new Handler(Looper.getMainLooper()) {
+    };
+    Handler specialHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -80,14 +81,11 @@ public class SchedulesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentSchedulesBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
         // User Interface
         setHasOptionsMenu(true);
         setEnterTransition(new MaterialFadeThrough());
-
         // Shared Preferences
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("com.davidp799.patcotoday_preferences", MODE_PRIVATE);
-
         // Initialize Variables
         ArrayList<String> stationOptionsList = new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.stations_list)));
         fromSelection = stationOptionsList.indexOf(sharedPreferences.getString("default_source", "Lindenwold"));
@@ -98,8 +96,8 @@ public class SchedulesFragment extends Fragment {
         // checkSpecial();
         special = true; // DEBUG
 
-        // Initialize Schedules ListView
-        ArrayList<String> schedulesArrayList = schedules.main(getContext(), fromSelection, toSelection);
+        // Initialize arrayList for schedules
+        ArrayList<String> schedulesArrayList = getSchedules(fromSelection, toSelection);
         ListView schedulesListView = root.findViewById(R.id.arrivalsListView);
         ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, schedulesArrayList);
         schedulesListView.setAdapter(schedulesAdapter);
@@ -135,7 +133,7 @@ public class SchedulesFragment extends Fragment {
                 fromSelection = position; // save selection for source station
 
                 // reload listview with new array and adapter //
-                ArrayList<String> schedulesArrayList = schedules.main(getContext(), fromSelection, toSelection);
+                ArrayList<String> schedulesArrayList = getSchedules(fromSelection, toSelection);
                 ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
                 schedulesListView.setAdapter(schedulesAdapter);
                 schedulesAdapter.notifyDataSetChanged();
@@ -169,7 +167,7 @@ public class SchedulesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toSelection = position; // account for positioning in array
                 // reload listview with new array and adapter //
-                ArrayList<String> schedulesArrayList = schedules.main(getContext(), fromSelection, toSelection);
+                ArrayList<String> schedulesArrayList = getSchedules(fromSelection, toSelection);
                 ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(
                         getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
                 schedulesListView.setAdapter(schedulesAdapter);
@@ -273,7 +271,7 @@ public class SchedulesFragment extends Fragment {
 
             // reload listview with new array and adapter //
             ListView schedulesListView = getActivity().findViewById(R.id.arrivalsListView);
-            ArrayList<String> schedulesArrayList = schedules.main(getContext(), fromSelection, toSelection);
+            ArrayList<String> schedulesArrayList = getSchedules(fromSelection, toSelection);
             ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
             schedulesListView.setAdapter(schedulesAdapter);
             schedulesAdapter.notifyDataSetChanged();
@@ -304,6 +302,23 @@ public class SchedulesFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    /** Function used to retrieve arrival times from Schedules class.
+     *  @param source_id starting station
+     *  @param destination_id arrival station
+     *  @return ArrayList of strings */
+    public ArrayList<String> getSchedules(int source_id, int destination_id) {
+        // Initialize travel duration and route_id for current trip
+        int travelTime = schedules.getTravelTime(source_id, destination_id);
+        int route_id = schedules.getRouteID(source_id, destination_id);
+        // Retrieve lists of base data
+        ArrayList<Integer> service_idList = schedules.getServiceID(weekday);
+        ArrayList<String> trip_idList = schedules.getTripID(route_id, service_idList);
+        // Retrieve unformatted list of arrival times
+        ArrayList<String> schedulesList = schedules.getSchedulesList(trip_idList, fromSelection);
+        // Return formatted list of arrival times for current trip
+        return schedules.getFormatSchedulesList(schedulesList, travelTime);
     }
 
     /* Background Threads - checkInternet, checkSpecial */

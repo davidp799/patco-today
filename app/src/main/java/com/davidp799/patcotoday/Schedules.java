@@ -2,7 +2,6 @@ package com.davidp799.patcotoday;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,35 +17,53 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/** Class which utilizes urllib and ZipFile to downlaod the latest
+ *  PortAuthorityTransitCorporation (PATCO) GTFS package. */
 public class Schedules {
-    /* Class which utilizes urllib and ZipFile to download the latest
-       PortAuthorityTransitCorporation (PATCO) GTFS package.
-       Returns: ZipFile object */
+    // Default file directory
     File fileDir = new File("/data/data/com.davidp799.patcotoday/files/data");
-    public ArrayList<String> main(Context context, int source_id, int destination_id) {
-        List<String> stopCodes = Arrays.asList( "Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont",
-                "Collingswood", "Ferry Avenue", "Broadway", "City Hall", "8th and Market",
-                "9-10th and Locust", "12-13th and Locust", "15-16th and Locust" );
-        List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 24, 26, 27, 28); // |idx(src) - idx(dst)| = travelTime
-        List<String> calCodes = Arrays.asList("1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
-                "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1");
-        Calendar cal = Calendar.getInstance();
-        int weekday = cal.get(Calendar.DAY_OF_WEEK)-1; // weekday in java starts on sunday
-        String source = stopCodes.get(source_id);//source_id-1
-        int travelTime = Math.abs(timeBetween.get(source_id) - timeBetween.get(destination_id));
-        int route_id;
-        if (destination_id < source_id) {
-            route_id = 1;
-        } else { route_id = 2; }
-        // create dependent variables
-        int stop_id = stopCodes.indexOf(source)+1;
-        ArrayList<String> tripID = trip_id(route_id, service_id(calCodes, weekday));
-        ArrayList<String> schedules = listSchedules(tripID, stop_id);
-        return formatSchedules(schedules, travelTime);
+    // Names for station ID's at specified indices
+    List<String> stopCodes = Arrays.asList( "Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont",
+            "Collingswood", "Ferry Avenue", "Broadway", "City Hall", "8th and Market",
+            "9-10th and Locust", "12-13th and Locust", "15-16th and Locust" );
+    // Travel times between stations at specified indices; |idx(src) - idx(dst)| = travelTime
+    List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 24, 26, 27, 28);
+    // Codes representing weekday or weekend status; Used to determine service_id
+    List<String> calCodes = Arrays.asList("1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
+            "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1");
+
+    /** Function which returns the name of the given station index.
+     * @param source_id station corresponding to stopCodes index
+     * @return string value of station name */
+    public String getStopCode(int source_id) {
+        return stopCodes.get(source_id);
     }
-    public ArrayList<Integer> service_id(List<String> calCodes, int weekday) {
-        /* Function which determines the service_id based on day of week.
-           Returns: int object */
+
+    /** Function which returns the length in minutes between source
+     *  station and destination station.
+     * @param source_id starting point
+     * @param destination_id ending point
+     * @return integer value of distance in minutes */
+    public int getTravelTime(int source_id, int destination_id) {
+        return Math.abs(timeBetween.get(source_id) - timeBetween.get(destination_id));
+    }
+
+    /** Function which returns the routeID which represents
+     *  the direction of the desired train (Eastbound / Westbound).
+     * @param source_id starting point
+     * @param destination_id ending point
+     * @return integer route code (1 = Westbound, 2 = Eastbound) */
+    public int getRouteID(int source_id, int destination_id) {
+        if (destination_id < source_id) {
+            return 1;
+        } else { return 2; }
+    }
+
+    /** Function which returns the service_id and determines whether a
+     *  weekday or weekend schedule is used.
+     * @param weekday integer value representing day of week
+     * @return ArrayList of integers */
+    public ArrayList<Integer> getServiceID(int weekday) {
         String code = calCodes.get(weekday);
         ArrayList<Integer> result = new ArrayList<>();
         if (code.equals("1,1,1,1,1,0,0")) {
@@ -60,22 +77,27 @@ public class Schedules {
             result.add(71);
         } return result;
     }
-    public ArrayList<String> trip_id(int route_id, ArrayList<Integer> service_ids) {
-        /* Function which determines the trip_id based on the given route_id and service_id
-           by reading the trips data file.
-           Returns: list object */
-        ArrayList<String> trips = new ArrayList<>();
+
+    /** Function which reads the trips.txt data file to determine the
+     *  trip_id based on the given route_id and service_id.
+     * @param route_id integer value representing travel direction
+     * @param service_ids list of service codes which determine which
+     *        weekday or weekend schedule is used.
+     * @return ArrayList of strings */
+    public ArrayList<String> getTripID(int route_id, ArrayList<Integer> service_ids) {
+        ArrayList<String> tripIDs = new ArrayList<>();
         String filename = fileDir + "/trips.txt";
-        // open trips.txt file as r/o data
+        // open trips.txt file as read only
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(filename));
             String line = reader.readLine();
             while (line != null) {
+                // split line, pull service_id and add to tripID list
                 List<String> c = Arrays.asList(line.split(",", 128));
                 for (int i=0; i<service_ids.size(); i++) {
                     if (c.get(0).equals(String.valueOf(route_id)) && c.get(1).equals(String.valueOf(service_ids.get(i)))) {
-                        trips.add(String.valueOf(c.get(2)));
+                        tripIDs.add(String.valueOf(c.get(2)));
                     }
                 } line = reader.readLine();
             } reader.close();
@@ -83,11 +105,15 @@ public class Schedules {
             Log.d("READ ERROR", "trips.txt");
             e.printStackTrace();
         }
-        return trips;
+        return tripIDs;
     }
-    public ArrayList<String> listSchedules(ArrayList<String> trip_id, int stop_id) {
-        /* Function which utilizes urllib to determine if a special schedule is
-           present for the current date. */
+
+    /** Function which reads the stop_times.txt data file to determine the
+     *  trip_id based on the given route_id and service_id.
+     * @param trip_id list of tripIDs
+     * @param source_id integer representing source station (will add 1)
+     * @return ArrayList of strings */
+    public ArrayList<String> getSchedulesList(ArrayList<String> trip_id, int source_id) {
         // init variables
         ArrayList<String> result = new ArrayList<>();
         // open stop_times dataset and search for arrival times
@@ -100,7 +126,7 @@ public class Schedules {
                 // split line and check if it contains a relevant travel time
                 String[] split = line.split(",", 32);
                 if (trip_id.contains(split[0])) {
-                    if (split[3].equals(String.valueOf(stop_id))) {
+                    if (split[3].equals(String.valueOf(source_id+1))) {
                         String[] splitTime = split[1].split(":", 16);
                         result.add(splitTime[0] + ":" + splitTime[1]);
                     }
@@ -112,10 +138,14 @@ public class Schedules {
         } Collections.sort(result);
         return result;
     }
-    public ArrayList<String> formatSchedules(ArrayList<String> schedules, int travelTime) {
-        /* Function which formats list of trip by removing duplicate arrivals,
-           settings arrivals to 12 hour format, and appending travel times. */
-        final long MILLISECONDS = 60000;//millisecs
+
+    /** Function which formats list of trip by removing duplicate arrivals,
+     *  settings arrivals to 12 hour format, and appending travel times.
+     *  @param schedules unformatted list of arrival times
+     *  @param travelTime minutes between source and destination station
+     *  @return ArrayList of strings */
+    public ArrayList<String> getFormatSchedulesList(ArrayList<String> schedules, int travelTime) {
+        final long MILLISECONDS = 60000; //milliseconds
 
         for (int i=0; i<schedules.size(); i++) {
             String aTime = schedules.get(i);
@@ -140,8 +170,8 @@ public class Schedules {
                 assert _24HourDt != null;
                 Date arrivedDt = new Date(_24HourDt.getTime() + (travelTime * MILLISECONDS));
                 // append formatted arrival times
-                String result = String.format("%s        -        %s", _12HourSDF.format(_24HourDt), _12HourSDF.format(arrivedDt));
-                schedules.set(i, result);
+                String result = String.format("%s        -        %s", _12HourSDF.format(_24HourDt), _12HourSDF.format(arrivedDt)); // DEBUG, REMOVE
+                schedules.set(i, String.format("%s", _12HourSDF.format(_24HourDt)));
 
             } catch (Exception e) {
                 e.printStackTrace();
