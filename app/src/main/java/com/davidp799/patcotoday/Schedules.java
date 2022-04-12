@@ -30,7 +30,7 @@ public class Schedules {
     List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 24, 26, 27, 28);
     // Codes representing weekday or weekend status; Used to determine service_id
     List<String> calCodes = Arrays.asList("1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
-            "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1");
+            "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1"); // possibly include a boolean array (on/off) depending on circumstances
 
     /** Function which returns the name of the given station index.
      * @param source_id station corresponding to stopCodes index

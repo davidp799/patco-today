@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/papda/AndroidStudioProjects/patco-today/app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.246" />
+        <entry key="..\:/Users/papda/AndroidStudioProjects/patco-today/app/src/main/res/drawable/ic_baseline_arrow_right_alt_24.xml" value="0.246" />
+        <entry key="..\:/Users/papda/AndroidStudioProjects/patco-today/app/src/main/res/layout/fragment_schedules.xml" value="0.20199275362318841" />
         <entry key="app/src/main/res/drawable/background_border.xml" value="0.3135" />
         <entry key="app/src/main/res/drawable/drawable_round_bottom_sheet.xml" value="0.16018518518518518" />
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.3035" />
