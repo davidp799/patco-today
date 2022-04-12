@@ -171,7 +171,8 @@ public class Schedules {
                 Date arrivedDt = new Date(_24HourDt.getTime() + (travelTime * MILLISECONDS));
                 // append formatted arrival times
                 String result = String.format("%s        -        %s", _12HourSDF.format(_24HourDt), _12HourSDF.format(arrivedDt)); // DEBUG, REMOVE
-                schedules.set(i, String.format("%s", _12HourSDF.format(_24HourDt)));
+//                schedules.set(i, String.format("%s", _12HourSDF.format(_24HourDt)));
+                schedules.set(i, result);
 
             } catch (Exception e) {
                 e.printStackTrace();
