@@ -111,7 +111,8 @@ public class SchedulesFragment extends Fragment {
         timeFormat.format(date);
         int value = 0;
         for (int i = 0; i < schedulesListView.getCount(); i++) { // get position value for next train
-            String v = String.valueOf(schedulesArrayList.get(i));
+            Arrival thisArrival = schedulesArrayList.get(i);
+            String v = String.valueOf(thisArrival.getArrivalTime());
             try {
                 if ((timeFormat.parse(timeFormat.format(date)).equals(timeFormat.parse(v)))) { // curTime == varTime
                     break;
@@ -145,7 +146,8 @@ public class SchedulesFragment extends Fragment {
                 String timeFormatDate = timeFormat.format(date);
                 int value = 0;
                 for (int i = 0; i < schedulesListView.getCount(); i++) {
-                    String v = String.valueOf(schedulesArrayList.get(i));
+                    Arrival thisArrival = schedulesArrayList.get(i);
+                    String v = String.valueOf(thisArrival.getArrivalTime());
                     try {
                         if ((Objects.requireNonNull(timeFormat.parse(timeFormatDate)).equals(timeFormat.parse(v)))) { // curTime == varTime
                             break;
@@ -178,7 +180,8 @@ public class SchedulesFragment extends Fragment {
                 timeFormat.format(date);
                 int value = 0;
                 for (int i = 0; i < schedulesListView.getCount(); i++) {
-                    String v = String.valueOf(schedulesArrayList.get(i));
+                    Arrival thisArrival = schedulesArrayList.get(i);
+                    String v = String.valueOf(thisArrival.getArrivalTime());
                     try {
                         if ((timeFormat.parse(timeFormat.format(date)).equals(timeFormat.parse(v)))) { // curTime == varTime
                             break;
