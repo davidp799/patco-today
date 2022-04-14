@@ -1,6 +1,5 @@
 package com.davidp799.patcotoday;
 
-import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -11,7 +10,6 @@ import java.lang.Math;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;

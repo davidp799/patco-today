@@ -58,7 +58,7 @@ public class SchedulesFragment extends Fragment {
     private Document doc;
     private final Schedules schedules = new Schedules();
     private static ConnectivityManager connectivityManager;
-    private int weekday = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1; // weekday in java starts on sunday
+    private final int weekday = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1; // weekday in java starts on sunday
 
     // Initialize Thread Handlers
     Handler internetHandler = new Handler(Looper.getMainLooper()) {
@@ -376,7 +376,6 @@ public class SchedulesFragment extends Fragment {
                 int day = cal.get(Calendar.DAY_OF_MONTH);
                 Element table = doc.body().getElementsByTag("table").first();
                 Element tbody = table.getElementsByTag("tbody").first();
-                StringBuilder headBuilder = new StringBuilder();
                 // check for special schedule
                 for (Element tr : tbody.getElementsByTag("tr")) {
                     for (Element td : tr.getElementsByTag("td")) {
