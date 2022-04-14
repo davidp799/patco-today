@@ -29,8 +29,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.davidp799.patcotoday.Arrival;
 import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.Schedules;
+import com.davidp799.patcotoday.SchedulesListAdapter;
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.transition.MaterialFadeThrough;
@@ -97,9 +99,9 @@ public class SchedulesFragment extends Fragment {
         special = true; // DEBUG
 
         // Initialize arrayList for schedules
-        ArrayList<String> schedulesArrayList = getSchedules(fromSelection, toSelection);
+        ArrayList<Arrival> schedulesArrayList = getSchedules(fromSelection, toSelection);
         ListView schedulesListView = root.findViewById(R.id.arrivalsListView);
-        ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, schedulesArrayList);
+        ArrayAdapter<Arrival> schedulesAdapter = new SchedulesListAdapter(getContext(), R.layout.adapter_view_layout, schedulesArrayList);
         schedulesListView.setAdapter(schedulesAdapter);
         schedulesListView.setTransitionGroup(true);
 
@@ -133,8 +135,8 @@ public class SchedulesFragment extends Fragment {
                 fromSelection = position; // save selection for source station
 
                 // reload listview with new array and adapter //
-                ArrayList<String> schedulesArrayList = getSchedules(fromSelection, toSelection);
-                ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
+                ArrayList<Arrival> schedulesArrayList = getSchedules(fromSelection, toSelection);
+                ArrayAdapter<Arrival> schedulesAdapter = new SchedulesListAdapter(getContext(), R.layout.adapter_view_layout, schedulesArrayList);
                 schedulesListView.setAdapter(schedulesAdapter);
                 schedulesAdapter.notifyDataSetChanged();
                 // scroll to next train //
@@ -167,9 +169,8 @@ public class SchedulesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toSelection = position; // account for positioning in array
                 // reload listview with new array and adapter //
-                ArrayList<String> schedulesArrayList = getSchedules(fromSelection, toSelection);
-                ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(
-                        getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
+                ArrayList<Arrival> schedulesArrayList = getSchedules(fromSelection, toSelection);
+                ArrayAdapter<Arrival> schedulesAdapter = new SchedulesListAdapter(getContext(), R.layout.adapter_view_layout, schedulesArrayList);
                 schedulesListView.setAdapter(schedulesAdapter);
                 schedulesAdapter.notifyDataSetChanged();
                 // scroll to next train //                Date date = new Date() ;
@@ -271,8 +272,8 @@ public class SchedulesFragment extends Fragment {
 
             // reload listview with new array and adapter //
             ListView schedulesListView = getActivity().findViewById(R.id.arrivalsListView);
-            ArrayList<String> schedulesArrayList = getSchedules(fromSelection, toSelection);
-            ArrayAdapter<String> schedulesAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, schedulesArrayList);
+            ArrayList<Arrival> schedulesArrayList = getSchedules(fromSelection, toSelection);
+            ArrayAdapter<Arrival> schedulesAdapter = new SchedulesListAdapter(getContext(), R.layout.adapter_view_layout, schedulesArrayList);
             schedulesListView.setAdapter(schedulesAdapter);
             schedulesAdapter.notifyDataSetChanged();
             // scroll to next train //
@@ -282,7 +283,8 @@ public class SchedulesFragment extends Fragment {
 
             int value = 0;
             for (int i = 0; i < schedulesListView.getCount(); i++) {
-                String v = String.valueOf(schedulesArrayList.get(i));
+                Arrival thisArrival = schedulesArrayList.get(i);
+                String v = String.valueOf(thisArrival.getArrivalTime());
                 try {
                     if ((timeFormat.parse(timeFormat.format(currentDateTime)).equals(timeFormat.parse(v)))) { // curTime == varTime
                         break;
@@ -308,7 +310,7 @@ public class SchedulesFragment extends Fragment {
      *  @param source_id starting station
      *  @param destination_id arrival station
      *  @return ArrayList of strings */
-    public ArrayList<String> getSchedules(int source_id, int destination_id) {
+    public ArrayList<Arrival> getSchedules(int source_id, int destination_id) {
         // Initialize travel duration and route_id for current trip
         int travelTime = schedules.getTravelTime(source_id, destination_id);
         int route_id = schedules.getRouteID(source_id, destination_id);
@@ -318,7 +320,7 @@ public class SchedulesFragment extends Fragment {
         // Retrieve unformatted list of arrival times
         ArrayList<String> schedulesList = schedules.getSchedulesList(trip_idList, fromSelection);
         // Return formatted list of arrival times for current trip
-        return schedules.getFormatSchedulesList(schedulesList, travelTime);
+        return schedules.getFormatArrival(schedulesList, travelTime);
     }
 
     /* Background Threads - checkInternet, checkSpecial */

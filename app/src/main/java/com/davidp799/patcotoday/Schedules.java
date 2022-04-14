@@ -138,11 +138,11 @@ public class Schedules {
     }
 
     /** Function which formats list of trip by removing duplicate arrivals,
-     *  settings arrivals to 12 hour format, and appending travel times.
+     *  setting arrivals to 12 hour format, and appending travel times.
      *  @param schedules unformatted list of arrival times
      *  @param travelTime minutes between source and destination station
      *  @return ArrayList of strings */
-    public ArrayList<String> getFormatSchedulesList(ArrayList<String> schedules, int travelTime) {
+    public ArrayList<String> getFormatString(ArrayList<String> schedules, int travelTime) {
         final long MILLISECONDS = 60000; //milliseconds
 
         for (int i=0; i<schedules.size(); i++) {
@@ -167,14 +167,56 @@ public class Schedules {
                 // compute trip finish time from train arrival time
                 assert _24HourDt != null;
                 Date arrivedDt = new Date(_24HourDt.getTime() + (travelTime * MILLISECONDS));
-                // append formatted arrival times
+/*                // append formatted arrival times
                 String result = String.format("%s        -        %s", _12HourSDF.format(_24HourDt), _12HourSDF.format(arrivedDt)); // DEBUG, REMOVE
-//                schedules.set(i, String.format("%s", _12HourSDF.format(_24HourDt)));
-                schedules.set(i, result);
-
+                schedules.set(i, result);*/
+                schedules.set(i, String.format("%s", _12HourSDF.format(_24HourDt)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } return schedules;
     }
+
+    /** Function which formats list of trip by removing duplicate arrivals,
+     *  setting arrivals to 12 hour format, and appending travel times as Arrival objects.
+     *  @param schedules unformatted list of arrival times
+     *  @param travelTime minutes between source and destination station
+     *  @return ArrayList of Arrival objects */
+    public ArrayList<Arrival> getFormatArrival(ArrayList<String> schedules, int travelTime) {
+        final long MILLISECONDS = 60000; //milliseconds
+        ArrayList<Arrival> arrivals = new ArrayList<>();
+
+        for (int i=0; i<schedules.size(); i++) {
+            String aTime = schedules.get(i);
+            String[] split = aTime.split(":",8);
+            int curMin = Integer.parseInt(split[1]);
+            // remove duplicates
+            if (i < schedules.size()-1) {
+                String nextTime = schedules.get(i+1);
+                String[] nextSplit = nextTime.split(":", 8);
+                int nextMin = Integer.parseInt(nextSplit[1]);
+                if (nextMin < curMin+3 && nextMin > curMin-3) { // not sure of acceptance interval yet
+                    schedules.remove(i+1);
+                }
+            }
+            try {
+                // convert to dateTime object, format as 24hr time
+                String _24HourTime = schedules.get(i);
+                SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm", Locale.US);
+                SimpleDateFormat _12HourSDF = new SimpleDateFormat("h:mm a", Locale.US);
+                Date _24HourDt = _24HourSDF.parse(_24HourTime);
+                // compute trip finish time from train arrival time
+                assert _24HourDt != null;
+                Date arrivedDt = new Date(_24HourDt.getTime() + (travelTime * MILLISECONDS));
+
+                // append formatted arrival times as Arrival objects
+                Arrival thisArrival = new Arrival(_12HourSDF.format(_24HourDt), _12HourSDF.format(arrivedDt));
+                arrivals.add(i, thisArrival);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } return arrivals;
+    }
+
 }
