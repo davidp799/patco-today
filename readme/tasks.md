@@ -11,6 +11,7 @@ Patco Today Tasks:
     1. Add getSchedules() function, [x] [r]
     2. Move redundant calls to single function, [x] [r]
     3. Fix race conditions occurring with: CheckInternet(), CheckSpecial(), UpdateSchedules(),
+    * java.util.concurrent (async task replacement)
     
 * Layout:
     1. Implement 3 column listView for formatting arrival times, [x] [r]
