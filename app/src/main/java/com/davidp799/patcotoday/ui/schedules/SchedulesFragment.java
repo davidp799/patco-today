@@ -99,108 +99,40 @@ public class SchedulesFragment extends Fragment {
         special = true; // DEBUG
 
         // Initialize arrayList for schedules
-        ArrayList<Arrival> schedulesArrayList = getSchedules(fromSelection, toSelection);
         ListView schedulesListView = root.findViewById(R.id.arrivalsListView);
-        ArrayAdapter<Arrival> schedulesAdapter = new SchedulesListAdapter(getContext(), R.layout.adapter_view_layout, schedulesArrayList);
-        schedulesListView.setAdapter(schedulesAdapter);
-        schedulesListView.setTransitionGroup(true);
+        updateListView(schedulesListView, fromSelection, toSelection);
 
-        // Scroll to Next Train in Schedules ListView
-        Date date = new Date();
-        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa", Locale.US) ;
-        timeFormat.format(date);
-        int value = 0;
-        for (int i = 0; i < schedulesListView.getCount(); i++) { // get position value for next train
-            Arrival thisArrival = schedulesArrayList.get(i);
-            String v = String.valueOf(thisArrival.getArrivalTime());
-            try {
-                if ((timeFormat.parse(timeFormat.format(date)).equals(timeFormat.parse(v)))) { // curTime == varTime
-                    break;
-                } if (timeFormat.parse(timeFormat.format(date)).before(timeFormat.parse(v))) { // curTime < varTime
-                    break;
-                } value = i+1;
-            } catch (ParseException e) { e.printStackTrace(); }
-        }
-        schedulesListView.smoothScrollToPositionFromTop(value,0,10);
-        schedulesListView.setSelection(value);
-        schedulesAdapter.notifyDataSetChanged();
-
-        // Initialize Exposed Dropdown Menus
-        ArrayAdapter<String> fromArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter
+        // Initialize array adapter for stations dropdown menu
+        ArrayAdapter<String> stationsArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter
+        // Initialize from and to textViews
         AutoCompleteTextView fromAutoCompleteTV = root.findViewById(R.id.fromTextView); // get reference to autocomplete text view
+        AutoCompleteTextView toAutoCompleteTV= root.findViewById(R.id.toTextView); // get reference to autocomplete text view
+        // set default text for both textViews
         fromAutoCompleteTV.setText(sharedPreferences.getString("default_source", "Lindenwold"));
-        fromAutoCompleteTV.setAdapter(fromArrayAdapter); // populate menu for source TV
+        toAutoCompleteTV.setText(sharedPreferences.getString("default_dest", "15-16th & Locust" ));
+
+        // connect textViews to stations options arrayAdapter
+        fromAutoCompleteTV.setAdapter(stationsArrayAdapter);
+        toAutoCompleteTV.setAdapter(stationsArrayAdapter);
+
+        // Listen for station selections: from and to respectively
         fromAutoCompleteTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                fromSelection = position; // save selection for source station
-
-                // reload listview with new array and adapter //
-                ArrayList<Arrival> schedulesArrayList = getSchedules(fromSelection, toSelection);
-                ArrayAdapter<Arrival> schedulesAdapter = new SchedulesListAdapter(getContext(), R.layout.adapter_view_layout, schedulesArrayList);
-                schedulesListView.setAdapter(schedulesAdapter);
-                schedulesAdapter.notifyDataSetChanged();
-                // scroll to next train //
-                Date date = new Date() ;
-                SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa", Locale.US) ;
-                String timeFormatDate = timeFormat.format(date);
-                int value = 0;
-                for (int i = 0; i < schedulesListView.getCount(); i++) {
-                    Arrival thisArrival = schedulesArrayList.get(i);
-                    String v = String.valueOf(thisArrival.getArrivalTime());
-                    try {
-                        if ((Objects.requireNonNull(timeFormat.parse(timeFormatDate)).equals(timeFormat.parse(v)))) { // curTime == varTime
-                            break;
-                        } if (Objects.requireNonNull(timeFormat.parse(timeFormat.format(date))).before(timeFormat.parse(v))) { // curTime < varTime
-                            break;
-                        } value = i+1;
-                    } catch (ParseException e) { e.printStackTrace(); }
-                }
-                schedulesAdapter.notifyDataSetChanged();
-                schedulesListView.smoothScrollToPositionFromTop(value, 0, 10);
+                fromSelection = position; // set source station to index of selected array position
+                // reload listview and scroll to next train
+                updateListView(schedulesListView, position, toSelection);
             }
         });
-
-        // to exposed-dropdown-menu
-        ArrayAdapter<String> toArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter and pass parameters (context, dropdown layout, array)
-        AutoCompleteTextView toAutoCompleteTV= root.findViewById(R.id.toTextView); // get reference to autocomplete text view
-        toAutoCompleteTV.setText(sharedPreferences.getString("default_dest", "15-16th & Locust" ));
-        toAutoCompleteTV.setAdapter(toArrayAdapter); // set adapter to autocomplete tv to arrayAdapter
         toAutoCompleteTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override // save from selection as variable
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                toSelection = position; // account for positioning in array
-                // reload listview with new array and adapter //
-                ArrayList<Arrival> schedulesArrayList = getSchedules(fromSelection, toSelection);
-                ArrayAdapter<Arrival> schedulesAdapter = new SchedulesListAdapter(getContext(), R.layout.adapter_view_layout, schedulesArrayList);
-                schedulesListView.setAdapter(schedulesAdapter);
-                schedulesAdapter.notifyDataSetChanged();
-                // scroll to next train //                Date date = new Date() ;
-                SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa", Locale.US) ;
-                timeFormat.format(date);
-                int value = 0;
-                for (int i = 0; i < schedulesListView.getCount(); i++) {
-                    Arrival thisArrival = schedulesArrayList.get(i);
-                    String v = String.valueOf(thisArrival.getArrivalTime());
-                    try {
-                        if ((timeFormat.parse(timeFormat.format(date)).equals(timeFormat.parse(v)))) { // curTime == varTime
-                            break;
-                        } if (timeFormat.parse(timeFormat.format(date)).before(timeFormat.parse(v))) { // curTime < varTime
-                            break;
-                        } value = i+1;
-                    } catch (ParseException e) { e.printStackTrace(); }
-                }
-                schedulesAdapter.notifyDataSetChanged();
-                schedulesListView.smoothScrollToPositionFromTop(value, 0, 10);
-
-                if (value > 0) {
-                    Toast.makeText(getActivity(),
-                            String.format("Next train arrives at %s",
-                                    schedulesListView.getItemAtPosition(value).toString()),
-                            Toast.LENGTH_SHORT).show(); //debug
-                }
+                toSelection = position; // set destination station to index of selected array position
+                // reload listview with new array and adapter and scroll to next train
+                updateListView(schedulesListView, fromSelection, toSelection);
             }
         });
+
         // Initialize Bottom Sheet Parameters //
         LinearLayout mBottomSheetLayout = root.findViewById(R.id.bottom_sheet_layout);
         BottomSheetBehavior<LinearLayout> sheetBehavior;
@@ -228,7 +160,6 @@ public class SchedulesFragment extends Fragment {
                 header_Arrow_Image.setRotation(slideOffset * 180);
             }
         });
-
         // Check for internet connection
         if (!internet) {
             Toast.makeText(getActivity(), "No Connection: Working Offline", Toast.LENGTH_SHORT).show();
@@ -275,29 +206,7 @@ public class SchedulesFragment extends Fragment {
 
             // reload listview with new array and adapter //
             ListView schedulesListView = getActivity().findViewById(R.id.arrivalsListView);
-            ArrayList<Arrival> schedulesArrayList = getSchedules(fromSelection, toSelection);
-            ArrayAdapter<Arrival> schedulesAdapter = new SchedulesListAdapter(getContext(), R.layout.adapter_view_layout, schedulesArrayList);
-            schedulesListView.setAdapter(schedulesAdapter);
-            schedulesAdapter.notifyDataSetChanged();
-            // scroll to next train //
-            Date currentDateTime = new Date() ;
-            SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa", Locale.US) ;
-            timeFormat.format(currentDateTime);
-
-            int value = 0;
-            for (int i = 0; i < schedulesListView.getCount(); i++) {
-                Arrival thisArrival = schedulesArrayList.get(i);
-                String v = String.valueOf(thisArrival.getArrivalTime());
-                try {
-                    if ((timeFormat.parse(timeFormat.format(currentDateTime)).equals(timeFormat.parse(v)))) { // curTime == varTime
-                        break;
-                    } if (timeFormat.parse(timeFormat.format(currentDateTime)).before(timeFormat.parse(v))) { // curTime < varTime
-                        break;
-                    } value = i+1;
-                } catch (ParseException e) { e.printStackTrace(); }
-            }
-            schedulesAdapter.notifyDataSetChanged();
-            schedulesListView.smoothScrollToPositionFromTop(value, 0, 10);
+            updateListView(schedulesListView, fromSelection, toSelection);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -324,6 +233,38 @@ public class SchedulesFragment extends Fragment {
         ArrayList<String> schedulesList = schedules.getSchedulesList(trip_idList, fromSelection);
         // Return formatted list of arrival times for current trip
         return schedules.getFormatArrival(schedulesList, travelTime);
+    }
+
+    /** Function used to reload schedules in provided listView.
+     *  @param listView listView object for schedules
+     *  @param source starting station
+     *  @param destination arrival station */
+    public void updateListView(ListView listView, int source, int destination) {
+        ArrayList<Arrival> schedulesArrayList = getSchedules(source, destination);
+        ArrayAdapter<Arrival> schedulesAdapter = new SchedulesListAdapter(getContext(), R.layout.adapter_view_layout, schedulesArrayList);
+        listView.setAdapter(schedulesAdapter);
+        schedulesAdapter.notifyDataSetChanged();
+        // scroll to next train
+        int value = scrollToNext(listView, schedulesArrayList);
+        listView.smoothScrollToPositionFromTop(value, 0, 10);
+    }
+
+    public int scrollToNext(@NonNull ListView listView, ArrayList<Arrival> arrayList) {
+        Date date = new Date() ;
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aa", Locale.US) ;
+        String timeFormatDate = timeFormat.format(date);
+        int value = 0;
+        for (int i = 0; i < listView.getCount(); i++) {
+            Arrival thisArrival = arrayList.get(i);
+            String v = String.valueOf(thisArrival.getArrivalTime());
+            try {
+                if ((Objects.requireNonNull(timeFormat.parse(timeFormatDate)).equals(timeFormat.parse(v)))) { // curTime == varTime
+                    break;
+                } if (Objects.requireNonNull(timeFormat.parse(timeFormat.format(date))).before(timeFormat.parse(v))) { // curTime < varTime
+                    break;
+                } value = i+1;
+            } catch (ParseException e) { e.printStackTrace(); }
+        } return value;
     }
 
     /* Background Threads - checkInternet, checkSpecial */
@@ -364,7 +305,8 @@ public class SchedulesFragment extends Fragment {
         };
         Thread internetBgThread = new Thread(internetRunnable);
         internetBgThread.start();
-    } public void checkSpecial() {
+    }
+    public void checkSpecial() {
         Runnable specialRunnable = new Runnable() {
             final Message specialMessage = specialHandler.obtainMessage();
             final Bundle specialBundle = new Bundle();
