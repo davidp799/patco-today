@@ -1,6 +1,7 @@
 package com.davidp799.patcotoday;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TooManyListenersException;
 
 /** Class which analyzes PATCO Transit GTFS data to provide a list of upcoming arrivals
  *  based on provided source and destination stations and day of week. */
@@ -74,6 +76,34 @@ public class Schedules {
             result.add(52); // debug
             result.add(71);
         } return result;
+        /*String code = calCodes.get(weekday);
+        ArrayList<String> serviceIDs = new ArrayList<>();
+        ArrayList<Integer> result = new ArrayList<>();
+        String filename = "/calendar.txt";
+        // open trips.txt file as read only
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(filename));
+            String line = reader.readLine();
+            while (line != null) {
+                // split line, pull service_id and add to tripID list
+                List<String> c = Arrays.asList(line.split(",", 128));
+
+                String currentCode = String.format("%s,%s,%s,%s,%s",
+                        c.get(1), c.get(2), c.get(3), c.get(4), c.get(5));
+                if (code.equals(currentCode)) {
+                    serviceIDs.add(c.get(0));
+                }
+
+                line = reader.readLine();
+            } reader.close();
+            result.add(Integer.parseInt(serviceIDs.get(serviceIDs.size()-1)));
+            result.add(Integer.valueOf(serviceIDs.get(serviceIDs.size()-2)));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;*/
     }
 
     /** Function which reads the trips.txt data file to determine the

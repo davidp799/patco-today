@@ -14,6 +14,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_update_24.xml" value="0.293" />
         <entry key="app/src/main/res/drawable/ic_dashboard_black_24dp.xml" value="0.16018518518518518" />
         <entry key="app/src/main/res/drawable/ic_navigation_black_24.xml" value="0.2455" />
+        <entry key="app/src/main/res/drawable/white_circle.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="app/src/main/res/layout/bottom_sheet_dialog_layout.xml" value="0.15" />
         <entry key="app/src/main/res/layout/dropdown_item.xml" value="0.3007246376811594" />

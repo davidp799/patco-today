@@ -100,7 +100,7 @@ public class SchedulesFragment extends Fragment {
 
         // Initialize arrayList for schedules
         ListView schedulesListView = root.findViewById(R.id.arrivalsListView);
-        updateListView(schedulesListView, fromSelection, toSelection);
+        updateListView(root, schedulesListView, fromSelection, toSelection);
 
         // Initialize array adapter for stations dropdown menu
         ArrayAdapter<String> stationsArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter
@@ -121,7 +121,7 @@ public class SchedulesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 fromSelection = position; // set source station to index of selected array position
                 // reload listview and scroll to next train
-                updateListView(schedulesListView, position, toSelection);
+                updateListView(root, schedulesListView, position, toSelection);
             }
         });
         toAutoCompleteTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -129,7 +129,7 @@ public class SchedulesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toSelection = position; // set destination station to index of selected array position
                 // reload listview with new array and adapter and scroll to next train
-                updateListView(schedulesListView, fromSelection, toSelection);
+                updateListView(root, schedulesListView, fromSelection, toSelection);
             }
         });
 
@@ -206,7 +206,7 @@ public class SchedulesFragment extends Fragment {
 
             // reload listview with new array and adapter //
             ListView schedulesListView = getActivity().findViewById(R.id.arrivalsListView);
-            updateListView(schedulesListView, fromSelection, toSelection);
+            updateListView(getView(), schedulesListView, fromSelection, toSelection);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -239,7 +239,8 @@ public class SchedulesFragment extends Fragment {
      *  @param listView listView object for schedules
      *  @param source starting station
      *  @param destination arrival station */
-    public void updateListView(ListView listView, int source, int destination) {
+    public void updateListView(View view, ListView listView, int source, int destination) {
+
         ArrayList<Arrival> schedulesArrayList = getSchedules(source, destination);
         ArrayAdapter<Arrival> schedulesAdapter = new SchedulesListAdapter(getContext(), R.layout.adapter_view_layout, schedulesArrayList);
         listView.setAdapter(schedulesAdapter);
@@ -247,6 +248,7 @@ public class SchedulesFragment extends Fragment {
         // scroll to next train
         int value = scrollToNext(listView, schedulesArrayList);
         listView.smoothScrollToPositionFromTop(value, 0, 10);
+
     }
 
     public int scrollToNext(@NonNull ListView listView, ArrayList<Arrival> arrayList) {
