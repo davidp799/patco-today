@@ -21,15 +21,15 @@ import java.util.TooManyListenersException;
  *  based on provided source and destination stations and day of week. */
 public class Schedules {
     // Default file directory
-    File fileDir = new File("/data/data/com.davidp799.patcotoday/files/data");
+    private final File fileDir = new File("/data/data/com.davidp799.patcotoday/files/data");
     // Names for station ID's at specified indices
-    List<String> stopCodes = Arrays.asList( "Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont",
+    private final List<String> stopCodes = Arrays.asList( "Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont",
             "Collingswood", "Ferry Avenue", "Broadway", "City Hall", "8th and Market",
             "9-10th and Locust", "12-13th and Locust", "15-16th and Locust" );
     // Travel times between stations at specified indices; |idx(src) - idx(dst)| = travelTime
-    List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 24, 26, 27, 28);
+    private final List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 24, 26, 27, 28);
     // Codes representing weekday or weekend status; Used to determine service_id
-    List<String> calCodes = Arrays.asList("1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
+    private final List<String> calCodes = Arrays.asList("1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
             "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1"); // possibly include a boolean array (on/off) depending on circumstances
 
     /** Function which returns the name of the given station index.
