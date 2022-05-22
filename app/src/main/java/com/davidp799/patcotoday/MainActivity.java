@@ -232,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
         internetBgThread.start();
     }
     public void downloadPDF(String urlStr, String destinationFilePath) {
-        Context context = MainActivity.this;
         Runnable downloadRunnable = new Runnable() {
             final Message downloadMessage = downloadHandler.obtainMessage();
             final Bundle downloadBundle = new Bundle();

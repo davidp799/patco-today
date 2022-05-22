@@ -17,8 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -31,6 +29,7 @@ import androidx.fragment.app.Fragment;
 
 import com.davidp799.patcotoday.utilities.Arrival;
 import com.davidp799.patcotoday.R;
+import com.davidp799.patcotoday.utilities.GetSpecial;
 import com.davidp799.patcotoday.utilities.Schedules;
 import com.davidp799.patcotoday.SchedulesListAdapter;
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding;
@@ -39,7 +38,6 @@ import com.google.android.material.transition.MaterialFadeThrough;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -96,7 +94,7 @@ public class SchedulesFragment extends Fragment {
         // Background Activities - network, special
         checkInternet();
         // checkSpecial();
-        special = true; // DEBUG
+        special = true;
 
         // Initialize arrayList for schedules
         ListView schedulesListView = root.findViewById(R.id.arrivalsListView);
@@ -166,12 +164,7 @@ public class SchedulesFragment extends Fragment {
             sheetBehavior.setPeekHeight(0);
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         } else {
-            // Initialize web view for bottom sheet
-            WebView webView = (WebView) root.findViewById(R.id.webview);
-            WebSettings webSettings = webView.getSettings();
-            webSettings.setBuiltInZoomControls(true);
-            webSettings.setDisplayZoomControls(false);
-            webView.loadUrl("http://www.ridepatco.org/schedules/schedules.asp");
+            /* ENTER SPECIAL SCHEDULE INFO HERE */
             if (!special) {
                 sheetBehavior.setPeekHeight(0);
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -319,24 +312,10 @@ public class SchedulesFragment extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                // initialize elements
-                Calendar cal = Calendar.getInstance();
-                int month = cal.get(Calendar.MONTH);
-                int day = cal.get(Calendar.DAY_OF_MONTH);
-                Element table = doc.body().getElementsByTag("table").first();
-                Element tbody = table.getElementsByTag("tbody").first();
-                // check for special schedule
-                for (Element tr : tbody.getElementsByTag("tr")) {
-                    for (Element td : tr.getElementsByTag("td")) {
-                        for (Element p : td.getElementsByTag("p")) {
-                            if (p.text().contains(", " + (month + 1) + "/" + day)) {
-                                special = true;
-                            } else if (p.text().contains("(" + (month + 1) + "/" + day + ")")) {
-                                special = true;
-                            }
-                        }
-                    }
-                }
+                // get special status
+                GetSpecial getSpecial = new GetSpecial(doc);
+                special = getSpecial.getStatus();
+
                 specialBundle.putBoolean("MSG_KEY", special);
                 specialMessage.setData(specialBundle);
                 specialHandler.sendMessage(specialMessage);
