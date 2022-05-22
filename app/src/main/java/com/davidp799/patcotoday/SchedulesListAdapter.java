@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.davidp799.patcotoday.utilities.Arrival;
+
 import java.util.ArrayList;
 
 /**

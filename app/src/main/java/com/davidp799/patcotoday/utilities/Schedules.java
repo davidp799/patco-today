@@ -1,7 +1,6 @@
-package com.davidp799.patcotoday;
+package com.davidp799.patcotoday.utilities;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +14,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TooManyListenersException;
 
 /** Class which analyzes PATCO Transit GTFS data to provide a list of upcoming arrivals
  *  based on provided source and destination stations and day of week. */
@@ -30,7 +28,7 @@ public class Schedules {
     private final List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 24, 26, 27, 28);
     // Codes representing weekday or weekend status; Used to determine service_id
     private final List<String> calCodes = Arrays.asList("1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
-            "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1"); // possibly include a boolean array (on/off) depending on circumstances
+            "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1");
 
     /** Function which returns the name of the given station index.
      * @param source_id station corresponding to stopCodes index
@@ -38,7 +36,6 @@ public class Schedules {
     public String getStopCode(int source_id) {
         return stopCodes.get(source_id);
     }
-
     /** Function which returns the length in minutes between source
      *  station and destination station.
      * @param source_id starting point
@@ -47,7 +44,6 @@ public class Schedules {
     public int getTravelTime(int source_id, int destination_id) {
         return Math.abs(timeBetween.get(source_id) - timeBetween.get(destination_id));
     }
-
     /** Function which returns the routeID which represents
      *  the direction of the desired train (Eastbound / Westbound).
      * @param source_id starting point
@@ -105,7 +101,6 @@ public class Schedules {
         }
         return result;*/
     }
-
     /** Function which reads the trips.txt data file to determine the
      *  trip_id based on the given route_id and service_id.
      * @param route_id integer value representing travel direction
@@ -135,7 +130,6 @@ public class Schedules {
         }
         return tripIDs;
     }
-
     /** Function which reads the stop_times.txt data file to determine the
      *  trip_id based on the given route_id and service_id.
      * @param trip_id list of tripIDs
@@ -166,7 +160,6 @@ public class Schedules {
         } Collections.sort(result);
         return result;
     }
-
     /** Function which formats list of trip by removing duplicate arrivals,
      *  setting arrivals to 12 hour format, and appending travel times.
      *  @param schedules unformatted list of arrival times
@@ -203,7 +196,6 @@ public class Schedules {
             }
         } return schedules;
     }
-
     /** Function which formats list of trip by removing duplicate arrivals,
      *  setting arrivals to 12 hour format, and appending travel times as Arrival objects.
      *  @param schedules unformatted list of arrival times
@@ -214,6 +206,7 @@ public class Schedules {
         ArrayList<Arrival> arrivals = new ArrayList<>();
 
         for (int i=0; i<schedules.size(); i++) {
+            System.out.println(schedules.get(i));
             String aTime = schedules.get(i);
             String[] split = aTime.split(":",8);
             int curMin = Integer.parseInt(split[1]);

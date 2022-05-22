@@ -1,4 +1,4 @@
-package com.davidp799.patcotoday;
+package com.davidp799.patcotoday.utilities;
 
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;

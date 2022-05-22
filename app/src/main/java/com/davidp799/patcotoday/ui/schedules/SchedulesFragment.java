@@ -29,9 +29,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.davidp799.patcotoday.Arrival;
+import com.davidp799.patcotoday.utilities.Arrival;
 import com.davidp799.patcotoday.R;
-import com.davidp799.patcotoday.Schedules;
+import com.davidp799.patcotoday.utilities.Schedules;
 import com.davidp799.patcotoday.SchedulesListAdapter;
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
