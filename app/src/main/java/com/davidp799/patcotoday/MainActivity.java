@@ -156,9 +156,7 @@ public class MainActivity extends AppCompatActivity {
     } public static boolean getInternet(){
         return internet;
     }
-
-
-    // BACKGROUND THREAD TASKS //
+    /* Background Threads: updateFiles, checkInternet, downloadPDF, downloadZip, extractZip */
     public void updateFiles() {
         Runnable updateRunnable = new Runnable() {
             Message updateMessage = updateHandler.obtainMessage();
@@ -232,6 +230,54 @@ public class MainActivity extends AppCompatActivity {
         };
         Thread internetBgThread = new Thread(internetRunnable);
         internetBgThread.start();
+    }
+    public void downloadPDF(String urlStr, String destinationFilePath) {
+        Context context = MainActivity.this;
+        Runnable downloadRunnable = new Runnable() {
+            final Message downloadMessage = downloadHandler.obtainMessage();
+            final Bundle downloadBundle = new Bundle();
+            @Override
+            public void run() {
+                InputStream input = null;
+                OutputStream output = null;
+                HttpURLConnection connection = null;
+                try {
+                    URL url = new URL(urlStr);
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.connect();
+                    if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                        Log.d("downloadPDF", "Server ResponseCode=" + connection.getResponseCode() + " ResponseMessage=" + connection.getResponseMessage());
+                    }
+                    // download the file
+                    input = connection.getInputStream();
+                    Log.d("downloadPDF", "destinationFilePath=" + destinationFilePath);
+                    new File(destinationFilePath).createNewFile();
+                    output = new FileOutputStream(destinationFilePath);
+
+                    byte[] data = new byte[4096];
+                    int count;
+                    while ((count = input.read(data)) != -1) {
+                        output.write(data, 0, count);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                } finally {
+                    try {
+                        if (output != null) output.close();
+                        if (input != null) input.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (connection != null) connection.disconnect();
+                }
+                File f = new File(destinationFilePath);
+                Log.d("downloadPDF", "f.getParentFile().getPath()=" + f.getParentFile().getPath());
+                Log.d("downloadPDF", "f.getName()=" + f.getName().replace(".pdf", ""));
+            }
+        };
+        Thread downloadBgThread = new Thread(downloadRunnable);
+        downloadBgThread.start();
     }
     public void downloadZip(String urlStr, String destinationFilePath) {
         Context context = MainActivity.this;
