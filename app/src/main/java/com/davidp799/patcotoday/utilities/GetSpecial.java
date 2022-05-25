@@ -3,11 +3,12 @@ package com.davidp799.patcotoday.utilities;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class GetSpecial {
     private Document doc;
-    private String text, url;
+    private ArrayList<String> text, url;
 
     public GetSpecial(Document doc) {
         setDoc(doc);
@@ -44,10 +45,13 @@ public class GetSpecial {
     }
     /* Modifier for url and text data */
     public void setData() {
+        /* Initialize lists for urls and titles */
+        ArrayList<String> url = new ArrayList<>();
+        ArrayList<String> text = new ArrayList<>();
         /* Initialize current day and month */
         Calendar cal = Calendar.getInstance();
         int month = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_MONTH);
+        int day = 25;//int day = cal.get(Calendar.DAY_OF_MONTH);
         /* Initialize HTML elements to search through */
         Element table = doc.body().getElementsByTag("table").first();
         Element tbody = table.getElementsByTag("tbody").first();
@@ -57,25 +61,29 @@ public class GetSpecial {
                 for (Element p : td.getElementsByTag("p")) {
                     if (p.text().contains(", " + (month + 1) + "/" + day)) {
                         for (Element a : p.getElementsByTag("a")) {
-                            this.url = a.attr("href");
-                            this.text = a.text();
+                            String urlDir = a.attr("href");
+                            url.add("http://www.ridepatco.org" + urlDir.replace("..", ""));
+                            text.add(p.text());
                         }
                     } else if (p.text().contains("(" + (month + 1) + "/" + day + ")")) {
                         for (Element a : p.getElementsByTag("a")) {
-                            this.url = a.attr("href");
-                            this.text = a.text();
+                            String urlDir = a.attr("href");
+                            url.add("http://www.ridepatco.org" + urlDir.replace("..", ""));
+                            text.add(p.text());
                         }
                     }
                 }
             }
         }
+        this.url = url;
+        this.text = text;
     }
     /* Accessor for url string data */
-    public String getUrl() {
+    public ArrayList<String> getUrl() {
         return this.url;
     }
     /* Accessor for text string data */
-    public String getText() {
+    public ArrayList<String> getText() {
         return this.text;
     }
 }
