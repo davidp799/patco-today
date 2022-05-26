@@ -51,7 +51,7 @@ public class GetSpecial {
         /* Initialize current day and month */
         Calendar cal = Calendar.getInstance();
         int month = cal.get(Calendar.MONTH);
-        int day = 25;//int day = cal.get(Calendar.DAY_OF_MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
         /* Initialize HTML elements to search through */
         Element table = doc.body().getElementsByTag("table").first();
         Element tbody = table.getElementsByTag("tbody").first();

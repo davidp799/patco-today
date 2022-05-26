@@ -17,12 +17,12 @@ public class ConvertPDF {
         try {
             PdfReader reader = new PdfReader(fileDir + fileName);
             int n = reader.getNumberOfPages();
-            String output = "";
+            StringBuilder output = new StringBuilder();
             for (int i = 0; i < n; i++) {
-                output = output + PdfTextExtractor.getTextFromPage(reader, i + 1).trim() + "\n";
+                output.append(PdfTextExtractor.getTextFromPage(reader, i + 1).trim()).append("\n");
             }
             reader.close();
-            return output;
+            return output.toString();
         } catch (Exception e) {
             return "Error found is : \n" + e;
         }
