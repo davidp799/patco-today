@@ -12,7 +12,7 @@ public class ParsePDF {
     public ParsePDF(String pdfText) {
         pdfLines = pdfText.split("\n", 1024);
     }
-    public int getRouteID() {
+    public int getSpecialRouteID() {
         // split pdfText into list of pdfLines
         // if direction line contains EASTBOUND, return 1; otherwise return 2
         for (String line : pdfLines) {
@@ -27,13 +27,16 @@ public class ParsePDF {
     /** Function which adds arrival time lines by finding start and end point
      *  and converts into indexed list of arrival times for each source station.
      *  @return list of strings representing travel times */
-    public ArrayList<ArrayList<String>> getArrivalLines(int routeID) {
+    public ArrayList<ArrayList<String>> getArrivalLines() {
+        /* Initialize return list of arrays */
+        ArrayList<ArrayList<String>> allArrivals = new ArrayList<>(); // both lists
+        /* Initialize organizer arrays */
         ArrayList<String> eastbound = new ArrayList<>(); // routeid = 1
         ArrayList<String> westbound = new ArrayList<>(); // routeid = 2
-        ArrayList<ArrayList<String>> allArrivals = new ArrayList<>(); // both lists
-
-        int collect = 0; // set collect line status to 0
-        for (int i=0; i< pdfLines.length; i++) { // search for lines containing travel times
+        /* Set collect line status to 0 [do not collect] */
+        int collect = 0;
+        /* Search for lines containing special arrivals */
+        for (int i=0; i< pdfLines.length; i++) {
             /* Parse only lines containing special arrivals; only parse when collect == 1 */
             if (pdfLines[i].contains("SPECIAL SCHEDULE STARTS WITH ADJUSTED DEPARTURE TIMES BELOW.")) {
                 collect = 1; // ready to parse special arrivals in following line
@@ -58,8 +61,13 @@ public class ParsePDF {
                                     if (!t.contains("12:")) { // add 12 to all PM hours except 12pm
                                         String[] split = t.split(":");
                                         int hour = Integer.parseInt(split[0]);
-                                        String arrivalTime = (hour + 12) + ":" + split[1];
-                                        allTimes.add(arrivalTime);
+                                        if (hour == 11) {
+                                            String arrivalTime = (hour) + ":" + split[1];
+                                            allTimes.add(arrivalTime);
+                                        } else {
+                                            String arrivalTime = (hour + 12) + ":" + split[1];
+                                            allTimes.add(arrivalTime);
+                                        }
                                     } else {
                                         allTimes.add(t);
                                     }
@@ -104,14 +112,8 @@ public class ParsePDF {
                 }
             }
         }
-        if (routeID == 1) {
-            allArrivals.add(eastbound);
-        } else if (routeID == 2) {
-            allArrivals.add(westbound);
-        } else {
-            allArrivals.add(westbound);
-            allArrivals.add(eastbound);
-        }
+        allArrivals.add(westbound);
+        allArrivals.add(eastbound);
         return allArrivals;
     }
 }
