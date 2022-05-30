@@ -44,7 +44,7 @@ public class InfoFragment extends Fragment {
                              "Elevator & Escalator Availability", "FAQ's", "Safety & Security"};
 
         // FIRST LISTVIEW ITEM
-        ListView listView = (ListView) root.findViewById(R.id.listView);
+        ListView listView = (ListView) root.findViewById(R.id.infoListView);
         ArrayAdapter<String> listGeneralAdapter = new ArrayAdapter<String>(
                 getActivity(),
                 android.R.layout.simple_list_item_1,

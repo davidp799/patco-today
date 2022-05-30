@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.171875" />
         <entry key="..\:/Users/papda/AndroidStudioProjects/patco-today/app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.246" />
         <entry key="..\:/Users/papda/AndroidStudioProjects/patco-today/app/src/main/res/drawable/ic_baseline_arrow_right_alt_24.xml" value="0.246" />
         <entry key="..\:/Users/papda/AndroidStudioProjects/patco-today/app/src/main/res/layout/adapter_view_layout.xml" value="0.19519927536231885" />
@@ -13,19 +14,29 @@
         <entry key="app/src/main/res/drawable/ic_baseline_menu_24.xml" value="0.2455" />
         <entry key="app/src/main/res/drawable/ic_baseline_update_24.xml" value="0.293" />
         <entry key="app/src/main/res/drawable/ic_dashboard_black_24dp.xml" value="0.16018518518518518" />
+        <entry key="app/src/main/res/drawable/ic_info_reload_24.xml" value="0.2935" />
+        <entry key="app/src/main/res/drawable/ic_info_twitter_24.xml" value="0.2935" />
+        <entry key="app/src/main/res/drawable/ic_launcher_round.xml" value="0.1525" />
         <entry key="app/src/main/res/drawable/ic_navigation_black_24.xml" value="0.2455" />
+        <entry key="app/src/main/res/drawable/ic_splash_screen_round.xml" value="0.181" />
         <entry key="app/src/main/res/drawable/white_circle.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_custom_list_view_android_example.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/adapter_view_layout.xml" value="0.3129528985507246" />
         <entry key="app/src/main/res/layout/bottom_sheet_dialog_layout.xml" value="0.5" />
         <entry key="app/src/main/res/layout/dropdown_item.xml" value="0.3007246376811594" />
         <entry key="app/src/main/res/layout/fragment_info.xml" value="0.3458333333333333" />
         <entry key="app/src/main/res/layout/fragment_map.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_schedules.xml" value="0.33" />
         <entry key="app/src/main/res/layout/header.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/info_adapter_view_layout.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/information_adapter_view_layout.xml" value="0.33469202898550726" />
         <entry key="app/src/main/res/layout/item_header.xml" value="0.1" />
         <entry key="app/src/main/res/layout/row.xml" value="0.1" />
         <entry key="app/src/main/res/layout/settings_activity.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/single_item.xml" value="0.22" />
         <entry key="app/src/main/res/layout/stations_item.xml" value="0.3007246376811594" />
+        <entry key="app/src/main/res/layout/tabitem.xml" value="0.16717325227963525" />
         <entry key="app/src/main/res/layout/time_picker_row.xml" value="0.33" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.1" />
         <entry key="app/src/main/res/menu/menu.xml" value="0.33" />
@@ -33,6 +44,7 @@
         <entry key="app/src/main/res/menu/settings.xml" value="0.1" />
         <entry key="app/src/main/res/menu/top_app_bar.xml" value="0.284375" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.24351851851851852" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.181" />
         <entry key="app/src/main/res/xml/network_security_config.xml" value="0.30694444444444446" />
         <entry key="app/src/main/res/xml/preferences.xml" value="0.1" />
       </map>

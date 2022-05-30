@@ -61,13 +61,13 @@ public class ParsePDF {
                                     if (!t.contains("12:")) { // add 12 to all PM hours except 12pm
                                         String[] split = t.split(":");
                                         int hour = Integer.parseInt(split[0]);
+                                        String arrivalTime;
                                         if (hour == 11) {
-                                            String arrivalTime = (hour) + ":" + split[1];
-                                            allTimes.add(arrivalTime);
+                                            arrivalTime = (hour) + ":" + split[1];
                                         } else {
-                                            String arrivalTime = (hour + 12) + ":" + split[1];
-                                            allTimes.add(arrivalTime);
+                                            arrivalTime = (hour + 12) + ":" + split[1];
                                         }
+                                        allTimes.add(arrivalTime);
                                     } else {
                                         allTimes.add(t);
                                     }

@@ -73,10 +73,13 @@ public class SchedulesFragment extends Fragment {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             special = msg.getData().getBoolean("MSG_KEY");
-            Toast.makeText(getActivity(), String.format("Special: %s", special), Toast.LENGTH_SHORT).show();
+            if (!special) {
+                Toast.makeText(getActivity(), "No Special Schedules Today", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getActivity(), "Special Schedules Available", Toast.LENGTH_SHORT).show();
+            }
         }
     };
-
     /* Initialize onCreate */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentSchedulesBinding.inflate(inflater, container, false);
@@ -93,9 +96,7 @@ public class SchedulesFragment extends Fragment {
 
         // Background Activities - network, special
         checkInternet();
-        // checkSpecial();
-        special = true;
-
+        checkSpecial();
         // Initialize arrayList for schedules
         ListView schedulesListView = root.findViewById(R.id.arrivalsListView);
         updateListView(root, schedulesListView, fromSelection, toSelection);
@@ -164,10 +165,11 @@ public class SchedulesFragment extends Fragment {
             sheetBehavior.setPeekHeight(0);
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         } else {
-            /* ENTER SPECIAL SCHEDULE INFO HERE */
             if (!special) {
                 sheetBehavior.setPeekHeight(0);
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            } else {
+                /* Retrieve special schedule info from class */
             }
         }
         return root;
@@ -322,11 +324,6 @@ public class SchedulesFragment extends Fragment {
             }
         };
         Thread specialBgThread = new Thread(specialRunnable);
-        try {
-            specialBgThread.wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         specialBgThread.start();
     }
 }
