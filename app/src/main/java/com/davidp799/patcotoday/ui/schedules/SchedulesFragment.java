@@ -61,6 +61,8 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class SchedulesFragment extends Fragment {
+    // TODO: Finish parsePDF() runnable; Create layout for special schedules sheet; Finish special schedules implementation...
+
     private FragmentSchedulesBinding binding;
 
     // Initialize Variables
