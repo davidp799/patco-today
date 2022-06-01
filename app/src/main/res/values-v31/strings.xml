@@ -45,7 +45,7 @@
     <string name="version">Application Version</string>
     <string name="line_map_desc">PATCO Line Map</string>
     <!-- Manifest Strings -->
-    <string name="manifest_theme">@style/Theme.PATCOToday</string>
+    <string name="manifest_theme">@style/Theme.PATCOToday.SplashScreen</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>

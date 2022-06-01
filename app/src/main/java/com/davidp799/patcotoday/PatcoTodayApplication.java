@@ -12,5 +12,5 @@ public class PatcoTodayApplication extends Application {
         super.onCreate();
         // Apply dynamic color
         DynamicColors.applyToActivitiesIfAvailable(this);
-        }
+    }
 }

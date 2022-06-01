@@ -206,7 +206,6 @@ public class Schedules {
         ArrayList<Arrival> arrivals = new ArrayList<>();
 
         for (int i=0; i<schedules.size(); i++) {
-            System.out.println(schedules.get(i));
             String aTime = schedules.get(i);
             String[] split = aTime.split(":",8);
             int curMin = Integer.parseInt(split[1]);

@@ -1,6 +1,5 @@
 package com.davidp799.patcotoday;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,7 +14,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
 
@@ -92,8 +90,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         /* Splash screen */
-        androidx.core.splashscreen.SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
-
+        if (Build.VERSION.SDK_INT >= 31) { // set splashscreen if api 31+
+            androidx.core.splashscreen.SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+        }
         super.onCreate(savedInstanceState);
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -179,11 +178,6 @@ public class MainActivity extends AppCompatActivity {
                         if (!tempFile.exists()) notFound++;
                     } if (notFound > 0) {
                         Toast.makeText(MainActivity.this, String.format("E: %s Files Not Found", notFound), Toast.LENGTH_SHORT).show(); // DEBUG REMOVE WHEN FINISHED
-                        /*downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip", directory + "gtfs.zip"); // download zip file
-                        extractZip(directory + "gtfs.zip"); // extract file contents
-                        if (extracted) {
-                            updated = true;
-                        }*/
                         updated = false;
                     } else {
                         updated = true;
@@ -237,53 +231,6 @@ public class MainActivity extends AppCompatActivity {
         Thread internetBgThread = new Thread(internetRunnable);
         internetBgThread.start();
     }
-    public void downloadPDF(String urlStr, String destinationFilePath) {
-        Runnable downloadRunnable = new Runnable() {
-            final Message downloadMessage = downloadHandler.obtainMessage();
-            final Bundle downloadBundle = new Bundle();
-            @Override
-            public void run() {
-                InputStream input = null;
-                OutputStream output = null;
-                HttpURLConnection connection = null;
-                try {
-                    URL url = new URL(urlStr);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.connect();
-                    if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                        Log.d("downloadPDF", "Server ResponseCode=" + connection.getResponseCode() + " ResponseMessage=" + connection.getResponseMessage());
-                    }
-                    // download the file
-                    input = connection.getInputStream();
-                    Log.d("downloadPDF", "destinationFilePath=" + destinationFilePath);
-                    new File(destinationFilePath).createNewFile();
-                    output = new FileOutputStream(destinationFilePath);
-
-                    byte[] data = new byte[4096];
-                    int count;
-                    while ((count = input.read(data)) != -1) {
-                        output.write(data, 0, count);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return;
-                } finally {
-                    try {
-                        if (output != null) output.close();
-                        if (input != null) input.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    if (connection != null) connection.disconnect();
-                }
-                File f = new File(destinationFilePath);
-                Log.d("downloadPDF", "f.getParentFile().getPath()=" + f.getParentFile().getPath());
-                Log.d("downloadPDF", "f.getName()=" + f.getName().replace(".pdf", ""));
-            }
-        };
-        Thread downloadBgThread = new Thread(downloadRunnable);
-        downloadBgThread.start();
-    }
     public void downloadZip(String urlStr, String destinationFilePath) {
         Context context = MainActivity.this;
         Runnable downloadRunnable = new Runnable() {
@@ -304,9 +251,10 @@ public class MainActivity extends AppCompatActivity {
                     // download the file
                     input = connection.getInputStream();
                     Log.d("downloadZipFile", "destinationFilePath=" + destinationFilePath);
-                    new File(destinationFilePath).createNewFile();
+                    File newFile = new File(destinationFilePath);
+                    newFile.getParentFile().mkdirs();
+                    newFile.createNewFile();
                     output = new FileOutputStream(destinationFilePath);
-
                     byte[] data = new byte[4096];
                     int count;
                     while ((count = input.read(data)) != -1) {

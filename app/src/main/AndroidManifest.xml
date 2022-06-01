@@ -25,7 +25,7 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".MainActivity"
-            android:theme="@style/Theme.PATCOToday.SplashScreen"
+            android:theme="@string/manifest_theme"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
