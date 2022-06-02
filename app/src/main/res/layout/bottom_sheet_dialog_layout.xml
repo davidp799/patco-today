@@ -56,20 +56,22 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="10dp">
+
             <TextView
-                android:id="@+id/specialScheduleTitle"
+                android:id="@+id/specialScheduleHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="TODAY'S DATE"/>
-            <TextView
-                android:id="@+id/specialScheduleUrl"
+                android:textAlignment="center"
+                android:text="Special Schedule:"/>
+            <ListView
+                android:id="@+id/specialArrivalsListView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="SCHEDULE URL"/>
+                android:layout_height="match_parent"
+                android:layout_marginTop="16sp">
+            </ListView>
+
         </LinearLayout>
 
 

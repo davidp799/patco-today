@@ -63,13 +63,15 @@ public class GetSpecial {
                         for (Element a : p.getElementsByTag("a")) {
                             String urlDir = a.attr("href");
                             url.add("http://www.ridepatco.org" + urlDir.replace("..", ""));
-                            text.add(p.text());
+                            String[] split = p.text().split(" \\[");
+                            text.add(split[0]);
                         }
                     } else if (p.text().contains("(" + (month + 1) + "/" + day + ")")) {
                         for (Element a : p.getElementsByTag("a")) {
                             String urlDir = a.attr("href");
                             url.add("http://www.ridepatco.org" + urlDir.replace("..", ""));
-                            text.add(p.text());
+                            String[] split = p.text().split(" \\[");
+                            text.add(split[0]);
                         }
                     }
                 }
