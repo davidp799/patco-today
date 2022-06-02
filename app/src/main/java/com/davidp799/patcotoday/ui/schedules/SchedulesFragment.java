@@ -31,7 +31,6 @@ import androidx.fragment.app.Fragment;
 import com.davidp799.patcotoday.utilities.Arrival;
 import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.utilities.ConvertPDF;
-import com.davidp799.patcotoday.utilities.DownloadPDF;
 import com.davidp799.patcotoday.utilities.GetSpecial;
 import com.davidp799.patcotoday.utilities.ParsePDF;
 import com.davidp799.patcotoday.utilities.Schedules;
@@ -50,7 +49,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.SQLOutput;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -59,6 +57,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SchedulesFragment extends Fragment {
     // TODO: Finish parsePDF() runnable; Create layout for special schedules sheet; Finish special schedules implementation...
@@ -75,6 +75,8 @@ public class SchedulesFragment extends Fragment {
     private final Schedules schedules = new Schedules();
     private static ConnectivityManager connectivityManager;
     private final int weekday = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1; // weekday in java starts on sunday
+
+    ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     // Initialize Thread Handlers
     Handler downloadHandler = new Handler(Looper.getMainLooper()) {
@@ -115,6 +117,7 @@ public class SchedulesFragment extends Fragment {
             Bundle convertBundle = msg.getData();
             convertedStrings = convertBundle.getStringArrayList("MSG_CONVERTED");
             converted = convertBundle.getBoolean("MSG_BOOLEAN");
+
         }
     };
     Handler parseHandler = new Handler(Looper.getMainLooper()) {
@@ -142,9 +145,10 @@ public class SchedulesFragment extends Fragment {
         // Background Activities - network, special
         checkInternet();
         checkSpecial();
+
         // Initialize arrayList for schedules
         ListView schedulesListView = root.findViewById(R.id.arrivalsListView);
-        updateListView(root, schedulesListView, fromSelection, toSelection);
+        updateListView(schedulesListView, fromSelection, toSelection);
 
         // Initialize array adapter for stations dropdown menu
         ArrayAdapter<String> stationsArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.dropdown_item, stationOptionsList); // create array adapter
@@ -165,7 +169,7 @@ public class SchedulesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 fromSelection = position; // set source station to index of selected array position
                 // reload listview and scroll to next train
-                updateListView(root, schedulesListView, position, toSelection);
+                updateListView(schedulesListView, position, toSelection);
             }
         });
         toAutoCompleteTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -173,12 +177,13 @@ public class SchedulesFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 toSelection = position; // set destination station to index of selected array position
                 // reload listview with new array and adapter and scroll to next train
-                updateListView(root, schedulesListView, fromSelection, toSelection);
+                updateListView(schedulesListView, fromSelection, toSelection);
             }
         });
 
-        // Initialize Bottom Sheet Parameters //
+        /* Initialize Bottom Sheet and Special Loading Parameters */
         LinearLayout mBottomSheetLayout = root.findViewById(R.id.bottom_sheet_layout);
+
         BottomSheetBehavior<LinearLayout> sheetBehavior;
         ImageView header_Arrow_Image; // header arrow
         sheetBehavior = BottomSheetBehavior.from(mBottomSheetLayout);
@@ -208,19 +213,17 @@ public class SchedulesFragment extends Fragment {
         if (!internet) {
             Toast.makeText(getActivity(), "No Connection: Working Offline", Toast.LENGTH_SHORT).show();
             sheetBehavior.setPeekHeight(0);
-            sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED); // hide bottom sheet
         } else {
             if (!special) {
                 sheetBehavior.setPeekHeight(0);
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             } else {
-                // ADD EVENT LISTENERS FOR SPECIAL - DOWNLOADED, CONVERTED, PARSED, READY
-                /* Retrieve special schedule info from class */
-                convertPDF(specialURL);
-                System.out.println(convertedStrings);
-
-                parsePDF(fromSelection, toSelection, convertedStrings);
-
+                try {
+                    convertPDF(specialURL, fromSelection, toSelection);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return root;
@@ -252,7 +255,7 @@ public class SchedulesFragment extends Fragment {
 
             // reload listview with new array and adapter //
             ListView schedulesListView = getActivity().findViewById(R.id.arrivalsListView);
-            updateListView(getView(), schedulesListView, fromSelection, toSelection);
+            updateListView(schedulesListView, fromSelection, toSelection);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -285,7 +288,7 @@ public class SchedulesFragment extends Fragment {
      *  @param listView listView object for schedules
      *  @param source starting station
      *  @param destination arrival station */
-    public void updateListView(View view, ListView listView, int source, int destination) {
+    public void updateListView(ListView listView, int source, int destination) {
 
         ArrayList<Arrival> schedulesArrayList = getSchedules(source, destination);
         ArrayAdapter<Arrival> schedulesAdapter = new SchedulesListAdapter(getContext(), R.layout.adapter_view_layout, schedulesArrayList);
@@ -314,7 +317,6 @@ public class SchedulesFragment extends Fragment {
             } catch (ParseException e) { e.printStackTrace(); }
         } return value;
     }
-
     /* Background Threads - checkInternet, checkSpecial */
     public void checkInternet() {
         Runnable internetRunnable = new Runnable() {
@@ -430,50 +432,47 @@ public class SchedulesFragment extends Fragment {
         Thread downloadBgThread = new Thread(downloadRunnable);
         downloadBgThread.start();
     }
-    public void convertPDF(ArrayList<String> urls) {
+    public void convertPDF(ArrayList<String> urls, int sourceID, int destinationID) throws InterruptedException {
+        ArrayList<String> runnableConvertedStrings = new ArrayList<>();
+
+        /* Runnable Thread for conversion of pdf data */
         Runnable convertRunnable = new Runnable() {
             final Message convertMessage = convertHandler.obtainMessage();
             final Bundle convertBundle = new Bundle();
             @Override
             public void run() {
-                ArrayList<String> strings = new ArrayList<>();
                 try {
                     for (int i=0; i<urls.size(); i++) {
                         System.out.println(specialText.get(i));
                         System.out.println(urls.get(i));
                         downloadPDF(urls.get(i), directory + "/special/" + "special" + i + ".pdf");
                         while (!downloaded){
-                            System.out.print(". ");
                         }
                         System.out.println("- Converting: special" + i + ".pdf");
                         ConvertPDF convertPDF = new ConvertPDF(directory + "/special/", "special" + i + ".pdf");
                         System.out.println("- PDF" + i + " Characters = " + convertPDF.getText().length());
-                        strings.add(convertPDF.getText());
+                        runnableConvertedStrings.add(convertPDF.getText());
                         downloaded = false;
                     } converted = true;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                convertBundle.putStringArrayList("MSG_CONVERTED", strings); // send arraylist to handler
+                convertBundle.putStringArrayList("MSG_CONVERTED", runnableConvertedStrings); // send arraylist to handler
                 convertBundle.putBoolean("MSG_BOOLEAN", converted); // send converted status to handler
                 convertMessage.setData(convertBundle);
                 convertHandler.sendMessage(convertMessage);
             }
         };
-        Thread convertBgThread = new Thread(convertRunnable);
-        convertBgThread.start();
-    }
-    public void parsePDF(int sourceID, int destinationID, ArrayList<String> strings) {
         Runnable parseRunnable = new Runnable() {
             final Message parseMessage = parseHandler.obtainMessage();
             final Bundle parseBundle = new Bundle();
             @Override
             public void run() {
                 try {
-                    for (int i = 0; i < strings.size(); i++) {
+                    for (int i = 0; i < runnableConvertedStrings.size(); i++) {
                         System.out.println("- Parsing Text" + i + ":");
                         System.out.println("-----------------------------------------------------------------------");
-                        ParsePDF parsePDF = new ParsePDF(strings.get(i));
+                        ParsePDF parsePDF = new ParsePDF(runnableConvertedStrings.get(i));
                         ArrayList<ArrayList<String>> parsedArrivals = parsePDF.getArrivalLines();
                         for (int j = 0; j < parsedArrivals.size(); j++) {
                             if (j == 0) {
@@ -491,7 +490,7 @@ public class SchedulesFragment extends Fragment {
                     int routeID = schedules.getRouteID(sourceID, destinationID);
                     System.out.println("- RouteID = " + routeID);
                     System.out.println("- Special Schedule Arrivals:");
-                    for (String c : strings) {
+                    for (String c : runnableConvertedStrings) {
                         ParsePDF parsePDF = new ParsePDF(c);
                         ArrayList<ArrayList<String>> specials = parsePDF.getArrivalLines();
                         System.out.println("-----------------------------------------------------------------------");
@@ -520,7 +519,84 @@ public class SchedulesFragment extends Fragment {
                     e.printStackTrace();
                     parsed = false;
                 }
+                parseBundle.putBoolean("MSG_KEY", parsed);
+                parseMessage.setData(parseBundle);
+                parseHandler.sendMessage(parseMessage);
+            }
+        };
+        Thread convertBgThread = new Thread(convertRunnable);
+        Thread parseBgThread = new Thread(parseRunnable);
+        convertBgThread.start();
+        parseBgThread.start();
 
+        convertBgThread.join();
+        parseBgThread.join();
+        if (!parseBgThread.isAlive()) {
+            System.out.println(specialArrivals);
+        }
+
+    }
+    public void parsePDF(int sourceID, int destinationID, ArrayList<String> converts) {
+        Runnable parseRunnable = new Runnable() {
+            final Message parseMessage = parseHandler.obtainMessage();
+            final Bundle parseBundle = new Bundle();
+            @Override
+            public void run() {
+                try {
+                    while (!converted) {
+                        System.out.print("! ");
+                    }
+                    System.out.println("");
+                    for (int i = 0; i < converts.size(); i++) {
+                        System.out.println("- Parsing Text" + i + ":");
+                        System.out.println("-----------------------------------------------------------------------");
+                        ParsePDF parsePDF = new ParsePDF(converts.get(i));
+                        ArrayList<ArrayList<String>> parsedArrivals = parsePDF.getArrivalLines();
+                        for (int j = 0; j < parsedArrivals.size(); j++) {
+                            if (j == 0) {
+                                System.out.println("Westbound:");
+                                System.out.println(parsedArrivals.get(j));
+                            } else {
+                                System.out.println("Eastbound:");
+                                System.out.println(parsedArrivals.get(j));
+                            }
+                        }
+                        System.out.println("-----------------------------------------------------------------------");
+                    }
+                    System.out.print("- Source Station [0-12]: " + sourceID + "\n");
+                    System.out.print("- Destination Station [0-12]: " + destinationID + "\n");
+                    int routeID = schedules.getRouteID(sourceID, destinationID);
+                    System.out.println("- RouteID = " + routeID);
+                    System.out.println("- Special Schedule Arrivals:");
+                    for (String c : converts) {
+                        ParsePDF parsePDF = new ParsePDF(c);
+                        ArrayList<ArrayList<String>> specials = parsePDF.getArrivalLines();
+                        System.out.println("-----------------------------------------------------------------------");
+                        ArrayList<String> theArrivals = specials.get(Math.abs(routeID-2)); // i made an oopsie with the routeid
+                        ArrayList<String> result = new ArrayList<>();
+                        int position = 0;
+                        for (int i=0; i < theArrivals.size(); i++) {
+                            if (position == 13) {
+                                position = 0;
+                            }
+                            if (position == sourceID) {
+                                result.add(theArrivals.get(i));
+                            }
+                            position += 1;
+                        }
+                        int travelTime = schedules.getTravelTime(0,12);
+                        specialArrivals = schedules.getFormatArrival(result, travelTime);
+                        for (Arrival a : specialArrivals) {
+                            System.out.printf("  %s --> %s\n", a.getArrivalTime(), a.getTravelTime());
+                        }
+                        System.out.println("-----------------------------------------------------------------------");
+
+                    }
+                    parsed = true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    parsed = false;
+                }
                 parseBundle.putBoolean("MSG_KEY", parsed);
                 parseMessage.setData(parseBundle);
                 parseHandler.sendMessage(parseMessage);
