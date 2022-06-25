@@ -3,18 +3,19 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk 32
 
     defaultConfig {
         applicationId "com.davidp799.patcotoday"
-        minSdk 21
-        targetSdk 31
+        minSdk 22
+        targetSdk 32
         versionCode 1
-        versionName "1.1"
+        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    applicationVariants.all { variant ->
+        variant.resValue "string", "versionName", variant.versionName }
     buildTypes {
         release {
             minifyEnabled false
@@ -32,9 +33,9 @@ android {
 
 dependencies {
 
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.7.0-alpha01'
-    implementation 'com.google.android.material:compose-theme-adapter-3:1.0.10'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.7.0-alpha02'
+    implementation 'com.google.android.material:compose-theme-adapter-3:1.0.12'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'

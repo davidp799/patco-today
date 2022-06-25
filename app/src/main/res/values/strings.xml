@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PATCO Today</string>
+    <string name="app_name">Patco Today</string>
     <string name="title_schedules">Schedules</string>
     <string name="title_map">Station Map</string>
     <string name="title_info">Information</string>

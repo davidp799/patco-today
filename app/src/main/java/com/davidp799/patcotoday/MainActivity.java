@@ -90,9 +90,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         /* Splash screen */
-        if (Build.VERSION.SDK_INT >= 31) { // set splashscreen if api 31+
+/*        if (Build.VERSION.SDK_INT >= 31) { // set splashscreen if api 31+
             androidx.core.splashscreen.SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
-        }
+        }*/
         super.onCreate(savedInstanceState);
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -280,7 +280,6 @@ public class MainActivity extends AppCompatActivity {
         Thread downloadBgThread = new Thread(downloadRunnable);
         downloadBgThread.start();
     } public void extractZip(String filePath) {
-        Context context = this;
         Runnable extractRunnable = new Runnable() {
             Message extractMessage = extractHandler.obtainMessage();
             Bundle extractBundle = new Bundle();

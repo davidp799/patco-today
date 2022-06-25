@@ -1,4 +1,4 @@
-package com.davidp799.patcotoday.utilities;
+package com.davidp799.patcotoday.utils;
 
 import android.util.Log;
 

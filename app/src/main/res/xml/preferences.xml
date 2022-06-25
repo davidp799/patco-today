@@ -72,8 +72,9 @@
     <PreferenceCategory
         android:title="About">
         <Preference
+            android:key="app_version"
             android:title="@string/pref_title_version"
-            android:summary="@string/pref_summary_version">
+            android:summary="@string/versionName">
         </Preference>
 
         <Preference

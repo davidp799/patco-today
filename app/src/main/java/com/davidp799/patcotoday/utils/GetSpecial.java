@@ -1,4 +1,4 @@
-package com.davidp799.patcotoday.utilities;
+package com.davidp799.patcotoday.utils;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

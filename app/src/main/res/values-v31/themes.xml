@@ -40,15 +40,4 @@
         <item name="android:background">@drawable/drawable_round_bottom_sheet</item>
     </style>
 
-    <style name="Theme.PATCOToday.SplashScreen" parent="Theme.SplashScreen">
-        <!-- Set the splash screen background, animated icon, and animation duration. -->
-        <item name="windowSplashScreenBackground">@color/md_theme_light_onBackground</item>
-        <!-- Use windowSplashScreenAnimatedIcon to add a drawable or animated drawable. One of these is required. -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/avd_ic_splash_screen</item>
-        <!-- Required for animated icons -->
-        <item name="windowSplashScreenAnimationDuration">3500</item>
-        <!-- Set the theme of the Activity that directly follows your splash screen. -->
-        <item name="postSplashScreenTheme">@style/Theme.PATCOToday</item>
-    </style>
-
 </resources>

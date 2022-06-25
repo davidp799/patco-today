@@ -29,12 +29,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.davidp799.patcotoday.utilities.Arrival;
+import com.davidp799.patcotoday.utils.Arrival;
 import com.davidp799.patcotoday.R;
-import com.davidp799.patcotoday.utilities.ConvertPDF;
-import com.davidp799.patcotoday.utilities.GetSpecial;
-import com.davidp799.patcotoday.utilities.ParsePDF;
-import com.davidp799.patcotoday.utilities.Schedules;
+import com.davidp799.patcotoday.utils.ConvertPDF;
+import com.davidp799.patcotoday.utils.GetSpecial;
+import com.davidp799.patcotoday.utils.ParsePDF;
+import com.davidp799.patcotoday.utils.Schedules;
 import com.davidp799.patcotoday.SchedulesListAdapter;
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;

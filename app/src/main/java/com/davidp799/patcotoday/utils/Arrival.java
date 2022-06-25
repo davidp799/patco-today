@@ -1,4 +1,4 @@
-package com.davidp799.patcotoday.utilities;
+package com.davidp799.patcotoday.utils;
 
 /** Object containing arrival time and travel time for each scheduled arrival.
  */
