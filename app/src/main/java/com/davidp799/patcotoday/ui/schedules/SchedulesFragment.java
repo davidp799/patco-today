@@ -59,6 +59,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SchedulesFragment extends Fragment {
     // TODO: Finish parsePDF() runnable; Create layout for special schedules sheet; Finish special schedules implementation...
@@ -74,6 +76,12 @@ public class SchedulesFragment extends Fragment {
     private ArrayList<String> specialURL = new ArrayList<>();
     private ArrayList<String> specialText = new ArrayList<>();
     private ArrayList<Arrival> specialArrivals = new ArrayList<>();
+    // bg lists
+    private ArrayList<String> specialURLs = new ArrayList<>();
+    private ArrayList<String> specialTexts = new ArrayList<>();
+    private ArrayList<String> runnableConvertedStrings = new ArrayList<>();
+    private ArrayList<ArrayList<String>> parsedArrivals = new ArrayList<>();
+    //
     private Document doc;
     private final Schedules schedules = new Schedules();
     private static ConnectivityManager connectivityManager;
@@ -147,7 +155,8 @@ public class SchedulesFragment extends Fragment {
         TextView specialHeader = root.findViewById(R.id.specialScheduleHeader);
 
         // Background Activities - internet, special
-        backgroundTasks(directory);
+        //backgroundTasks(directory);
+        tasksThreadPool(directory);
 
         // Initialize arrayList for schedules and special schedules
         ListView schedulesListView = root.findViewById(R.id.arrivalsListView);
@@ -369,7 +378,7 @@ public class SchedulesFragment extends Fragment {
             } catch (ParseException e) { e.printStackTrace(); }
         } return value;
     }
-    /* Background Threads - checkInternet, checkSpecial */
+    /* Background Tasks using Runnable */
     public void backgroundTasks(String destinationFilePath) {
         /* Initialize common variables and assets */
         ArrayList<String> specialTexts = new ArrayList<>();
@@ -577,6 +586,182 @@ public class SchedulesFragment extends Fragment {
             t5_parse.join();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    /* Background Tasks using ExecutorService */
+    public void checkInternetBg() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            try {
+                connectivityManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // use new connectivity manager mode if Android N
+                    connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
+                        @Override
+                        public void onAvailable(@NonNull Network network) {
+                            internet = true;
+                        }
+                        @Override
+                        public void onLost(@NonNull Network network) {
+                            internet = false;
+                        }
+                    });
+                } else { // otherwise, ping server
+                    try {
+                        String command = "ping -c 1 www.ridepatco.org";
+                        internet = (Runtime.getRuntime().exec(command).waitFor() == 0);
+                    } catch (Exception e) {
+                        internet = false;
+                    }
+                }
+            } catch (Exception e) {
+                internet = false;
+            }
+            if (!internet) {
+                handler.post(() -> Toast.makeText(getContext(), "No Internet Connection. Working Offline", Toast.LENGTH_LONG).show());
+            }
+        });
+    }
+    public void checkSpecialBg() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            try {
+                doc = Jsoup.connect("http://www.ridepatco.org/schedules/schedules.asp").get();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            GetSpecial getSpecial = new GetSpecial(doc);
+            specialURLs.addAll(getSpecial.getUrl());
+            specialTexts.addAll(getSpecial.getText());
+            if (!special) {
+                handler.post(() -> Toast.makeText(getContext(), "No Special Schedules Today", Toast.LENGTH_SHORT).show());
+            }
+        });
+    }
+    public void downloadSpecialBg(String destinationFilePath) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            InputStream input = null;
+            OutputStream output = null;
+            HttpURLConnection connection = null;
+            for (int i = 0; i < specialURLs.size(); i++) {
+                String filePath = directory + "/special/" + "special" + i + ".pdf";
+                System.out.println(specialTexts.get(i));
+                System.out.println(specialURLs.get(i));
+                try {
+                    URL url = new URL(specialURLs.get(i));
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.connect();
+                    if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                        Log.d("downloadPDF", "Server ResponseCode=" + connection.getResponseCode() + " ResponseMessage=" + connection.getResponseMessage());
+                    }
+                    // download the file
+                    input = connection.getInputStream();
+                    Log.d("downloadPDF", "destinationFilePath=" + filePath);
+                    File newFile = new File(filePath);
+                    newFile.getParentFile().mkdirs();
+                    newFile.createNewFile();
+                    output = new FileOutputStream(filePath);
+
+                    byte[] data = new byte[4096];
+                    int count;
+                    while ((count = input.read(data)) != -1) {
+                        output.write(data, 0, count);
+                    }
+                    downloaded = true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                } finally {
+                    try {
+                        if (output != null) output.close();
+                        if (input != null) input.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (connection != null) connection.disconnect();
+                }
+                File f = new File(destinationFilePath);
+                Log.d("downloadPDF", "f.getParentFile().getPath()=" + f.getParentFile().getPath());
+                Log.d("downloadPDF", "f.getName()=" + f.getName().replace(".pdf", ""));
+            }
+            handler.post(() -> Toast.makeText(getContext(), "downloadSpecialThread says: " + downloaded, Toast.LENGTH_SHORT).show());
+        });
+    }
+    public void convertSpecialBg() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            try {
+                for (int i = 0; i < specialURLs.size(); i++) {
+                    System.out.println("- Converting: special" + i + ".pdf");
+                    ConvertPDF convertPDF = new ConvertPDF(directory + "/special/", "special" + i + ".pdf");
+                    System.out.println("- PDF" + i + " Characters = " + convertPDF.getText().length());
+                    runnableConvertedStrings.add(convertPDF.getText());
+                }
+                converted = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            handler.post(() -> Toast.makeText(getContext(), "convertSpecialThread says: " + converted, Toast.LENGTH_SHORT).show());
+        });
+    }
+    public void parseSpecialBg() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            try {
+                for (int i = 0; i < runnableConvertedStrings.size(); i++) {
+                    System.out.println("- Parsing Text" + i + ":");
+                    System.out.println("-----------------------------------------------------------------------");
+                    ParsePDF parsePDF = new ParsePDF(runnableConvertedStrings.get(i));
+                    parsedArrivals.addAll(parsePDF.getArrivalLines());
+                    for (int j = 0; j < parsedArrivals.size(); j++) {
+                        if (j == 0) {
+                            System.out.println("Westbound:");
+                            System.out.println(parsedArrivals.get(j));
+                        } else {
+                            System.out.println("Eastbound:");
+                            System.out.println(parsedArrivals.get(j));
+                        }
+                    }
+                    System.out.println("-----------------------------------------------------------------------");
+                }
+                parsed = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                parsed = false;
+            }
+            specialWestBound.addAll(parsedArrivals.get(0));
+            specialEastBound.addAll(parsedArrivals.get(1));
+            handler.post(() -> Toast.makeText(getContext(), "parseSpecialThread says: " + parsed, Toast.LENGTH_SHORT).show());
+        });
+    }
+    public void tasksThreadPool(String destinationFilePath) {
+        final int DEFAULT_THREAD_POOL_SIZE = 5;
+        ExecutorService executorService = Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
+
+        executorService.execute(this::checkInternetBg);
+        if (internet) {
+            executorService.execute(this::checkSpecialBg);
+            if (special) {
+                executorService.execute(() -> {
+                    downloadSpecialBg(destinationFilePath);
+                });
+                if (downloaded) {
+                    executorService.execute(this::convertSpecialBg);
+                    if (converted) {
+                        executorService.execute(this::parseSpecialBg);
+                    }
+                }
+            }
         }
     }
 }

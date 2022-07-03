@@ -232,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
         internetBgThread.start();
     }
     public void downloadZip(String urlStr, String destinationFilePath) {
-        Context context = MainActivity.this;
         Runnable downloadRunnable = new Runnable() {
             Message downloadMessage = downloadHandler.obtainMessage();
             Bundle downloadBundle = new Bundle();
