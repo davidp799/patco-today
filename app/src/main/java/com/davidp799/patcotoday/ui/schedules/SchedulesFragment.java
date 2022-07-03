@@ -303,14 +303,18 @@ public class SchedulesFragment extends Fragment {
         int position = 0;
         ArrayList<String> theArrivals = specialArrivals.get(Math.abs(route_id-2)); // i made an oopsie with the routeid
         ArrayList<String> temp = new ArrayList<>();
-        for (int i=0; i<theArrivals.size(); i++) {
-            if (position == 13) {
-                position = 0;
+        try { // check for null
+            for (int i=0; i < theArrivals.size(); i++) {
+                if (position == 13) {
+                    position = 0;
+                }
+                if (position == source_id) {
+                    temp.add(theArrivals.get(i));
+                }
+                position += 1;
             }
-            if (position == source_id) {
-                temp.add(theArrivals.get(i));
-            }
-            position += 1;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return schedules.getFormatArrival(temp, travelTime);
     }
@@ -539,8 +543,11 @@ public class SchedulesFragment extends Fragment {
                     e.printStackTrace();
                     parsed = false;
                 }
-                parseBundle.putStringArrayList("MSG_WB", parsedArrivals.get(0));
-                parseBundle.putStringArrayList("MSG_EB", parsedArrivals.get(1));
+                if (parsedArrivals.size() > 0) {
+                    parseBundle.putStringArrayList("MSG_WB", parsedArrivals.get(0));
+                } if (parsedArrivals.size() > 1) {
+                    parseBundle.putStringArrayList("MSG_EB", parsedArrivals.get(1));
+                }
                 parseBundle.putBoolean("MSG_KEY", parsed);
                 parseMessage.setData(parseBundle);
                 parseHandler.sendMessage(parseMessage);
