@@ -1,26 +1,15 @@
 <resources>
-    <!-- Preferences -->
-    <string-array name="pref_default_source_entries">
+    <!-- Settings Preferences -->
+    <string-array name="pref_theme_entries">
         <item>Light</item>
         <item>Dark</item>
         <item>Follow device theme</item>
     </string-array>
 
-    <string-array name="pref_default_source_values">
-        <item>Light</item>
-        <item>Dark</item>
-        <item>Follow device theme</item>
+    <string-array name="pref_theme_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
     </string-array>
 
-    <string-array name="pref_default_destination_entries">
-        <item>Light</item>
-        <item>Dark</item>
-        <item>Follow device theme</item>
-    </string-array>
-
-    <string-array name="pref_default_destination_values">
-        <item>Light</item>
-        <item>Dark</item>
-        <item>Follow device theme</item>
-    </string-array>
 </resources>

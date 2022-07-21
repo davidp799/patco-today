@@ -8,17 +8,18 @@
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/linearLayoutCompat"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginTop="90sp"
+        android:orientation="horizontal"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
@@ -29,11 +30,11 @@
 
             <AutoCompleteTextView
                 android:id="@+id/fromTextView"
-                android:maxLines="2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:inputType="none"
+                android:maxLines="2"
                 android:text="@string/from"
                 android:textColor="#757575"
                 android:textSize="14.5sp"
@@ -45,11 +46,12 @@
             android:layout_width="wrap_content"
             android:layout_height="20sp"
             android:layout_gravity="center"
-            android:src="@drawable/ic_baseline_arrow_right_alt_24" />
+            android:src="@drawable/ic_baseline_arrow_right_alt_24"
+            android:contentDescription="@string/arrow" />
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
@@ -60,11 +62,11 @@
 
             <AutoCompleteTextView
                 android:id="@+id/toTextView"
-                android:maxLines="2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:inputType="none"
+                android:maxLines="2"
                 android:text="@string/to"
                 android:textColor="#757575"
                 android:textSize="14.5sp"
@@ -85,12 +87,12 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         android:layout_marginTop="-80sp"
         android:layout_marginBottom="10sp">
 
         <include layout="@layout/bottom_sheet_dialog_layout" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

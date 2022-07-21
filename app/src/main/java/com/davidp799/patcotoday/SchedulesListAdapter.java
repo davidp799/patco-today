@@ -4,8 +4,9 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -53,16 +54,12 @@ public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
         //get the persons information
         String arrivalTime = getItem(position).getArrivalTime();
         String travelTime = getItem(position).getTravelTime();
-
         //Create the person object with the information
         Arrival arrival = new Arrival(arrivalTime,travelTime);
-
         //create the view result for showing the animation
         final View result;
-
         //ViewHolder object
         ViewHolder holder;
-
 
         if(convertView == null){
             LayoutInflater inflater = LayoutInflater.from(mContext);
@@ -79,16 +76,14 @@ public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
             holder = (ViewHolder) convertView.getTag();
             result = convertView;
         }
-
-
-        Animation animation = AnimationUtils.loadAnimation(mContext,
-                (position > lastPosition) ? R.anim.load_down_anim : R.anim.load_up_anim);
-        result.startAnimation(animation);
-        lastPosition = position;
+        /* Animations: fade in fast */
+        Animation fadeInAnimation = new AlphaAnimation(0,1);
+        fadeInAnimation.setInterpolator(new DecelerateInterpolator());
+        fadeInAnimation.setDuration(500);
+        result.startAnimation(fadeInAnimation);
 
         holder.arrives.setText(arrival.getArrivalTime());
         holder.travels.setText(arrival.getTravelTime());
-
 
         return convertView;
     }

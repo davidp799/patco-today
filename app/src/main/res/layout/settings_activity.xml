@@ -7,8 +7,9 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
         android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar"
-        style="@style/Theme.PATCOToday">
+        style="@style/Theme.PatcoToday">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
