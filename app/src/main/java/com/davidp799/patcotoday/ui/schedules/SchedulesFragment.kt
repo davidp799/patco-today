@@ -25,7 +25,10 @@ import com.davidp799.patcotoday.utils.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.transition.MaterialFadeThrough
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -38,6 +41,9 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import kotlin.collections.ArrayList
 
 class SchedulesFragment : Fragment() {
 
@@ -87,9 +93,6 @@ class SchedulesFragment : Fragment() {
         val root: View = binding.root
         enterTransition = MaterialFadeThrough()
 
-        // check internet
-        Toast.makeText(requireContext(), mainViewModel.internet.toString(), Toast.LENGTH_SHORT).show()
-
         // implement reverse menu button
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object: MenuProvider {
@@ -130,7 +133,13 @@ class SchedulesFragment : Fragment() {
 
         // Initialize schedules ListView
         val schedulesListView = root.findViewById<ListView>(R.id.arrivalsListView)
-        updateListViewBg(schedulesListView, fromSelection, toSelection)
+        CoroutineScope(Dispatchers.IO).launch {
+            backgroundTasksRequest(fromSelection, toSelection)
+        }
+        val schedulesAdapter: ArrayAdapter<Arrival> =
+            SchedulesListAdapter(context, R.layout.adapter_view_layout, schedulesArrayList)
+        schedulesListView.adapter = schedulesAdapter
+
         val value = scrollToNext(schedulesListView, schedulesArrayList)
         schedulesListView.smoothScrollToPositionFromTop(value, 0, 10)
 
@@ -168,7 +177,13 @@ class SchedulesFragment : Fragment() {
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 fromSelection = position // set source station to index of selected array position
                 // reload listview and scroll to next train
-                updateListViewBg(schedulesListView, fromSelection, toSelection)
+                CoroutineScope(Dispatchers.IO).launch {
+                    backgroundTasksRequest(fromSelection, toSelection)
+                }
+                val schedulesAdapter: ArrayAdapter<Arrival> =
+                    SchedulesListAdapter(context, R.layout.adapter_view_layout, schedulesArrayList)
+                schedulesListView.adapter = schedulesAdapter
+
                 updateSpecialData(
                     specialListView,
                     specialProgressBar,
@@ -184,7 +199,13 @@ class SchedulesFragment : Fragment() {
                 toSelection =
                     position // set destination station to index of selected array position
                 // reload listview with new array and adapter and scroll to next train
-                updateListViewBg(schedulesListView, fromSelection, toSelection)
+                CoroutineScope(Dispatchers.IO).launch {
+                    backgroundTasksRequest(fromSelection, toSelection)
+                }
+                val schedulesAdapter: ArrayAdapter<Arrival> =
+                    SchedulesListAdapter(context, R.layout.adapter_view_layout, schedulesArrayList)
+                schedulesListView.adapter = schedulesAdapter
+
                 updateSpecialData(
                     specialListView,
                     specialProgressBar,
@@ -239,7 +260,7 @@ class SchedulesFragment : Fragment() {
     }
 
     /** Function which uses executorService to update ListView content in the background.  */
-    private fun updateListViewBg(listView: ListView, source: Int, destination: Int) {
+/*    private fun updateListViewBg(listView: ListView, source: Int, destination: Int) {
         Handler().post {
             schedulesArrayList.clear()
             schedulesArrayList.addAll(getSchedules(source, destination))
@@ -247,7 +268,7 @@ class SchedulesFragment : Fragment() {
                 SchedulesListAdapter(context, R.layout.adapter_view_layout, schedulesArrayList)
             requireActivity().runOnUiThread { listView.adapter = schedulesAdapter }
         }
-    }
+    }*/
 
     /** Function used to retrieve arrival times from Schedules class.  */
     private fun getSchedules(source_id: Int, destination_id: Int): ArrayList<Arrival> {
@@ -340,4 +361,83 @@ class SchedulesFragment : Fragment() {
         }
         return value
     }
+
+
+
+
+
+    /* Background Tasks using Kotlin Coroutine: internet, update, download, extract */
+    private fun logThread(methodName: String){
+        println("debug: ${methodName}: ${Thread.currentThread().name}")
+    }
+
+    private fun setInternetStatus(input: Boolean){
+        mainViewModel.internet = input
+    }
+    private suspend fun setInternetStatusOnMainThread(input: Boolean) {
+        withContext (Main) {
+            setInternetStatus(input)
+            if (!input) {
+                Toast.makeText(requireContext(), "No internet connection. Working offline", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Internet Connected", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    private fun setArrivals(input: ArrayList<Arrival>){
+        schedulesArrayList.clear()
+        schedulesArrayList.addAll(input)
+    }
+    private suspend fun setArrivalsOnMainThread(input: ArrayList<Arrival>) {
+        withContext (Main) {
+            setArrivals(input)
+        }
+    }
+
+    private suspend fun backgroundTasksRequest(source: Int, destination: Int) {
+        logThread("backgroundTasksRequest")
+        val arrivals = getArrivalsBackground(source, destination)
+        setArrivalsOnMainThread(arrivals)
+
+    }
+
+    private fun getArrivalsBackground(source: Int, destination: Int): ArrayList<Arrival> {
+        logThread("getSchedulesActive")
+        return try {
+            getSchedules(source, destination)
+        } catch (e: Error) {
+            e.printStackTrace()
+            ArrayList()
+        }
+    }
+
+    private fun checkInternet(context: Context): Boolean {
+        logThread("checkInternetBackgroundActive")
+        // register activity with the connectivity manager service
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        // if Android M or greater, use NetworkCapabilities to check which network has connection
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Returns Network object corresponding to active default data network.
+            val network = connectivityManager.activeNetwork ?: return false
+            // Representation of the capabilities of an active network.
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+            return when {
+                // Indicates this network uses a Wi-Fi transport, or WiFi has connectivity
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                // Indicates this network uses a Cellular transport, or Cellular has connectivity
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                // else return false
+                else -> false
+            }
+        } else {
+            // if the android version is below M
+            @Suppress("DEPRECATION") val networkInfo =
+                connectivityManager.activeNetworkInfo ?: return false
+            @Suppress("DEPRECATION")
+            return networkInfo.isConnected
+        }
+    }
+
+
 }

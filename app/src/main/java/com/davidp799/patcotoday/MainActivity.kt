@@ -210,10 +210,10 @@ class MainActivity : AppCompatActivity() {
             val updated = updateFiles() // wait until job is done
             setUpdatedStatusOnMainThread(updated)
             if (!updated) {
-                val downloaded = downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip", directory + "gtfs.zip")
+                val downloaded = downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip", viewModel.directory + "gtfs.zip")
                 setDownloadedStatusOnMainThread(downloaded)
                 if (downloaded) {
-                    val extracted = extractZip(directory + "gtfs.zip")
+                    val extracted = extractZip(viewModel.directory + "gtfs.zip")
                     setExtractedStatusOnMainThread(extracted)
                 }
 
@@ -252,11 +252,11 @@ class MainActivity : AppCompatActivity() {
     private fun updateFiles(): Boolean {
         logThread("updateFilesBackgroundActive")
         try {
-            val fileDir = File(directory)
+            val fileDir = File(viewModel.directory)
             fileDir.mkdirs()
             var notFound = 0
             for (fileName in dataFiles) { // Check for data files
-                val tempFile = File(directory + fileName)
+                val tempFile = File(viewModel.directory + fileName)
                 if (!tempFile.exists()) notFound++
             }
             return notFound <= 0
@@ -341,14 +341,5 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
             return false
         }
-    }
-
-    companion object {
-        /* Initialize Variables */
-        private var internet = false
-        private var updated = false
-        private var downloaded = false
-        private var extracted = false
-        private const val directory = "/data/data/com.davidp799.patcotoday/files/data/"
     }
 }
