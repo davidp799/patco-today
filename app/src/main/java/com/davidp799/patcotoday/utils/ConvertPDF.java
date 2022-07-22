@@ -1,5 +1,6 @@
 package com.davidp799.patcotoday.utils;
 
+import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 
@@ -27,6 +28,7 @@ public class ConvertPDF {
             return "Error found is : \n" + e;
         }
     }
+
     /* Accessor for file name */
     public String getFileName() {
         return fileName;

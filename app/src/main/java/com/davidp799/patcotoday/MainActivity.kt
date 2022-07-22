@@ -82,9 +82,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(topAppBar)
 
         // Add 'home' button to toolbar
-        if (supportActionBar != null) {
-            supportActionBar!!.setDisplayHomeAsUpEnabled(true) // show home button
-        }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true) // show home button
         topAppBar.setNavigationIcon(R.drawable.ic_update_tt)
         topAppBar.navigationContentDescription = "Check for updates"
 
@@ -156,8 +154,6 @@ class MainActivity : AppCompatActivity() {
             setInternetStatus(input)
             if (!input) {
                 Toast.makeText(this@MainActivity, "No internet connection. Working offline", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this@MainActivity, "Internet Connected", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -167,11 +163,6 @@ class MainActivity : AppCompatActivity() {
     private suspend fun setUpdatedStatusOnMainThread(input: Boolean) {
         withContext (Main) {
             setUpdatedStatus(input)
-            if (input) {
-                Toast.makeText(this@MainActivity, "Files up to date", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this@MainActivity, "Error: Files not found!", Toast.LENGTH_SHORT).show()
-            }
         }
     }
     private fun setDownloadedStatus(input: Boolean){
@@ -180,10 +171,8 @@ class MainActivity : AppCompatActivity() {
     private suspend fun setDownloadedStatusOnMainThread(input: Boolean) {
         withContext (Main) {
             setDownloadedStatus(input)
-            if (input) {
-                Toast.makeText(this@MainActivity, "Download successful", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this@MainActivity, "Download failure", Toast.LENGTH_SHORT).show()
+            if (!input) {
+                Toast.makeText(this@MainActivity, "Unable to download schedule data", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -193,10 +182,8 @@ class MainActivity : AppCompatActivity() {
     private suspend fun setExtractedStatusOnMainThread(input: Boolean) {
         withContext (Main) {
             setExtractedStatus(input)
-            if (input) {
-                Toast.makeText(this@MainActivity, "Extraction successful", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this@MainActivity, "Extraction failure", Toast.LENGTH_SHORT).show()
+            if (!input) {
+                Toast.makeText(this@MainActivity, "Unable to configure schedule data", Toast.LENGTH_SHORT).show()
             }
         }
     }
