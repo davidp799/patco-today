@@ -79,7 +79,7 @@ public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
         /* Animations: fade in fast */
         Animation fadeInAnimation = new AlphaAnimation(0,1);
         fadeInAnimation.setInterpolator(new DecelerateInterpolator());
-        fadeInAnimation.setDuration(500);
+        fadeInAnimation.setDuration(100);
         result.startAnimation(fadeInAnimation);
 
         holder.arrives.setText(arrival.getArrivalTime());
