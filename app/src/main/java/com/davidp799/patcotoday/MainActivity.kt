@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         // Configure Shared Preferences
         val sharedPreferences =
             getSharedPreferences("com.davidp799.patcotoday_preferences", MODE_PRIVATE)
-        val currentTheme = sharedPreferences.getString("deviceTheme", "")
+        val currentTheme = sharedPreferences.getString("device_theme", "")
 
         // Support Material Toolbar
         val window = this.window
@@ -86,13 +86,17 @@ class MainActivity : AppCompatActivity() {
         topAppBar.setNavigationIcon(R.drawable.ic_update_tt)
         topAppBar.navigationContentDescription = "Check for updates"
 
-        // Set current theme (light/dark)
-        if (currentTheme == "Dark") {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else if (currentTheme == "Light") {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        // Set current theme (light/dark/auto)
+        when (currentTheme) {
+            "1" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+            "2" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+            else -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
         }
 
         // Set status bar and navigation bar colors
@@ -189,8 +193,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun backgroundTasksRequest() {
-        logThread("checkInternetRequest")
-
+        logThread("\n*** backgroundTasksRequest Active ***\n")
         val connected = checkInternet(this) // wait until job is done
         setInternetStatusOnMainThread(connected)
         if (connected) {
@@ -209,7 +212,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkInternet(context: Context): Boolean {
-        logThread("checkInternetBackgroundActive")
         // register activity with the connectivity manager service
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         // if Android M or greater, use NetworkCapabilities to check which network has connection
@@ -237,8 +239,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateFiles(): Boolean {
-        logThread("updateFilesBackgroundActive")
-        try {
+        return try {
             val fileDir = File(viewModel.directory)
             fileDir.mkdirs()
             var notFound = 0
@@ -246,10 +247,10 @@ class MainActivity : AppCompatActivity() {
                 val tempFile = File(viewModel.directory + fileName)
                 if (!tempFile.exists()) notFound++
             }
-            return notFound <= 0
+            notFound <= 0
         } catch (e: Exception) {
             println("Error: Files not up to date!")
-            return false
+            false
         }
     }
 
@@ -295,34 +296,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun extractZip(filePath: String): Boolean {
-        val `is`: InputStream
-        val zis: ZipInputStream
+        val inputStream: InputStream
+        val zipInputStream: ZipInputStream
         try {
-            val zipfile = File(filePath)
-            val parentFolder = zipfile.parentFile?.path
-            var filename: String
-            `is` = FileInputStream(filePath)
-            zis = ZipInputStream(BufferedInputStream(`is`))
-            var ze: ZipEntry?
+            val zipFile = File(filePath)
+            val parentFolder = zipFile.parentFile?.path
+            var fileName: String
+            inputStream = FileInputStream(filePath)
+            zipInputStream = ZipInputStream(BufferedInputStream(inputStream))
+            var zipEntry: ZipEntry?
             val buffer = ByteArray(1024)
             var count: Int
-            while (zis.nextEntry.also { ze = it } != null) {
-                filename = ze!!.name
-                if (ze!!.isDirectory) {
-                    val fmd = File("$parentFolder/$filename")
+            while (zipInputStream.nextEntry.also { zipEntry = it } != null) {
+                fileName = zipEntry!!.name
+                if (zipEntry!!.isDirectory) {
+                    val fmd = File("$parentFolder/$fileName")
                     fmd.mkdirs()
                     continue
                 }
-                val fout = FileOutputStream(
-                    "$parentFolder/$filename"
+                val fileOut = FileOutputStream(
+                    "$parentFolder/$fileName"
                 )
-                while (zis.read(buffer).also { count = it } != -1) {
-                    fout.write(buffer, 0, count)
+                while (zipInputStream.read(buffer).also { count = it } != -1) {
+                    fileOut.write(buffer, 0, count)
                 }
-                fout.close()
-                zis.closeEntry()
+                fileOut.close()
+                zipInputStream.closeEntry()
             }
-            zis.close()
+            zipInputStream.close()
             return true
         } catch (e: IOException) {
             e.printStackTrace()
