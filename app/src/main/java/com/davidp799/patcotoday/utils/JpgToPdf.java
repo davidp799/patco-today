@@ -43,7 +43,7 @@ public class JpgToPdf {
             e.printStackTrace();
         }
 
-        assert image != null;
+//        assert image != null;
         float scaler = ((document.getPageSize().getWidth() - document.leftMargin()
                 - document.rightMargin() - 0) / image.getWidth()) * 100; // 0 means you have no indentation. If you have any, change it.
         image.scalePercent(scaler);
