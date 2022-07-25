@@ -10,7 +10,7 @@
         android:id="@+id/linearLayoutCompat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="126sp"
+        android:layout_marginTop="100sp"
         android:layout_marginBottom="96sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

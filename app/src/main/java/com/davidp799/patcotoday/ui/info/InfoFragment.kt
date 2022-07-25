@@ -34,9 +34,9 @@ class InfoFragment : Fragment() {
         val root: View = binding.root
         enterTransition = MaterialFadeThrough()
 
-        // first listview item
+        // listview items
         val infoListView = root.findViewById<View>(R.id.infoListView) as ListView
-        val infoGeneralAdapter = ArrayAdapter(
+        val infoGeneralAdapter = InfoListAdapter(
             requireActivity(),
             android.R.layout.simple_list_item_1,
             infoViewModel.infoItems

@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageView
 import com.davidp799.patcotoday.R
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 
 class MapListAdapter(private val mContext: Context, resource: Int, private val mObjects: Array<String>): ArrayAdapter<String>(mContext, resource, mObjects) {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
