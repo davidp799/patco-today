@@ -36,7 +36,7 @@
                 android:inputType="none"
                 android:maxLines="2"
                 android:text="@string/from"
-                android:textColor="#757575"
+                android:textColor="@color/material_on_surface_emphasis_medium"
                 android:textSize="14.5sp"
                 tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -44,15 +44,15 @@
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="wrap_content"
-            android:layout_height="20sp"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
             android:src="@drawable/ic_baseline_arrow_right_alt_24"
             android:contentDescription="@string/arrow" />
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="10sp"
@@ -62,19 +62,30 @@
 
             <AutoCompleteTextView
                 android:id="@+id/toTextView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:inputType="none"
                 android:maxLines="2"
                 android:text="@string/to"
-                android:textColor="#757575"
+                android:textColor="@color/material_on_surface_emphasis_medium"
                 android:textSize="14.5sp"
                 tools:ignore="TextContrastCheck" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <!-- Linear progress indicator -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/arrivalsProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3sp"
+        android:layout_marginBottom="1sp"
+        app:layout_constraintTop_toBottomOf="@id/linearLayoutCompat"
+        android:indeterminate="true"
+        style="@style/Theme.PatcoToday"/>
 
     <ListView
         android:id="@+id/arrivalsListView"
