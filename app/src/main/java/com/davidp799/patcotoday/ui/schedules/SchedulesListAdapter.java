@@ -1,4 +1,4 @@
-package com.davidp799.patcotoday;
+package com.davidp799.patcotoday.ui.schedules;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,17 +12,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.utils.Arrival;
 
 import java.util.ArrayList;
 
-/**
- *
- */
-
 public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
-
-    private static final String TAG = "SchedulesListAdapter";
 
     private Context mContext;
     private int mResource;

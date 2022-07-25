@@ -26,12 +26,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import java.io.*
 import java.lang.Exception
-import java.lang.Runnable
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-import kotlin.system.measureTimeMillis
 
 class MainActivity : AppCompatActivity() {
     private val dataFiles = listOf(

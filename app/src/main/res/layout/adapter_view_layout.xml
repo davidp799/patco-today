@@ -2,15 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:weightSum="100">
 
     <TextView
         android:gravity="center"
         android:textAlignment="center"
         android:textSize="16sp"
+        android:layout_gravity="center"
         android:layout_width="160sp"
-        android:layout_height="50sp"
+        android:layout_height="match_parent"
         android:id="@+id/textView1"
         android:layout_weight="10"/>
 
@@ -24,6 +25,7 @@
     <TextView
         android:gravity="center"
         android:textSize="16sp"
+        android:layout_gravity="center"
         android:layout_width="160sp"
         android:layout_height="50sp"
 

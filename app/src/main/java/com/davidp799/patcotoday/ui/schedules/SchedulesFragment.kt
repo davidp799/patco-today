@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelLazy
 import com.davidp799.patcotoday.R
-import com.davidp799.patcotoday.SchedulesListAdapter
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding
 import com.davidp799.patcotoday.utils.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -94,8 +93,13 @@ class SchedulesFragment : Fragment() {
 
         // Initialize schedules ListView
         val schedulesAdapter: ArrayAdapter<Arrival> =
-            SchedulesListAdapter(context, R.layout.adapter_view_layout, viewModel.schedulesArrayList)
+            SchedulesListAdapter(
+                context,
+                R.layout.adapter_view_layout,
+                viewModel.schedulesArrayList
+            )
         val schedulesListView = root.findViewById<ListView>(R.id.arrivalsListView)
+        schedulesListView.isTransitionGroup
         schedulesListView.adapter = schedulesAdapter
         arrivalsProgressBar.visibility = View.VISIBLE
         CoroutineScope(Dispatchers.IO).launch {
@@ -137,7 +141,12 @@ class SchedulesFragment : Fragment() {
                 CoroutineScope(Dispatchers.IO).launch {
                     updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsProgressBar)
                 }
-                schedulesListView.adapter = SchedulesListAdapter(context, R.layout.adapter_view_layout, viewModel.schedulesArrayList)
+                schedulesListView.adapter =
+                    SchedulesListAdapter(
+                        context,
+                        R.layout.adapter_view_layout,
+                        viewModel.schedulesArrayList
+                    )
                 /* Set progressbar as visible while working */
                 specialProgressBar.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
@@ -155,7 +164,12 @@ class SchedulesFragment : Fragment() {
                 CoroutineScope(Dispatchers.IO).launch {
                     updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsProgressBar)
                 }
-                schedulesListView.adapter = SchedulesListAdapter(context, R.layout.adapter_view_layout, viewModel.schedulesArrayList)
+                schedulesListView.adapter =
+                    SchedulesListAdapter(
+                        context,
+                        R.layout.adapter_view_layout,
+                        viewModel.schedulesArrayList
+                    )
                 /* Set progressbar as visible while working */
                 specialProgressBar.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
@@ -189,7 +203,6 @@ class SchedulesFragment : Fragment() {
         // connect textViews to stations options arrayAdapter
         fromAutoCompleteTV.setAdapter(stationsArrayAdapter)
         toAutoCompleteTV.setAdapter(stationsArrayAdapter)
-
     }
 
     override fun onDestroyView() {
@@ -249,7 +262,11 @@ class SchedulesFragment : Fragment() {
         if (viewModel.specialText.size > 0) { header.text = viewModel.specialText[0] }
         /* Add formatted arrivals to special listview */
         val specialArrayAdapter =
-            SchedulesListAdapter(context, R.layout.adapter_view_layout, viewModel.specialSchedulesArrayList)
+            SchedulesListAdapter(
+                context,
+                R.layout.adapter_view_layout,
+                viewModel.specialSchedulesArrayList
+            )
         listView.adapter = specialArrayAdapter
         specialArrayAdapter.notifyDataSetChanged()
     }
@@ -544,7 +561,11 @@ class SchedulesFragment : Fragment() {
         viewModel.schedulesArrayList.clear()
         viewModel.schedulesArrayList.addAll(arrayList)
         val schedulesAdapter: ArrayAdapter<Arrival> =
-            SchedulesListAdapter(context, R.layout.adapter_view_layout, viewModel.schedulesArrayList)
+            SchedulesListAdapter(
+                context,
+                R.layout.adapter_view_layout,
+                viewModel.schedulesArrayList
+            )
         listView.adapter = schedulesAdapter
         schedulesAdapter.notifyDataSetChanged()
         listView.smoothScrollToPositionFromTop(scrollValue, 0, 120)

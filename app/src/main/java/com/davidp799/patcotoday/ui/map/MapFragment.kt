@@ -29,14 +29,14 @@ class MapFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val mapViewModel =
-            ViewModelProvider(this).get(MapViewModel::class.java)
+            ViewModelProvider(this)[MapViewModel::class.java]
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         val root: View = binding.root
         enterTransition = MaterialFadeThrough()
 
         // listView items
         val stationMap = root.findViewById<View>(R.id.stationMap) as ListView
-        val stationMapGeneralAdapter = ArrayAdapter(
+        val stationMapGeneralAdapter = MapListAdapter(
             requireActivity(),
             android.R.layout.simple_list_item_1,
             mapViewModel.stationList

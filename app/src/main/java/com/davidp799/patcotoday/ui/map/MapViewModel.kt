@@ -3,11 +3,11 @@ package com.davidp799.patcotoday.ui.map
 import androidx.lifecycle.ViewModel
 
 class MapViewModel : ViewModel() {
-
     private val _stationList = arrayOf(
-        "15/16th & Locust", "12/13th & Locust", "9/10th & Locust", "8th & Market",
-        "City Hall", "Broadway", "Ferry Avenue", "Collingswood", "Westmont",
-        "Haddonfield", "Woodcrest", "Ashland", "Lindenwold"
+        "Lindenwold", "Ashland", "Woodcrest", "Haddonfield",
+        "Westmont", "Collingswood", "Ferry Avenue", "Broadway",
+        "City Hall", "8th & Market", "9/10th & Locust",
+        "12/13th & Locust", "15/16th & Locust"
     )
     private val _stationLinks = arrayOf(
         "http://www.ridepatco.org/stations/15th.asp",

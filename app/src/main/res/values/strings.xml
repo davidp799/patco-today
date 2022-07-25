@@ -56,6 +56,7 @@
 
     <string name="line_map_desc">PATCO Line Map</string>
     <string name="arrow">Arrow</string>
+    <string name="menu_reverse">Reverse Direction</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
