@@ -358,6 +358,7 @@ class SchedulesFragment : Fragment() {
                 try {
                     val url = URL(viewModel.specialURLs[i])
                     filePath += if (url.toString().contains(".jpg")) {
+                        println(viewModel.specialText[i])
                         println("\n\n\nFOUND JPG FILE: $url\n\n\n")
                         ".jpg"
                     } else {
@@ -412,6 +413,11 @@ class SchedulesFragment : Fragment() {
                 viewModel.runnableConvertedStrings.add(convertPDF.text)
             }
             viewModel.converted = true
+            println("\n\n### CONVERTED PDF ###")
+            for (i in 0 until viewModel.runnableConvertedStrings.size) {
+                println(viewModel.runnableConvertedStrings[i])
+            }
+            println("###\n\n")
             true
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
@@ -486,7 +492,23 @@ class SchedulesFragment : Fragment() {
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
             } else {
                 /* obtain special info from saved array */
-                println("im empty...")
+                val special_about: TextView = view.findViewById(R.id.specialScheduleAbout)
+                val special_link: TextView = view.findViewById(R.id.specialScheduleLink)
+
+                special_about.setText(viewModel.specialTexts[0])
+                special_link.setText(viewModel.specialURLs[0])
+
+
+                println("\n\n### PARSED PDF ###")
+                if (viewModel.specialSchedulesArrayList.size > 0 ) {
+                    for (i in 0 until viewModel.specialSchedulesArrayList.size) {
+                        println(viewModel.specialSchedulesArrayList[i])
+                    }
+
+                } else {
+                    println("EMPTY\nEMPTY\nEMPTY")
+                }
+                println("###\n\n")
             }
         }
     }
