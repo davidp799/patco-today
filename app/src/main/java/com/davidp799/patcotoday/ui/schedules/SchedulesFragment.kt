@@ -1,8 +1,10 @@
 package com.davidp799.patcotoday.ui.schedules
 
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -37,7 +39,6 @@ class SchedulesFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-
     private val viewModel: SchedulesViewModel by ViewModelLazy(
         SchedulesViewModel::class, {viewModelStore }, { defaultViewModelProviderFactory }
     )
@@ -54,6 +55,8 @@ class SchedulesFragment : Fragment() {
         enterTransition = MaterialFadeThrough()
         val arrivalsProgressBar: LinearProgressIndicator = root.findViewById(R.id.arrivalsProgressBar)
         arrivalsProgressBar.visibility = View.GONE
+        val specialViewButton: Button = root.findViewById(R.id.specialScheduleViewButton)
+        specialViewButton.visibility = View.GONE
 
         // implement reverse menu button
         val menuHost: MenuHost = requireActivity()
@@ -317,12 +320,14 @@ class SchedulesFragment : Fragment() {
                         if (parseStatus) {
                             // step 6: update main ui thread with special schedule data
                             val specialArrivals = getSpecialArrivalsBackground(source, destination)
-                            setSpecialArrivalsOnMainThread(specialArrivals, progressIndicator, view)
+                            setSpecialArrivalsOnMainThread(specialArrivals, progressIndicator, view, specialStatus)
                         }
                     }
 
                 }
             }
+        } else {
+            configureBottomSheetOnMainThread(view, false, progressIndicator)
         }
     }
     private fun checkSpecial(): Boolean {
@@ -447,68 +452,90 @@ class SchedulesFragment : Fragment() {
             ArrayList()
         }
     }
-    private suspend fun setSpecialArrivalsOnMainThread(input: ArrayList<Arrival>, progressIndicator: LinearProgressIndicator, view: View) {
+    private suspend fun setSpecialArrivalsOnMainThread(input: ArrayList<Arrival>, progressIndicator: LinearProgressIndicator, view: View, specialStatus: Boolean) {
         withContext (Main) {
-            setSpecialArrivals(input, progressIndicator, view)
+            setSpecialArrivals(input, progressIndicator, view, specialStatus)
         }
     }
-    private fun setSpecialArrivals(input: ArrayList<Arrival>, progressIndicator: LinearProgressIndicator, view: View){
+    private fun setSpecialArrivals(input: ArrayList<Arrival>, progressIndicator: LinearProgressIndicator, view: View, specialStatus: Boolean){
         viewModel.specialSchedulesArrayList.clear()
         viewModel.specialSchedulesArrayList.addAll(input)
-        configureBottomSheet(view)
+        configureBottomSheet(view, specialStatus)
         // Initialize special ListView
         val specialListView = view.findViewById<ListView>(R.id.specialArrivalsListView)
-        val specialHeader = view.findViewById<TextView>(R.id.specialScheduleHeader)
-        updateSpecialData(specialListView, specialHeader)
+        val specialAbout = view.findViewById<TextView>(R.id.specialScheduleAbout)
+        updateSpecialData(specialListView, specialAbout)
         progressIndicator.visibility = View.GONE
     }
-    private fun configureBottomSheet(view: View ) {
+    private suspend fun configureBottomSheetOnMainThread(view: View, specialStatus: Boolean, progressIndicator: LinearProgressIndicator) {
+        withContext (Main) {
+            configureBottomSheet(view, specialStatus)
+            progressIndicator.visibility = View.GONE
+        }
+    }
+    private fun configureBottomSheet(view: View, specialStatus: Boolean ) {
         /* Initialize Bottom Sheet and Special Loading Parameters */
         val mBottomSheetLayout = view.findViewById<LinearLayout>(R.id.bottom_sheet_layout)
         val sheetBehavior: BottomSheetBehavior<LinearLayout> = BottomSheetBehavior.from(mBottomSheetLayout)
-        val headerArrowImage: ImageView =
-            view.findViewById(R.id.bottom_sheet_arrow) // header arrow
-        // Header arrow implementation for bottom sheet
-        headerArrowImage.setOnClickListener {
-            if (sheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
-                sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
-            } else {
-                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-            }
-        }
-        // Implement bottom sheet call
-        sheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {}
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                headerArrowImage.rotation = slideOffset * 180
-            }
-        })
-        if (!viewModel.internet) {
+
+        if (!specialStatus) {
+            println("\n\n\n\n\n!!!!!!!! $specialStatus")
             sheetBehavior.peekHeight = 0
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED) // hide bottom sheet
         } else {
-            if (!viewModel.special) {
-                sheetBehavior.peekHeight = 0
-                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-            } else {
-                /* obtain special info from saved array */
-                val special_about: TextView = view.findViewById(R.id.specialScheduleAbout)
-                val special_link: TextView = view.findViewById(R.id.specialScheduleLink)
+            println("\n\n\n\n\n!!!!!!!! $specialStatus")
 
-                special_about.setText(viewModel.specialTexts[0])
-                special_link.setText(viewModel.specialURLs[0])
-
-
-                println("\n\n### PARSED PDF ###")
-                if (viewModel.specialSchedulesArrayList.size > 0 ) {
-                    for (i in 0 until viewModel.specialSchedulesArrayList.size) {
-                        println(viewModel.specialSchedulesArrayList[i])
-                    }
-
+            val headerArrowImage: ImageView =
+                view.findViewById(R.id.bottom_sheet_arrow) // header arrow
+            // Header arrow implementation for bottom sheet
+            headerArrowImage.setOnClickListener {
+                if (sheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
                 } else {
-                    println("EMPTY\nEMPTY\nEMPTY")
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
                 }
-                println("###\n\n")
+
+            }
+            // Implement bottom sheet call
+            sheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {}
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    headerArrowImage.rotation = slideOffset * 180
+                }
+            })
+            if (!viewModel.internet) {
+                sheetBehavior.peekHeight = 0
+                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED) // hide bottom sheet
+            } else {
+                if (!viewModel.special) {
+                    sheetBehavior.peekHeight = 0
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                } else {
+                    // initialize about and button for schedules
+                    val specialAbout: TextView = view.findViewById(R.id.specialScheduleAbout)
+                    val specialViewButton: Button = view.findViewById(R.id.specialScheduleViewButton)
+                    specialViewButton.visibility = View.VISIBLE
+                    val specialAboutValue = try {
+                        viewModel.specialTexts[0].split(" | ")[1]
+                    } catch (e: Exception) {
+                        viewModel.specialTexts[0]
+                    }
+                    specialAbout.text = specialAboutValue
+                    specialViewButton.setOnClickListener {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(viewModel.specialURLs[0])))
+                    }
+                    // debug
+                    println("\n\n### PARSED PDF ###")
+                    if (viewModel.specialSchedulesArrayList.size > 0 ) {
+                        for (i in 0 until viewModel.specialSchedulesArrayList.size) {
+                            println(viewModel.specialSchedulesArrayList[i])
+                        }
+
+                    } else {
+                        println("EMPTY\nEMPTY\nEMPTY")
+                    }
+                    println("###\n\n")
+                }
             }
         }
     }
@@ -549,9 +576,6 @@ class SchedulesFragment : Fragment() {
     private suspend fun setInternetStatusOnMainThread(input: Boolean) {
         withContext (Main) {
             setInternetStatus(input)
-            if (!input) {
-                Toast.makeText(requireContext(), "No internet connection. Working offline", Toast.LENGTH_SHORT).show()
-            }
         }
     }
     private fun setInternetStatus(input: Boolean){

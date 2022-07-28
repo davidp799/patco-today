@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet_layout"
-    android:layout_width="match_parent"
     android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:behavior_hideable="true"
     app:behavior_peekHeight="155sp"
@@ -43,7 +43,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="?android:attr/windowBackground"
         android:layout_width="match_parent"
-        android:layout_height="500sp">
+        android:layout_height="wrap_content"
+        android:minHeight="200sp">
 
         <!-- Linear progress indicator -->
         <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -56,29 +57,24 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             app:layout_constraintTop_toBottomOf="@id/specialProgressIndicator"
             android:orientation="vertical"
             android:padding="10dp">
 
-            <TextView
-                android:id="@+id/specialScheduleHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="@string/special_schedule_header"/>
             <TextView
                 android:id="@+id/specialScheduleAbout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:text="@string/special_schedule_about"/>
-            <TextView
-                android:id="@+id/specialScheduleLink"
+
+            <Button
+                android:id="@+id/specialScheduleViewButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="@string/special_schedule_link"/>
+                android:text="@string/special_schedule_download">
+            </Button>
 
             <ListView
                 android:id="@+id/specialArrivalsListView"
@@ -89,7 +85,6 @@
 
         </LinearLayout>
 
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </LinearLayout>

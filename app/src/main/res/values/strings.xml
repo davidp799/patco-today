@@ -8,7 +8,8 @@
     <string name="to">To</string>
     <string name="special_schedules">Special Schedules Available</string>
     <string name="special_schedule_header">Special Schedule(s):</string>
-    <string name="special_schedule_about"></string>
+    <string name="special_schedule_about">No Special Schedules Today</string>
+    <string name="special_schedule_download">View Schedule</string>
     <string name="special_schedule_link"></string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_settings">Settings</string>
