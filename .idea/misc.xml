@@ -32,6 +32,7 @@
         <entry key="app/src/main/res/drawable/ic_launcher_round.xml" value="0.1525" />
         <entry key="app/src/main/res/drawable/ic_launcher_train.xml" value="0.1525" />
         <entry key="app/src/main/res/drawable/ic_navigation_black_24.xml" value="0.2455" />
+        <entry key="app/src/main/res/drawable/ic_reverse_button.xml" value="0.3115" />
         <entry key="app/src/main/res/drawable/ic_splash_screen.xml" value="0.18" />
         <entry key="app/src/main/res/drawable/ic_splash_screen_js.xml" value="0.157" />
         <entry key="app/src/main/res/drawable/ic_splash_screen_round.xml" value="0.181" />
@@ -56,7 +57,7 @@
         <entry key="app/src/main/res/layout/dropdown_item.xml" value="0.3007246376811594" />
         <entry key="app/src/main/res/layout/fragment_info.xml" value="0.3458333333333333" />
         <entry key="app/src/main/res/layout/fragment_map.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/fragment_schedules.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_schedules.xml" value="0.4" />
         <entry key="app/src/main/res/layout/header.xml" value="0.1" />
         <entry key="app/src/main/res/layout/info_adapter_view_layout.xml" value="0.4" />
         <entry key="app/src/main/res/layout/information_adapter_view_layout.xml" value="0.33469202898550726" />

@@ -8,98 +8,107 @@
     tools:context=".ui.schedules.SchedulesFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/linearLayoutCompat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30sp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="10sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <AutoCompleteTextView
-                android:id="@+id/fromTextView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:inputType="none"
-                android:maxLines="2"
-                android:text="@string/from"
-                android:textColor="@color/material_on_surface_emphasis_medium"
-                android:textSize="14.5sp"
-                tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_baseline_arrow_right_alt_24"
-            android:contentDescription="@string/arrow" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="10sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <AutoCompleteTextView
-                android:id="@+id/toTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:inputType="none"
-                android:maxLines="2"
-                android:text="@string/to"
-                android:textColor="@color/material_on_surface_emphasis_medium"
-                android:textSize="14.5sp"
-                tools:ignore="TextContrastCheck" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <!-- Linear progress indicator -->
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/arrivalsProgressBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3sp"
-        android:layout_marginBottom="1sp"
-        app:layout_constraintTop_toBottomOf="@id/linearLayoutCompat"
-        android:indeterminate="true"
-        style="@style/Theme.PatcoToday"/>
-
-    <ListView
-        android:id="@+id/arrivalsListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="100sp"
-        android:layout_marginBottom="96sp">
-    </ListView>
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:orientation="horizontal"
+            android:layout_weight=".25">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/stationSelectionLayout"
+                android:layout_width="0sp"
+                android:layout_height="match_parent"
+                android:layout_weight=".9"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20sp"
+                    android:layout_marginEnd="10sp">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/fromTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="none"
+                        android:maxLines="1"
+                        android:text="@string/from"
+                        android:textColor="@color/material_on_surface_emphasis_medium"
+                        android:textSize="15sp"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20sp"
+                    android:layout_marginEnd="10sp">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/toTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:inputType="none"
+                        android:maxLines="1"
+                        android:text="@string/to"
+                        android:textColor="@color/material_on_surface_emphasis_medium"
+                        android:textSize="15sp"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <RelativeLayout
+                android:layout_width="0sp"
+                android:layout_height="match_parent"
+                android:layout_weight=".2">
+
+                <Button
+                    android:id="@+id/reverseStationsButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10sp"
+                    android:layout_marginEnd="20sp"
+                    android:drawable="@drawable/ic_reverse_button">
+                </Button>
+
+            </RelativeLayout>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        <!-- Linear progress indicator -->
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/arrivalsProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/stationSelectionLayout"
+            android:indeterminate="true"
+            style="@style/Theme.PatcoToday"/>
+
+        <ListView
+            android:id="@+id/arrivalsListView"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight=".75"
+            android:layout_marginBottom="96sp"
+            app:layout_constraintTop_toBottomOf="@id/stationSelectionLayout">
+        </ListView>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         android:layout_marginTop="-80sp"
         android:layout_marginBottom="10sp">
 

@@ -58,20 +58,6 @@ class SchedulesFragment : Fragment() {
         val specialViewButton: Button = root.findViewById(R.id.specialScheduleViewButton)
         specialViewButton.visibility = View.GONE
 
-        // implement reverse menu button
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object: MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_reverse, menu)
-            }
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                if (menuItem.itemId == R.id.menu_reverse) {
-                    return true
-                }
-                return true
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-
         // shared preferences
         val sharedPreferences = requireActivity().getSharedPreferences(
             "com.davidp799.patcotoday_preferences",
@@ -119,6 +105,8 @@ class SchedulesFragment : Fragment() {
             root.findViewById<AutoCompleteTextView>(R.id.fromTextView)
         val toAutoCompleteTV =
             root.findViewById<AutoCompleteTextView>(R.id.toTextView)
+        val stationReverse =
+            root.findViewById<Button>(R.id.reverseStationsButton)
 
         // Initialize array adapter for stations dropdown menu
         val stationsArrayAdapter = ArrayAdapter(
@@ -179,6 +167,31 @@ class SchedulesFragment : Fragment() {
                     checkSpecialBackgroundRequest(requireContext(), viewModel.fromSelection, viewModel.toSelection, specialProgressBar, root)
                 }
             }
+        stationReverse.setOnClickListener {
+            Toast.makeText(requireContext(), "HI REVERSE NOW", Toast.LENGTH_SHORT).show()
+            var temp = viewModel.fromSelection
+            viewModel.fromSelection = viewModel.toSelection
+            viewModel.toSelection = temp
+
+            arrivalsProgressBar.visibility = View.VISIBLE
+            CoroutineScope(Dispatchers.IO).launch {
+                updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsProgressBar)
+            }
+            schedulesListView.adapter =
+                SchedulesListAdapter(
+                    context,
+                    R.layout.adapter_view_layout,
+                    viewModel.schedulesArrayList
+                )
+            /* Set progressbar as visible while working */
+            specialProgressBar.visibility = View.VISIBLE
+            CoroutineScope(Dispatchers.IO).launch {
+                checkSpecialBackgroundRequest(requireContext(), viewModel.fromSelection, viewModel.toSelection, specialProgressBar, root)
+            }
+            fromAutoCompleteTV.setText(viewModel.stationOptions[viewModel.fromSelection])
+            toAutoCompleteTV.setText(viewModel.stationOptions[viewModel.toSelection])
+        }
+
         return root
     }
 
