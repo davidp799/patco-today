@@ -10,6 +10,7 @@
         <entry key="..\:/Users/papda/AndroidStudioProjects/patco-today/app/src/main/res/layout/fragment_schedules.xml" value="0.20199275362318841" />
         <entry key="app/src/main/res/drawable/avd_ic_splash_screen.xml" value="0.33" />
         <entry key="app/src/main/res/drawable/background_border.xml" value="0.3135" />
+        <entry key="app/src/main/res/drawable/button_shape.xml" value="0.188" />
         <entry key="app/src/main/res/drawable/drawable_round_bottom_sheet.xml" value="0.16018518518518518" />
         <entry key="app/src/main/res/drawable/ic_android_black_24dp.xml" value="0.3125" />
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.3035" />
@@ -27,7 +28,9 @@
         <entry key="app/src/main/res/drawable/ic_info_quiz_20.xml" value="0.3" />
         <entry key="app/src/main/res/drawable/ic_info_quiz_tt.xml" value="0.3" />
         <entry key="app/src/main/res/drawable/ic_info_reload_24.xml" value="0.2935" />
+        <entry key="app/src/main/res/drawable/ic_info_tt.xml" value="0.188" />
         <entry key="app/src/main/res/drawable/ic_info_twitter_24.xml" value="0.2935" />
+        <entry key="app/src/main/res/drawable/ic_info_twitter_tt.xml" value="0.188" />
         <entry key="app/src/main/res/drawable/ic_info_web_24.xml" value="0.3" />
         <entry key="app/src/main/res/drawable/ic_launcher_round.xml" value="0.1525" />
         <entry key="app/src/main/res/drawable/ic_launcher_train.xml" value="0.1525" />
@@ -79,7 +82,7 @@
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.24351851851851852" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.181" />
         <entry key="app/src/main/res/xml/network_security_config.xml" value="0.30694444444444446" />
-        <entry key="app/src/main/res/xml/preferences.xml" value="0.1" />
+        <entry key="app/src/main/res/xml/preferences.xml" value="0.264" />
         <entry key="app/src/main/res/xml/splash_theme.xml" value="0.1" />
       </map>
     </option>

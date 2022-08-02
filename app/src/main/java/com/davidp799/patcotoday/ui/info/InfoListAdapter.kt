@@ -19,7 +19,7 @@ class InfoListAdapter(private val mContext: Context, resource: Int, private val 
         when (position) {
             0 -> image.setImageResource(R.drawable.ic_info_fares_tt)
             1 -> image.setImageResource(R.drawable.ic_info_reload_tt)
-            2 -> image.setImageResource(R.drawable.ic_info_twitter_24)
+            2 -> image.setImageResource(R.drawable.ic_info_twitter_tt)
             3 -> image.setImageResource(R.drawable.ic_info_call_tt)
             4 -> image.setImageResource(R.drawable.ic_info_email_tt)
             5 -> image.setImageResource(R.drawable.ic_info_website_tt)
