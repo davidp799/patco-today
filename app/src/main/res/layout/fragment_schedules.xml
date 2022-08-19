@@ -8,19 +8,19 @@
     tools:context=".ui.schedules.SchedulesFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/schedulesLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/schedulesConfigHorizLayout"
             android:layout_width="match_parent"
-            android:layout_height="0sp"
-            android:orientation="horizontal"
-            android:layout_weight=".2"
-            android:elevation="8dp">
+            android:layout_height="120sp"
+            android:orientation="horizontal">
 
         <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/stationIconsLayout"
+                android:id="@+id/stationIconsVertLayout"
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
                 android:layout_weight=".15"
@@ -57,7 +57,7 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/stationSelectionLayout"
+                android:id="@+id/stationSelectionsVertLayout"
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
                 android:layout_weight=".70"
@@ -106,6 +106,7 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <RelativeLayout
+                android:id="@+id/stationsReverseButtonLayout"
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
                 android:layout_weight=".15">
@@ -123,29 +124,41 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <View
+            android:id="@+id/stationsDropShadow"
             android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_below="@id/stationSelectionLayout"
+            android:layout_height="8sp"
             android:background="@drawable/drawable_drop_shadow"/>
 
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/arrivalsShimmerContainer"
             android:layout_width="match_parent"
-            android:layout_height="0sp"
-            android:layout_weight=".78"
-            android:layout_marginBottom="96sp"
-            app:layout_constraintTop_toBottomOf="@id/stationSelectionLayout"
-            app:shimmer_auto_start="true">
+            android:layout_height="match_parent"
+            android:layout_marginBottom="96sp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+
+            </LinearLayout>
 
         </com.facebook.shimmer.ShimmerFrameLayout>
 
         <ListView
             android:id="@+id/arrivalsListView"
             android:layout_width="match_parent"
-            android:layout_height="0sp"
-            android:layout_weight=".78"
+            android:layout_height="match_parent"
             android:layout_marginBottom="96sp"
-            app:layout_constraintTop_toBottomOf="@id/stationSelectionLayout">
+            app:layout_constraintTop_toBottomOf="@id/schedulesConfigHorizLayout">
         </ListView>
 
     </androidx.appcompat.widget.LinearLayoutCompat>

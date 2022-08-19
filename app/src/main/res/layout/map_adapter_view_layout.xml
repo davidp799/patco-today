@@ -5,29 +5,37 @@
     android:layout_height="wrap_content">
 
     <Space
-        android:layout_width="64sp"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_width="0sp"
+        android:layout_weight=".05">
     </Space>
 
     <ImageView
         android:id="@+id/item_image"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_width="0sp"
+        android:layout_weight=".25"
         android:layout_gravity="center"
         android:src="@drawable/ic_timeline_tt" />
 
-    <Space
-        android:layout_width="48sp"
-        android:layout_height="match_parent">
-    </Space>
-
     <TextView
         android:id="@+id/item_text"
-        android:gravity="left"
-        android:textSize="18sp"
+        android:gravity="center"
+        android:textSize="22sp"
         android:layout_gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_width="0sp"
+        android:layout_weight=".50"/>
 
+    <ImageView
+        android:layout_height="match_parent"
+        android:layout_width="0sp"
+        android:layout_weight=".10"
+        android:src="@drawable/ic_chevron_right"/>
+
+    <Space
+        android:layout_height="match_parent"
+        android:layout_width="0sp"
+        android:layout_weight=".05"/>
 
 </LinearLayout>

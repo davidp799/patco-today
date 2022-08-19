@@ -61,6 +61,7 @@
     <string name="arrow">Arrow</string>
     <string name="menu_reverse">Reverse Direction</string>
     <string name="info_icon_desc">Info Icon</string>
+    <string name="map_state_divider_text">New Jersey</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
