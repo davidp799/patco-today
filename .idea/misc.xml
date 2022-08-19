@@ -11,9 +11,13 @@
         <entry key="app/src/main/res/drawable/avd_ic_splash_screen.xml" value="0.33" />
         <entry key="app/src/main/res/drawable/background_border.xml" value="0.3135" />
         <entry key="app/src/main/res/drawable/button_shape.xml" value="0.188" />
-        <entry key="app/src/main/res/drawable/drawable_round_bottom_sheet.xml" value="0.16018518518518518" />
+        <entry key="app/src/main/res/drawable/drawable_drop_shadow.xml" value="0.2965" />
+        <entry key="app/src/main/res/drawable/drawable_round_bottom_sheet.xml" value="0.4" />
+        <entry key="app/src/main/res/drawable/drawable_round_drop_shadow.xml" value="0.2965" />
+        <entry key="app/src/main/res/drawable/drawable_shadow.xml" value="0.2965" />
         <entry key="app/src/main/res/drawable/ic_android_black_24dp.xml" value="0.3125" />
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.3035" />
+        <entry key="app/src/main/res/drawable/ic_baseline_arrow_right_alt_24.xml" value="0.2975" />
         <entry key="app/src/main/res/drawable/ic_baseline_menu_24.xml" value="0.2455" />
         <entry key="app/src/main/res/drawable/ic_baseline_update_24.xml" value="0.293" />
         <entry key="app/src/main/res/drawable/ic_dashboard_black_24dp.xml" value="0.16018518518518518" />
@@ -39,6 +43,9 @@
         <entry key="app/src/main/res/drawable/ic_splash_screen.xml" value="0.18" />
         <entry key="app/src/main/res/drawable/ic_splash_screen_js.xml" value="0.157" />
         <entry key="app/src/main/res/drawable/ic_splash_screen_round.xml" value="0.181" />
+        <entry key="app/src/main/res/drawable/ic_swap_plain_tt.xml" value="0.2975" />
+        <entry key="app/src/main/res/drawable/ic_swap_round_48.xml" value="0.2975" />
+        <entry key="app/src/main/res/drawable/ic_swap_tt.xml" value="0.2975" />
         <entry key="app/src/main/res/drawable/ic_timeline.xml" value="0.2035" />
         <entry key="app/src/main/res/drawable/ic_timeline_divider.xml" value="0.3115" />
         <entry key="app/src/main/res/drawable/ic_timeline_divider_tt.xml" value="0.1475" />
@@ -60,7 +67,7 @@
         <entry key="app/src/main/res/layout/dropdown_item.xml" value="0.3007246376811594" />
         <entry key="app/src/main/res/layout/fragment_info.xml" value="0.3458333333333333" />
         <entry key="app/src/main/res/layout/fragment_map.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/fragment_schedules.xml" value="0.4" />
+        <entry key="app/src/main/res/layout/fragment_schedules.xml" value="0.30749354005167956" />
         <entry key="app/src/main/res/layout/header.xml" value="0.1" />
         <entry key="app/src/main/res/layout/info_adapter_view_layout.xml" value="0.4" />
         <entry key="app/src/main/res/layout/information_adapter_view_layout.xml" value="0.33469202898550726" />
@@ -87,7 +94,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

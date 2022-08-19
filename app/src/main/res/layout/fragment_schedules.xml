@@ -16,21 +16,59 @@
             android:layout_width="match_parent"
             android:layout_height="0sp"
             android:orientation="horizontal"
-            android:layout_weight=".22">
+            android:layout_weight=".2"
+            android:elevation="8dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/stationIconsLayout"
+                android:layout_width="0sp"
+                android:layout_height="match_parent"
+                android:layout_weight=".15"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/iconSource"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10sp"
+                    app:srcCompat="@drawable/ic_source_tt"
+                    tools:layout_editor_absoluteX="55dp"
+                    tools:layout_editor_absoluteY="130dp" />
+
+                <ImageView
+                    android:id="@+id/iconDots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10sp"
+                    app:srcCompat="@drawable/ic_dots_tt"
+                    tools:layout_editor_absoluteX="55dp"
+                    tools:layout_editor_absoluteY="130dp" />
+
+                <ImageView
+                    android:id="@+id/iconDestination"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10sp"
+                    app:srcCompat="@drawable/ic_destination_tt"
+                    tools:layout_editor_absoluteX="55dp"
+                    tools:layout_editor_absoluteY="130dp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/stationSelectionLayout"
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
-                android:layout_weight=".9"
+                android:layout_weight=".70"
                 android:orientation="vertical"
                 android:gravity="center">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20sp"
+                    android:layout_marginStart="10sp"
                     android:layout_marginEnd="10sp">
 
                     <AutoCompleteTextView
@@ -47,10 +85,10 @@
 
 
                 <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20sp"
+                    android:layout_marginStart="10sp"
                     android:layout_marginEnd="10sp">
 
                     <AutoCompleteTextView
@@ -62,6 +100,7 @@
                         android:text="@string/to"
                         android:textColor="@color/material_on_surface_emphasis_medium"
                         android:textSize="14sp"/>
+
                 </com.google.android.material.textfield.TextInputLayout>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -69,30 +108,36 @@
             <RelativeLayout
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
-                android:layout_weight=".20">
+                android:layout_weight=".15">
 
-                <Button
+                <ImageButton
                     android:id="@+id/reverseStationsButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="48sp"
+                    android:layout_height="48sp"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="10sp"
-                    android:layout_marginEnd="20sp">
-                </Button>
+                    android:src="@drawable/ic_swap_round_48"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
 
             </RelativeLayout>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-
-        <!-- Linear progress indicator -->
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/arrivalsProgressBar"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="4dp"
+            android:layout_below="@id/stationSelectionLayout"
+            android:background="@drawable/drawable_drop_shadow"/>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/arrivalsShimmerContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight=".78"
+            android:layout_marginBottom="96sp"
             app:layout_constraintTop_toBottomOf="@id/stationSelectionLayout"
-            android:indeterminate="true"
-            style="@style/Theme.PatcoToday"/>
+            app:shimmer_auto_start="true">
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
 
         <ListView
             android:id="@+id/arrivalsListView"

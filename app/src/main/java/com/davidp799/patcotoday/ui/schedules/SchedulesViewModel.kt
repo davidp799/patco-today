@@ -10,6 +10,7 @@ import kotlin.collections.ArrayList
 
 class SchedulesViewModel : ViewModel() {
     // Station options
+    var isReversed = false;
     // Station Data
     var weekday =
         Calendar.getInstance()[Calendar.DAY_OF_WEEK] - 1 // weekday in java starts on sunday
@@ -25,6 +26,9 @@ class SchedulesViewModel : ViewModel() {
     var parsed = false
     var schedules = Schedules()
 
+    // Background Lists - arrivals list
+    var schedulesArrayList = ArrayList<Arrival>()
+
     // Background Lists
     var specialEastBound = ArrayList<String>()
     var specialWestBound = ArrayList<String>()
@@ -33,11 +37,9 @@ class SchedulesViewModel : ViewModel() {
     var specialTexts = ArrayList<String>()
     var runnableConvertedStrings = ArrayList<String>()
     var parsedArrivals = ArrayList<ArrayList<String>>()
-    var schedulesArrayList = ArrayList<Arrival>()
     var specialSchedulesArrayList = ArrayList<Arrival>()
-    
-    
-    
+
+    // List objects
     var stationOptions = listOf(
         "Lindenwold",
         "Ashland",

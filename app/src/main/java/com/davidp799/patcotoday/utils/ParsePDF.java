@@ -36,7 +36,7 @@ public class ParsePDF {
         /* Set collect line status to 0 [do not collect] */
         int collect = 0;
         /* Search for lines containing special arrivals */
-        for (int i=0; i< pdfLines.length; i++) {
+        for (int i=0; i< pdfLines.length; i++) { // TODO: implement binary search algorithm
             /* Parse only lines containing special arrivals; only parse when collect == 1 */
             if (pdfLines[i].contains("SPECIAL SCHEDULE STARTS WITH ADJUSTED DEPARTURE TIMES BELOW.")) {
                 collect = 1; // ready to parse special arrivals in following line

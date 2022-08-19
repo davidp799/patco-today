@@ -9,4 +9,5 @@
         android:title="@string/menu_settings"
         android:orderInCategory="1"
         app:showAsAction="always"/>
+
 </menu>

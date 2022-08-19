@@ -10,14 +10,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelLazy
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding
 import com.davidp799.patcotoday.utils.*
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.transition.MaterialFadeThrough
@@ -53,8 +51,9 @@ class SchedulesFragment : Fragment() {
 
         // Configure UI
         enterTransition = MaterialFadeThrough()
-        val arrivalsProgressBar: LinearProgressIndicator = root.findViewById(R.id.arrivalsProgressBar)
-        arrivalsProgressBar.visibility = View.GONE
+
+        val arrivalsShimmerContainer: ShimmerFrameLayout = root.findViewById(R.id.arrivalsShimmerContainer)
+        arrivalsShimmerContainer.visibility = View.GONE
         val specialViewButton: Button = root.findViewById(R.id.specialScheduleViewButton)
         specialViewButton.visibility = View.GONE
 
@@ -81,18 +80,14 @@ class SchedulesFragment : Fragment() {
         }
 
         // Initialize schedules ListView
-        val schedulesAdapter: ArrayAdapter<Arrival> =
-            SchedulesListAdapter(
-                context,
-                R.layout.adapter_view_layout,
-                viewModel.schedulesArrayList
-            )
+
         val schedulesListView = root.findViewById<ListView>(R.id.arrivalsListView)
         schedulesListView.isTransitionGroup
-        schedulesListView.adapter = schedulesAdapter
-        arrivalsProgressBar.visibility = View.VISIBLE
+        arrivalsShimmerContainer.visibility = View.VISIBLE
+
+        // update listview with actual arrivals
         CoroutineScope(Dispatchers.IO).launch {
-            updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsProgressBar)
+            updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsShimmerContainer)
         }
 
         /* Set progressbar as visible while working */
@@ -106,7 +101,7 @@ class SchedulesFragment : Fragment() {
         val toAutoCompleteTV =
             root.findViewById<AutoCompleteTextView>(R.id.toTextView)
         val stationReverse =
-            root.findViewById<Button>(R.id.reverseStationsButton)
+            root.findViewById<ImageButton>(R.id.reverseStationsButton)
 
         // Initialize array adapter for stations dropdown menu
         val stationsArrayAdapter = ArrayAdapter(
@@ -128,9 +123,9 @@ class SchedulesFragment : Fragment() {
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 viewModel.fromSelection = position // set source station to index of selected array position
                 // reload listview and scroll to next train
-                arrivalsProgressBar.visibility = View.VISIBLE
+                arrivalsShimmerContainer.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsProgressBar)
+                    updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsShimmerContainer)
                 }
                 schedulesListView.adapter =
                     SchedulesListAdapter(
@@ -151,9 +146,9 @@ class SchedulesFragment : Fragment() {
                 viewModel.toSelection =
                     position // set destination station to index of selected array position
                 // reload listview with new array and adapter and scroll to next train
-                arrivalsProgressBar.visibility = View.VISIBLE
+                arrivalsShimmerContainer.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsProgressBar)
+                    updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsShimmerContainer)
                 }
                 schedulesListView.adapter =
                     SchedulesListAdapter(
@@ -168,14 +163,21 @@ class SchedulesFragment : Fragment() {
                 }
             }
         stationReverse.setOnClickListener {
-            Toast.makeText(requireContext(), "HI REVERSE NOW", Toast.LENGTH_SHORT).show()
-            var temp = viewModel.fromSelection
+            // rotate counter clock-wise if reversed, else rotate clock-wise
+            if (viewModel.isReversed) {
+                stationReverse.animate().setDuration(180).rotationBy(-180f).start()
+                viewModel.isReversed = false;
+            } else {
+                stationReverse.animate().setDuration(180).rotationBy(180f).start()
+                viewModel.isReversed = true;
+            }
+            val temp = viewModel.fromSelection
             viewModel.fromSelection = viewModel.toSelection
             viewModel.toSelection = temp
 
-            arrivalsProgressBar.visibility = View.VISIBLE
+            arrivalsShimmerContainer.visibility = View.VISIBLE
             CoroutineScope(Dispatchers.IO).launch {
-                updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsProgressBar)
+                updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsShimmerContainer)
             }
             schedulesListView.adapter =
                 SchedulesListAdapter(
@@ -498,24 +500,7 @@ class SchedulesFragment : Fragment() {
         } else {
             println("\n\n\n\n\n!!!!!!!! $specialStatus")
 
-            val headerArrowImage: ImageView =
-                view.findViewById(R.id.bottom_sheet_arrow) // header arrow
-            // Header arrow implementation for bottom sheet
-            headerArrowImage.setOnClickListener {
-                if (sheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
-                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
-                } else {
-                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-                }
-
-            }
             // Implement bottom sheet call
-            sheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-                override fun onStateChanged(bottomSheet: View, newState: Int) {}
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    headerArrowImage.rotation = slideOffset * 180
-                }
-            })
             if (!viewModel.internet) {
                 sheetBehavior.peekHeight = 0
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED) // hide bottom sheet
@@ -597,11 +582,11 @@ class SchedulesFragment : Fragment() {
     //
     //
     // Threads which update listView contents in background
-    private suspend fun updateListViewBackgroundRequest(source: Int, destination: Int, listView: ListView, progressIndicator: LinearProgressIndicator) {
+    private suspend fun updateListViewBackgroundRequest(source: Int, destination: Int, listView: ListView, arrivalsShimmerContainer: ShimmerFrameLayout) {
         logThread("\n*** updateListViewBackgroundRequest Active ***\n")
         val arrivals = getArrivalsBackground(source, destination)
         val value = scrollToNext(arrivals)
-        setArrivalsOnMainThread(arrivals, listView, value, progressIndicator)
+        setArrivalsOnMainThread(arrivals, listView, value, arrivalsShimmerContainer)
     }
     private fun getArrivalsBackground(source: Int, destination: Int): ArrayList<Arrival> {
         return try {
@@ -611,12 +596,12 @@ class SchedulesFragment : Fragment() {
             ArrayList()
         }
     }
-    private suspend fun setArrivalsOnMainThread(arrayList: ArrayList<Arrival>, listView: ListView, scrollValue: Int, progressIndicator: LinearProgressIndicator) {
+    private suspend fun setArrivalsOnMainThread(arrayList: ArrayList<Arrival>, listView: ListView, scrollValue: Int, arrivalsShimmerContainer: ShimmerFrameLayout) {
         withContext (Main) {
-            setArrivals(arrayList, listView, scrollValue, progressIndicator)
+            setArrivals(arrayList, listView, scrollValue, arrivalsShimmerContainer)
         }
     }
-    private fun setArrivals(arrayList: ArrayList<Arrival>, listView: ListView, scrollValue: Int, arrivalsProgressBar: LinearProgressIndicator){
+    private fun setArrivals(arrayList: ArrayList<Arrival>, listView: ListView, scrollValue: Int, arrivalsShimmerContainer: ShimmerFrameLayout){
         viewModel.schedulesArrayList.clear()
         viewModel.schedulesArrayList.addAll(arrayList)
         val schedulesAdapter: ArrayAdapter<Arrival> =
@@ -628,7 +613,7 @@ class SchedulesFragment : Fragment() {
         listView.adapter = schedulesAdapter
         schedulesAdapter.notifyDataSetChanged()
         listView.smoothScrollToPositionFromTop(scrollValue, 0, 120)
-        arrivalsProgressBar.visibility = View.GONE
+        arrivalsShimmerContainer.visibility = View.GONE
     }
     // Logger function for background tasks (or other tasks...)
     private fun logThread(methodName: String){
