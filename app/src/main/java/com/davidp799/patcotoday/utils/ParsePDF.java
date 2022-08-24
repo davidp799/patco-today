@@ -38,7 +38,7 @@ public class ParsePDF {
         /* Search for lines containing special arrivals */
         for (int i=0; i< pdfLines.length; i++) {
             /* Parse only lines containing special arrivals; only parse when collect == 1 */
-            if (pdfLines[i].contains("SPECIAL SCHEDULE STARTS WITH ADJUST DEPARTURE TIMES BELOW.")) {
+            if (pdfLines[i].contains("SPECIAL SCHEDULE STARTS WITH ADJUSTED DEPARTURE TIMES BELOW.")) {
                 collect = 1; // ready to parse special arrivals in following line
             } else if (pdfLines[i].contains("SCHEDULE")) { // TRAIN RETURNS TO NORMAL SCHEDULE. REFER TO TIMETABLE FOR DEPARTURE TIMES.
                 collect = 2; // finish parsing special arrivals at this line
