@@ -23,9 +23,10 @@ class InfoListAdapter(private val mContext: Context, resource: Int, private val 
             3 -> image.setImageResource(R.drawable.ic_info_call_tt)
             4 -> image.setImageResource(R.drawable.ic_info_email_tt)
             5 -> image.setImageResource(R.drawable.ic_info_website_tt)
-            6 -> image.setImageResource(R.drawable.ic_info_accessibility_new_tt)
-            7 -> image.setImageResource(R.drawable.ic_info_faq_tt)
-            8 -> image.setImageResource(R.drawable.ic_info_safety_tt)
+            6 -> image.setImageResource(R.drawable.ic_info_special_tt)
+            7 -> image.setImageResource(R.drawable.ic_info_accessibility_new_tt)
+            8 -> image.setImageResource(R.drawable.ic_info_faq_tt)
+            9 -> image.setImageResource(R.drawable.ic_info_safety_tt)
         }
         return row
     }

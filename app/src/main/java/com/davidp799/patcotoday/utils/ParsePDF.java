@@ -1,5 +1,7 @@
 package com.davidp799.patcotoday.utils;
 
+import com.davidp799.patcotoday.ui.schedules.SchedulesViewModel;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,9 +10,11 @@ import java.util.Locale;
 
 public class ParsePDF {
     private final String[] pdfLines;
+    private final ArrayList<String> specialFromToTimes;
 
-    public ParsePDF(String pdfText) {
-        pdfLines = pdfText.split("\n", 1024);
+    public ParsePDF(String pdfText, ArrayList<String> specialFromToTimes) {
+        this.pdfLines = pdfText.split("\n", 1024);
+        this.specialFromToTimes = specialFromToTimes;
     }
     public int getSpecialRouteID() {
         // split pdfText into list of pdfLines
@@ -38,9 +42,9 @@ public class ParsePDF {
         /* Search for lines containing special arrivals */
         for (int i=0; i< pdfLines.length; i++) { // TODO: implement binary search algorithm
             /* Parse only lines containing special arrivals; only parse when collect == 1 */
-            if (pdfLines[i].contains("SPECIAL SCHEDULE STARTS WITH ADJUSTED DEPARTURE TIMES BELOW.")) {
+            if (pdfLines[i].contains(specialFromToTimes.get(0))) {
                 collect = 1; // ready to parse special arrivals in following line
-            } else if (pdfLines[i].contains("SCHEDULE")) { // TRAIN RETURNS TO NORMAL SCHEDULE. REFER TO TIMETABLE FOR DEPARTURE TIMES.
+            } else if (pdfLines[i].contains(specialFromToTimes.get(1))) { // TRAIN RETURNS TO NORMAL SCHEDULE. REFER TO TIMETABLE FOR DEPARTURE TIMES.
                 collect = 2; // finish parsing special arrivals at this line
             } else if (collect == 1) { // parse current line for special arrivals
                 /* Strip white-space from string */

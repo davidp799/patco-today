@@ -35,6 +35,7 @@ class SchedulesViewModel : ViewModel() {
     var specialText = ArrayList<String>()
     var specialURLs = ArrayList<String>()
     var specialTexts = ArrayList<String>()
+    var specialFromToTimes = ArrayList<String>()
     var runnableConvertedStrings = ArrayList<String>()
     var parsedArrivals = ArrayList<ArrayList<String>>()
     var specialSchedulesArrayList = ArrayList<Arrival>()

@@ -350,6 +350,17 @@ class SchedulesFragment : Fragment() {
             val getSpecial = GetSpecial(doc)
             viewModel.specialURLs.addAll(getSpecial.url)
             viewModel.specialTexts.addAll(getSpecial.text)
+            var split = getSpecial.text[0].split("from ")[1].split("-")
+            for (i in split.indices) {
+                if (split.get(i).contains("AM")) {
+                    val value = split.get(i).replace("AM", " A")
+                    viewModel.specialFromToTimes.add(value)
+                } else if (split.get(i).contains("PM")) {
+                    val value = split.get(i).replace("PM", " P")
+                    viewModel.specialFromToTimes.add(value)
+                }
+            }
+            print(viewModel.specialFromToTimes)
             viewModel.specialURLs.size > 0
         } catch (e: IOException) {
             e.printStackTrace()
@@ -446,7 +457,7 @@ class SchedulesFragment : Fragment() {
     private fun parseSpecial(): Boolean {
         return try {
             for (i in 0 until viewModel.runnableConvertedStrings.size) {
-                val parsePDF = ParsePDF(viewModel.runnableConvertedStrings.get(i))
+                val parsePDF = ParsePDF(viewModel.runnableConvertedStrings[i], viewModel.specialFromToTimes)
                 viewModel.parsedArrivals.addAll(parsePDF.arrivalLines)
             }
             viewModel.specialWestBound.addAll(viewModel.parsedArrivals.get(0))
