@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -22,15 +21,14 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.davidp799.patcotoday.databinding.ActivityMainBinding
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import java.io.*
-import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -196,6 +194,7 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun backgroundTasksRequest() {
         logThread("\n*** backgroundTasksRequest Active ***\n")
+        cleanUpFiles()
         val connected = checkInternet(this) // wait until job is done
         setInternetStatusOnMainThread(connected)
         if (connected) {
@@ -235,6 +234,16 @@ class MainActivity : AppCompatActivity() {
                 connectivityManager.activeNetworkInfo ?: return false
             @Suppress("DEPRECATION")
             return networkInfo.isConnected
+        }
+    }
+
+    private fun cleanUpFiles(){
+        File(viewModel.directory + "special/").walk().forEach {
+            val specialPdfFile = File(viewModel.directory + "special/" + it)
+            val lastModified = Date(specialPdfFile.lastModified())
+            if (lastModified < Date() ) {
+                it.delete()
+            }
         }
     }
 

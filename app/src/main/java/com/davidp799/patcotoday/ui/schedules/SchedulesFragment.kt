@@ -422,6 +422,7 @@ class SchedulesFragment : Fragment() {
                     e.printStackTrace()
                 } finally {
                     try {
+                        // close readers
                         output?.close()
                         input?.close()
                     } catch (e: IOException) {
