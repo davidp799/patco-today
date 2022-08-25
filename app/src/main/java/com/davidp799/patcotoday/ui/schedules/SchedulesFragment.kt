@@ -339,6 +339,8 @@ class SchedulesFragment : Fragment() {
                     }
 
                 }
+            } else {
+                configureBottomSheetOnMainThread(view, specialStatus, specialShimmerContainer)
             }
         } else {
             configureBottomSheetOnMainThread(view, false, specialShimmerContainer)
@@ -350,14 +352,16 @@ class SchedulesFragment : Fragment() {
             val getSpecial = GetSpecial(doc)
             viewModel.specialURLs.addAll(getSpecial.url)
             viewModel.specialTexts.addAll(getSpecial.text)
-            var split = getSpecial.text[0].split("from ")[1].split("-")
-            for (i in split.indices) {
-                if (split.get(i).contains("AM")) {
-                    val value = split.get(i).replace("AM", " A")
-                    viewModel.specialFromToTimes.add(value)
-                } else if (split.get(i).contains("PM")) {
-                    val value = split.get(i).replace("PM", " P")
-                    viewModel.specialFromToTimes.add(value)
+            if (getSpecial.text.size > 0) {
+                val split = getSpecial.text[0].split("from ")[1].split("-")
+                for (i in split.indices) {
+                    if (split.get(i).contains("AM")) {
+                        val value = split.get(i).replace("AM", " A")
+                        viewModel.specialFromToTimes.add(value)
+                    } else if (split.get(i).contains("PM")) {
+                        val value = split.get(i).replace("PM", " P")
+                        viewModel.specialFromToTimes.add(value)
+                    }
                 }
             }
             print(viewModel.specialFromToTimes)
