@@ -28,6 +28,9 @@ import java.io.*
 import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -172,9 +175,10 @@ class MainActivity : AppCompatActivity() {
     }
     private suspend fun setDownloadedStatusOnMainThread(input: Boolean) {
         withContext (Main) {
+            Toast.makeText(this@MainActivity, "Downloading new schedules", Toast.LENGTH_LONG).show()
             setDownloadedStatus(input)
             if (!input) {
-                Toast.makeText(this@MainActivity, "Unable to download schedule data", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Unable to download schedules", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -195,16 +199,14 @@ class MainActivity : AppCompatActivity() {
         val connected = checkInternet(this) // wait until job is done
         setInternetStatusOnMainThread(connected)
         if (connected) {
-            val updated = updateFiles() // wait until job is done
-            setUpdatedStatusOnMainThread(updated)
-            if (!updated) {
+            setUpdatedStatusOnMainThread(updateFiles())
+            if (!viewModel.updated) {
                 val downloaded = downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip", viewModel.directory + "gtfs.zip")
                 setDownloadedStatusOnMainThread(downloaded)
                 if (downloaded) {
                     val extracted = extractZip(viewModel.directory + "gtfs.zip")
                     setExtractedStatusOnMainThread(extracted)
                 }
-
             }
         }
     }
@@ -238,13 +240,28 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateFiles(): Boolean {
         return try {
-            val fileDir = File(viewModel.directory)
-            fileDir.mkdirs()
+            // check if new version released
+            var updated = 0
+            val zipFile = File(viewModel.directory + "gtfs.zip")
+            val lastModified = Date(zipFile.lastModified())
+            val latestRelease = Date("12/4/2021") // TODO: Scrape latest release date from web
+            val formatter = SimpleDateFormat("M/d/yyyy", Locale.US)
+            val formattedDateString: String = formatter.format(lastModified)
+            print("!!!! Zip modified on $formattedDateString")
+            if (lastModified < latestRelease) {
+                updated++
+                print(" !!!!! FILES OUT OF DATE")
+            } else {
+                print("!!!!! FILES UP TO DATE")
+            }
+
+            // check if files downloaded and extracted
             var notFound = 0
             for (fileName in dataFiles) { // Check for data files
                 val tempFile = File(viewModel.directory + fileName)
                 if (!tempFile.exists()) notFound++
             }
+            notFound += updated
             notFound <= 0
         } catch (e: Exception) {
             println("Error: Files not up to date!")
