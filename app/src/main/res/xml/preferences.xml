@@ -4,6 +4,12 @@
     <PreferenceCategory
         app:iconSpaceReserved="false"
         android:title="Display">
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            android:key="device_dynamic_colors"
+            android:title="@string/pref_dynamic"
+            android:defaultValue="@string/pref_dynamic_def_value"
+            android:disableDependentsState="true" />
         <ListPreference
             app:iconSpaceReserved="false"
             android:key="device_theme"
