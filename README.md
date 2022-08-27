@@ -29,7 +29,9 @@ Current features of Patco Today include the following:
 - Caching of files for offline viewing.
 - Support for android 5.1 or higher.
 - An ad-free experience.
-- Applicaiton theming (light, dark, system).
+- Applicaiton theming:
+	* Light, Dark, and System Modes
+	* Support for Material 3 Dynamic Colors
 
 Coming Soon:
 - Ability to change date for schedule viewing.
