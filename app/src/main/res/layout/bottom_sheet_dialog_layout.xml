@@ -5,7 +5,7 @@
     style="@style/Widget.Material3.BottomSheet"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     app:behavior_hideable="true"
     app:behavior_peekHeight="118sp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
