@@ -22,7 +22,7 @@ public class DownloadPDF {
             }
             // download the file
             input = connection.getInputStream();
-            System.out.println("- destinationFilePath = " + filePath+fileName);
+            System.out.println("- destinationFilePath = " + filePath + fileName);
             new File(filePath+fileName).createNewFile();
             output = new FileOutputStream(filePath+fileName);
 

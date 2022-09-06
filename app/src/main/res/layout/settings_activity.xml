@@ -7,15 +7,18 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:theme="?actionBarTheme"
+        app:liftOnScroll="true"
+        app:liftOnScrollTargetViewId="@id/settings_fragment_container"
         app:layout_constraintTop_toTopOf="parent"
-        android:theme="@style/ThemeOverlay.AppCompat.DayNight.ActionBar"
         style="@style/Theme.PatcoToday">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="?actionBarSize"
             android:layout_marginTop="24sp"
+            app:popupTheme="?actionBarPopupTheme"
             app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
             app:title="@string/menu_settings"/>
 

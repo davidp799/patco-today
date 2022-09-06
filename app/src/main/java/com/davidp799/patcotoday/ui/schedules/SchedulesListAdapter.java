@@ -19,9 +19,8 @@ import java.util.ArrayList;
 
 public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
 
-    private Context mContext;
-    private int mResource;
-    private int lastPosition = -1;
+    private final Context mContext;
+    private final int mResource;
 
     /**
      * Holds variables in a View
@@ -33,9 +32,6 @@ public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
 
     /**
      * Default constructor for the PersonListAdapter
-     * @param context
-     * @param resource
-     * @param objects
      */
     public SchedulesListAdapter(Context context, int resource, ArrayList<Arrival> objects) {
         super(context, resource, objects);
@@ -60,8 +56,8 @@ public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(mResource, parent, false);
             holder= new ViewHolder();
-            holder.arrives = (TextView) convertView.findViewById(R.id.textView1);
-            holder.travels = (TextView) convertView.findViewById(R.id.textView2);
+            holder.arrives = convertView.findViewById(R.id.textView1);
+            holder.travels = convertView.findViewById(R.id.textView2);
 
             result = convertView;
 

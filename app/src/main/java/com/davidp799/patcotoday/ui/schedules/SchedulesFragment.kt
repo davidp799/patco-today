@@ -1,23 +1,22 @@
 package com.davidp799.patcotoday.ui.schedules
 
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelLazy
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding
 import com.davidp799.patcotoday.utils.*
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.transition.MaterialFadeThrough
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
@@ -37,7 +36,6 @@ class SchedulesFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-
     private val viewModel: SchedulesViewModel by ViewModelLazy(
         SchedulesViewModel::class, {viewModelStore }, { defaultViewModelProviderFactory }
     )
@@ -52,22 +50,11 @@ class SchedulesFragment : Fragment() {
 
         // Configure UI
         enterTransition = MaterialFadeThrough()
-        val arrivalsProgressBar: LinearProgressIndicator = root.findViewById(R.id.arrivalsProgressBar)
-        arrivalsProgressBar.visibility = View.GONE
 
-        // implement reverse menu button
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object: MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.menu_reverse, menu)
-            }
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                if (menuItem.itemId == R.id.menu_reverse) {
-                    return true
-                }
-                return true
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        val arrivalsShimmerContainer: ShimmerFrameLayout = root.findViewById(R.id.arrivalsShimmerContainer)
+        arrivalsShimmerContainer.visibility = View.GONE
+        val specialViewButton: Button = root.findViewById(R.id.specialScheduleViewButton)
+        specialViewButton.visibility = View.GONE
 
         // shared preferences
         val sharedPreferences = requireActivity().getSharedPreferences(
@@ -82,9 +69,9 @@ class SchedulesFragment : Fragment() {
         )
 
         // Manage Special Schedules Progress Bar
-        val specialProgressBar: LinearProgressIndicator =
-            root.findViewById(R.id.specialProgressIndicator)
-        specialProgressBar.visibility = View.VISIBLE
+        val specialShimmerContainer: ShimmerFrameLayout =
+            root.findViewById(R.id.specialShimmerContainer)
+        specialShimmerContainer.visibility = View.VISIBLE
 
         // Background Activities - internet, special, etc...
         CoroutineScope(Dispatchers.IO).launch {
@@ -92,23 +79,19 @@ class SchedulesFragment : Fragment() {
         }
 
         // Initialize schedules ListView
-        val schedulesAdapter: ArrayAdapter<Arrival> =
-            SchedulesListAdapter(
-                context,
-                R.layout.adapter_view_layout,
-                viewModel.schedulesArrayList
-            )
+
         val schedulesListView = root.findViewById<ListView>(R.id.arrivalsListView)
         schedulesListView.isTransitionGroup
-        schedulesListView.adapter = schedulesAdapter
-        arrivalsProgressBar.visibility = View.VISIBLE
+        arrivalsShimmerContainer.visibility = View.VISIBLE
+
+        // update listview with actual arrivals
         CoroutineScope(Dispatchers.IO).launch {
-            updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsProgressBar)
+            updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsShimmerContainer)
         }
 
         /* Set progressbar as visible while working */
         CoroutineScope(Dispatchers.IO).launch {
-            checkSpecialBackgroundRequest(requireContext(), viewModel.fromSelection, viewModel.toSelection, specialProgressBar, root)
+            checkSpecialBackgroundRequest(requireContext(), viewModel.fromSelection, viewModel.toSelection, specialShimmerContainer, root)
         }
 
         // Initialize from and to textViews
@@ -116,6 +99,8 @@ class SchedulesFragment : Fragment() {
             root.findViewById<AutoCompleteTextView>(R.id.fromTextView)
         val toAutoCompleteTV =
             root.findViewById<AutoCompleteTextView>(R.id.toTextView)
+        val stationReverse =
+            root.findViewById<ImageButton>(R.id.reverseStationsButton)
 
         // Initialize array adapter for stations dropdown menu
         val stationsArrayAdapter = ArrayAdapter(
@@ -137,9 +122,9 @@ class SchedulesFragment : Fragment() {
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 viewModel.fromSelection = position // set source station to index of selected array position
                 // reload listview and scroll to next train
-                arrivalsProgressBar.visibility = View.VISIBLE
+                arrivalsShimmerContainer.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsProgressBar)
+                    updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsShimmerContainer)
                 }
                 schedulesListView.adapter =
                     SchedulesListAdapter(
@@ -148,9 +133,9 @@ class SchedulesFragment : Fragment() {
                         viewModel.schedulesArrayList
                     )
                 /* Set progressbar as visible while working */
-                specialProgressBar.visibility = View.VISIBLE
+                specialShimmerContainer.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    checkSpecialBackgroundRequest(requireContext(), viewModel.fromSelection, viewModel.toSelection, specialProgressBar, root)
+                    checkSpecialBackgroundRequest(requireContext(), viewModel.fromSelection, viewModel.toSelection, specialShimmerContainer, root)
                 }
             }
         toAutoCompleteTV.onItemClickListener =
@@ -160,9 +145,9 @@ class SchedulesFragment : Fragment() {
                 viewModel.toSelection =
                     position // set destination station to index of selected array position
                 // reload listview with new array and adapter and scroll to next train
-                arrivalsProgressBar.visibility = View.VISIBLE
+                arrivalsShimmerContainer.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsProgressBar)
+                    updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsShimmerContainer)
                 }
                 schedulesListView.adapter =
                     SchedulesListAdapter(
@@ -171,11 +156,43 @@ class SchedulesFragment : Fragment() {
                         viewModel.schedulesArrayList
                     )
                 /* Set progressbar as visible while working */
-                specialProgressBar.visibility = View.VISIBLE
+                specialShimmerContainer.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    checkSpecialBackgroundRequest(requireContext(), viewModel.fromSelection, viewModel.toSelection, specialProgressBar, root)
+                    checkSpecialBackgroundRequest(requireContext(), viewModel.fromSelection, viewModel.toSelection, specialShimmerContainer, root)
                 }
             }
+        stationReverse.setOnClickListener {
+            // rotate counter clock-wise if reversed, else rotate clock-wise
+            if (viewModel.isReversed) {
+                stationReverse.animate().setDuration(180).rotationBy(-180f).start()
+                viewModel.isReversed = false
+            } else {
+                stationReverse.animate().setDuration(180).rotationBy(180f).start()
+                viewModel.isReversed = true
+            }
+            val temp = viewModel.fromSelection
+            viewModel.fromSelection = viewModel.toSelection
+            viewModel.toSelection = temp
+
+            arrivalsShimmerContainer.visibility = View.VISIBLE
+            CoroutineScope(Dispatchers.IO).launch {
+                updateListViewBackgroundRequest(viewModel.fromSelection, viewModel.toSelection, schedulesListView, arrivalsShimmerContainer)
+            }
+            schedulesListView.adapter =
+                SchedulesListAdapter(
+                    context,
+                    R.layout.adapter_view_layout,
+                    viewModel.schedulesArrayList
+                )
+            /* Set progressbar as visible while working */
+            specialShimmerContainer.visibility = View.VISIBLE
+            CoroutineScope(Dispatchers.IO).launch {
+                checkSpecialBackgroundRequest(requireContext(), viewModel.fromSelection, viewModel.toSelection, specialShimmerContainer, root)
+            }
+            fromAutoCompleteTV.setText(viewModel.stationOptions[viewModel.fromSelection])
+            toAutoCompleteTV.setText(viewModel.stationOptions[viewModel.toSelection])
+        }
+
         return root
     }
 
@@ -296,7 +313,7 @@ class SchedulesFragment : Fragment() {
     //
     //
     /* Function which manages background tasks using Kotlin coroutines */
-    private suspend fun checkSpecialBackgroundRequest(context: Context, source: Int, destination: Int, progressIndicator: LinearProgressIndicator, view: View) {
+    private suspend fun checkSpecialBackgroundRequest(context: Context, source: Int, destination: Int, specialShimmerContainer: ShimmerFrameLayout, view: View) {
         logThread("\n*** checkSpecialBackgroundRequest Active ***\n")
         // step 1: check internet status
         val internetStatus = checkInternet(context)
@@ -317,12 +334,16 @@ class SchedulesFragment : Fragment() {
                         if (parseStatus) {
                             // step 6: update main ui thread with special schedule data
                             val specialArrivals = getSpecialArrivalsBackground(source, destination)
-                            setSpecialArrivalsOnMainThread(specialArrivals, progressIndicator, view)
+                            setSpecialArrivalsOnMainThread(specialArrivals, specialShimmerContainer, view, specialStatus)
                         }
                     }
 
                 }
+            } else {
+                configureBottomSheetOnMainThread(view, specialStatus, specialShimmerContainer)
             }
+        } else {
+            configureBottomSheetOnMainThread(view, false, specialShimmerContainer)
         }
     }
     private fun checkSpecial(): Boolean {
@@ -331,6 +352,19 @@ class SchedulesFragment : Fragment() {
             val getSpecial = GetSpecial(doc)
             viewModel.specialURLs.addAll(getSpecial.url)
             viewModel.specialTexts.addAll(getSpecial.text)
+            if (getSpecial.text.size > 0) {
+                val split = getSpecial.text[0].split("from ")[1].split("-")
+                for (i in split.indices) {
+                    if (split.get(i).contains("AM")) {
+                        val value = split.get(i).replace("AM", " A")
+                        viewModel.specialFromToTimes.add(value)
+                    } else if (split.get(i).contains("PM")) {
+                        val value = split.get(i).replace("PM", " P")
+                        viewModel.specialFromToTimes.add(value)
+                    }
+                }
+            }
+            print(viewModel.specialFromToTimes)
             viewModel.specialURLs.size > 0
         } catch (e: IOException) {
             e.printStackTrace()
@@ -358,6 +392,7 @@ class SchedulesFragment : Fragment() {
                 try {
                     val url = URL(viewModel.specialURLs[i])
                     filePath += if (url.toString().contains(".jpg")) {
+                        println(viewModel.specialText[i])
                         println("\n\n\nFOUND JPG FILE: $url\n\n\n")
                         ".jpg"
                     } else {
@@ -387,6 +422,7 @@ class SchedulesFragment : Fragment() {
                     e.printStackTrace()
                 } finally {
                     try {
+                        // close readers
                         output?.close()
                         input?.close()
                     } catch (e: IOException) {
@@ -412,6 +448,11 @@ class SchedulesFragment : Fragment() {
                 viewModel.runnableConvertedStrings.add(convertPDF.text)
             }
             viewModel.converted = true
+            println("\n\n### CONVERTED PDF ###")
+            for (i in 0 until viewModel.runnableConvertedStrings.size) {
+                println(viewModel.runnableConvertedStrings[i])
+            }
+            println("###\n\n")
             true
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
@@ -421,7 +462,7 @@ class SchedulesFragment : Fragment() {
     private fun parseSpecial(): Boolean {
         return try {
             for (i in 0 until viewModel.runnableConvertedStrings.size) {
-                val parsePDF = ParsePDF(viewModel.runnableConvertedStrings.get(i))
+                val parsePDF = ParsePDF(viewModel.runnableConvertedStrings[i], viewModel.specialFromToTimes)
                 viewModel.parsedArrivals.addAll(parsePDF.arrivalLines)
             }
             viewModel.specialWestBound.addAll(viewModel.parsedArrivals.get(0))
@@ -441,52 +482,73 @@ class SchedulesFragment : Fragment() {
             ArrayList()
         }
     }
-    private suspend fun setSpecialArrivalsOnMainThread(input: ArrayList<Arrival>, progressIndicator: LinearProgressIndicator, view: View) {
+    private suspend fun setSpecialArrivalsOnMainThread(input: ArrayList<Arrival>, specialShimmerContainer: ShimmerFrameLayout, view: View, specialStatus: Boolean) {
         withContext (Main) {
-            setSpecialArrivals(input, progressIndicator, view)
+            setSpecialArrivals(input, specialShimmerContainer, view, specialStatus)
         }
     }
-    private fun setSpecialArrivals(input: ArrayList<Arrival>, progressIndicator: LinearProgressIndicator, view: View){
+    private fun setSpecialArrivals(input: ArrayList<Arrival>, specialShimmerContainer: ShimmerFrameLayout, view: View, specialStatus: Boolean){
         viewModel.specialSchedulesArrayList.clear()
         viewModel.specialSchedulesArrayList.addAll(input)
-        configureBottomSheet(view)
+        configureBottomSheet(view, specialStatus)
         // Initialize special ListView
         val specialListView = view.findViewById<ListView>(R.id.specialArrivalsListView)
-        val specialHeader = view.findViewById<TextView>(R.id.specialScheduleHeader)
-        updateSpecialData(specialListView, specialHeader)
-        progressIndicator.visibility = View.GONE
+        val specialAbout = view.findViewById<TextView>(R.id.specialScheduleAbout)
+        updateSpecialData(specialListView, specialAbout)
+        specialShimmerContainer.visibility = View.GONE
     }
-    private fun configureBottomSheet(view: View ) {
+    private suspend fun configureBottomSheetOnMainThread(view: View, specialStatus: Boolean, specialShimmerContainer: ShimmerFrameLayout) {
+        withContext (Main) {
+            configureBottomSheet(view, specialStatus)
+            specialShimmerContainer.visibility = View.GONE
+        }
+    }
+    private fun configureBottomSheet(view: View, specialStatus: Boolean ) {
         /* Initialize Bottom Sheet and Special Loading Parameters */
         val mBottomSheetLayout = view.findViewById<LinearLayout>(R.id.bottom_sheet_layout)
         val sheetBehavior: BottomSheetBehavior<LinearLayout> = BottomSheetBehavior.from(mBottomSheetLayout)
-        val headerArrowImage: ImageView =
-            view.findViewById(R.id.bottom_sheet_arrow) // header arrow
-        // Header arrow implementation for bottom sheet
-        headerArrowImage.setOnClickListener {
-            if (sheetBehavior.state != BottomSheetBehavior.STATE_EXPANDED) {
-                sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
-            } else {
-                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-            }
-        }
-        // Implement bottom sheet call
-        sheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {}
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                headerArrowImage.rotation = slideOffset * 180
-            }
-        })
-        if (!viewModel.internet) {
+
+        if (!specialStatus) {
+            println("\n\n\n\n\n!!!!!!!! $specialStatus")
             sheetBehavior.peekHeight = 0
             sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED) // hide bottom sheet
         } else {
-            if (!viewModel.special) {
+            println("\n\n\n\n\n!!!!!!!! $specialStatus")
+
+            // Implement bottom sheet call
+            if (!viewModel.internet) {
                 sheetBehavior.peekHeight = 0
-                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED) // hide bottom sheet
             } else {
-                /* obtain special info from saved array */
-                println("im empty...")
+                if (!viewModel.special) {
+                    sheetBehavior.peekHeight = 0
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                } else {
+                    // initialize about and button for schedules
+                    val specialAbout: TextView = view.findViewById(R.id.specialScheduleAbout)
+                    val specialViewButton: Button = view.findViewById(R.id.specialScheduleViewButton)
+                    specialViewButton.visibility = View.VISIBLE
+                    val specialAboutValue = try {
+                        viewModel.specialTexts[0].split(" | ")[1]
+                    } catch (e: Exception) {
+                        viewModel.specialTexts[0]
+                    }
+                    specialAbout.text = specialAboutValue
+                    specialViewButton.setOnClickListener {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(viewModel.specialURLs[0])))
+                    }
+                    // debug
+                    println("\n\n### PARSED PDF ###")
+                    if (viewModel.specialSchedulesArrayList.size > 0 ) {
+                        for (i in 0 until viewModel.specialSchedulesArrayList.size) {
+                            println(viewModel.specialSchedulesArrayList[i])
+                        }
+
+                    } else {
+                        println("EMPTY\nEMPTY\nEMPTY")
+                    }
+                    println("###\n\n")
+                }
             }
         }
     }
@@ -527,9 +589,6 @@ class SchedulesFragment : Fragment() {
     private suspend fun setInternetStatusOnMainThread(input: Boolean) {
         withContext (Main) {
             setInternetStatus(input)
-            if (!input) {
-                Toast.makeText(requireContext(), "No internet connection. Working offline", Toast.LENGTH_SHORT).show()
-            }
         }
     }
     private fun setInternetStatus(input: Boolean){
@@ -538,11 +597,11 @@ class SchedulesFragment : Fragment() {
     //
     //
     // Threads which update listView contents in background
-    private suspend fun updateListViewBackgroundRequest(source: Int, destination: Int, listView: ListView, progressIndicator: LinearProgressIndicator) {
+    private suspend fun updateListViewBackgroundRequest(source: Int, destination: Int, listView: ListView, arrivalsShimmerContainer: ShimmerFrameLayout) {
         logThread("\n*** updateListViewBackgroundRequest Active ***\n")
         val arrivals = getArrivalsBackground(source, destination)
         val value = scrollToNext(arrivals)
-        setArrivalsOnMainThread(arrivals, listView, value, progressIndicator)
+        setArrivalsOnMainThread(arrivals, listView, value, arrivalsShimmerContainer)
     }
     private fun getArrivalsBackground(source: Int, destination: Int): ArrayList<Arrival> {
         return try {
@@ -552,12 +611,12 @@ class SchedulesFragment : Fragment() {
             ArrayList()
         }
     }
-    private suspend fun setArrivalsOnMainThread(arrayList: ArrayList<Arrival>, listView: ListView, scrollValue: Int, progressIndicator: LinearProgressIndicator) {
+    private suspend fun setArrivalsOnMainThread(arrayList: ArrayList<Arrival>, listView: ListView, scrollValue: Int, arrivalsShimmerContainer: ShimmerFrameLayout) {
         withContext (Main) {
-            setArrivals(arrayList, listView, scrollValue, progressIndicator)
+            setArrivals(arrayList, listView, scrollValue, arrivalsShimmerContainer)
         }
     }
-    private fun setArrivals(arrayList: ArrayList<Arrival>, listView: ListView, scrollValue: Int, arrivalsProgressBar: LinearProgressIndicator){
+    private fun setArrivals(arrayList: ArrayList<Arrival>, listView: ListView, scrollValue: Int, arrivalsShimmerContainer: ShimmerFrameLayout){
         viewModel.schedulesArrayList.clear()
         viewModel.schedulesArrayList.addAll(arrayList)
         val schedulesAdapter: ArrayAdapter<Arrival> =
@@ -569,7 +628,7 @@ class SchedulesFragment : Fragment() {
         listView.adapter = schedulesAdapter
         schedulesAdapter.notifyDataSetChanged()
         listView.smoothScrollToPositionFromTop(scrollValue, 0, 120)
-        arrivalsProgressBar.visibility = View.GONE
+        arrivalsShimmerContainer.visibility = View.GONE
     }
     // Logger function for background tasks (or other tasks...)
     private fun logThread(methodName: String){

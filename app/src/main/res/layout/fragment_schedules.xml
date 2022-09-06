@@ -8,100 +8,165 @@
     tools:context=".ui.schedules.SchedulesFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/linearLayoutCompat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30sp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:id="@+id/schedulesLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="10sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/schedulesConfigHorizLayout"
+            android:layout_width="match_parent"
+            android:layout_height="120sp"
+            android:orientation="horizontal">
 
-            <AutoCompleteTextView
-                android:id="@+id/fromTextView"
-                android:layout_width="match_parent"
+        <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/stationIconsVertLayout"
+                android:layout_width="0sp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:inputType="none"
-                android:maxLines="2"
-                android:text="@string/from"
-                android:textColor="@color/material_on_surface_emphasis_medium"
-                android:textSize="14.5sp"
-                tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_weight=".15"
+                android:orientation="vertical"
+                android:gravity="center">
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_baseline_arrow_right_alt_24"
-            android:contentDescription="@string/arrow" />
+                <ImageView
+                    android:id="@+id/iconSource"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10sp"
+                    app:srcCompat="@drawable/ic_source_tt"
+                    tools:layout_editor_absoluteX="55dp"
+                    tools:layout_editor_absoluteY="130dp" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                <ImageView
+                    android:id="@+id/iconDots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10sp"
+                    app:srcCompat="@drawable/ic_dots_tt"
+                    tools:layout_editor_absoluteX="55dp"
+                    tools:layout_editor_absoluteY="130dp" />
+
+                <ImageView
+                    android:id="@+id/iconDestination"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10sp"
+                    app:srcCompat="@drawable/ic_destination_tt"
+                    tools:layout_editor_absoluteX="55dp"
+                    tools:layout_editor_absoluteY="130dp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/stationSelectionsVertLayout"
+                android:layout_width="0sp"
+                android:layout_height="match_parent"
+                android:layout_weight=".70"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10sp"
+                    android:layout_marginEnd="10sp">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/fromTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:maxLines="1"
+                        android:text="@string/from"
+                        android:textColor="@color/material_on_surface_emphasis_medium"
+                        android:textSize="14sp"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10sp"
+                    android:layout_marginEnd="10sp">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/toTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:maxLines="1"
+                        android:text="@string/to"
+                        android:textColor="@color/material_on_surface_emphasis_medium"
+                        android:textSize="14sp"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <RelativeLayout
+                android:id="@+id/stationsReverseButtonLayout"
+                android:layout_width="0sp"
+                android:layout_height="match_parent"
+                android:layout_weight=".15">
+
+                <ImageButton
+                    android:id="@+id/reverseStationsButton"
+                    android:layout_width="48sp"
+                    android:layout_height="48sp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_swap_round_48"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+
+            </RelativeLayout>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <View
+            android:id="@+id/stationsDropShadow"
+            android:layout_width="match_parent"
+            android:layout_height="8sp"
+            android:background="@drawable/drawable_drop_shadow"/>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/arrivalsShimmerContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="10sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginBottom="96sp">
 
-            <AutoCompleteTextView
-                android:id="@+id/toTextView"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:inputType="none"
-                android:maxLines="2"
-                android:text="@string/to"
-                android:textColor="@color/material_on_surface_emphasis_medium"
-                android:textSize="14.5sp"
-                tools:ignore="TextContrastCheck" />
+                android:orientation="vertical">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/arrivals_placeholder_layout" />
+
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <ListView
+            android:id="@+id/arrivalsListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="96sp"
+            app:layout_constraintTop_toBottomOf="@id/schedulesConfigHorizLayout">
+        </ListView>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <!-- Linear progress indicator -->
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/arrivalsProgressBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3sp"
-        android:layout_marginBottom="1sp"
-        app:layout_constraintTop_toBottomOf="@id/linearLayoutCompat"
-        android:indeterminate="true"
-        style="@style/Theme.PatcoToday"/>
-
-    <ListView
-        android:id="@+id/arrivalsListView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="100sp"
-        android:layout_marginBottom="96sp">
-    </ListView>
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
-        android:layout_marginTop="-80sp"
-        android:layout_marginBottom="10sp">
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/schedulesLinearLayout">
 
         <include layout="@layout/bottom_sheet_dialog_layout" />
 

@@ -1,82 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet_layout"
-    android:layout_width="match_parent"
+    style="@style/Widget.Material3.BottomSheet"
     android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:behavior_hideable="true"
-    app:behavior_peekHeight="155sp"
+    app:behavior_peekHeight="118sp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     android:elevation="8dp">
 
-    <LinearLayout
-        android:id="@+id/bottom_sheet_header"
+    <!-- Drag handle for accessibility -->
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:id="@+id/drag_handle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/drawable_round_bottom_sheet"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:padding="20dp"
-            android:textSize="18sp"
-            android:text="@string/specialSchedules"
-            android:textColor="?android:textColorPrimary" />
-
-        <ImageView
-            android:id="@+id/bottom_sheet_arrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/ic_baseline_keyboard_arrow_up_24"
-            tools:ignore="ContentDescription" />
-    </LinearLayout>
+        android:layout_height="wrap_content" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="?android:attr/windowBackground"
         android:layout_width="match_parent"
-        android:layout_height="500sp">
-
-        <!-- Linear progress indicator -->
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/specialProgressIndicator"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            android:indeterminate="true"
-            style="@style/Theme.PatcoToday"/>
+        android:layout_height="match_parent"
+        android:minHeight="400sp">
 
         <LinearLayout
+            android:id="@+id/specialVertLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/specialProgressIndicator"
+            android:layout_height="match_parent"
+            android:background="@color/transparent"
             android:orientation="vertical"
             android:padding="10dp">
 
             <TextView
-                android:id="@+id/specialScheduleHeader"
+                android:id="@+id/specialScheduleAbout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
-                android:text="@string/specialHeader"/>
+                android:text="@string/special_schedule_about"/>
+
+            <Button
+                android:id="@+id/specialScheduleViewButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/special_schedule_download">
+            </Button>
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/specialShimmerContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
             <ListView
                 android:id="@+id/specialArrivalsListView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16sp">
+                android:layout_height="wrap_content">
+
             </ListView>
 
         </LinearLayout>
 
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </LinearLayout>
