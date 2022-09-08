@@ -9,7 +9,7 @@
     app:behavior_hideable="true"
     app:behavior_peekHeight="118sp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-    android:elevation="8dp">
+    android:elevation="2dp">
 
     <!-- Drag handle for accessibility -->
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView

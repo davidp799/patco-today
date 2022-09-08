@@ -17,7 +17,8 @@
             android:id="@+id/schedulesConfigHorizLayout"
             android:layout_width="match_parent"
             android:layout_height="120sp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            >
 
         <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/stationIconsVertLayout"
