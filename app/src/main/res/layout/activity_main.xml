@@ -21,7 +21,6 @@
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:layout_marginTop="24sp"
             app:title="@string/app_name"
             app:titleCentered="true" />
 

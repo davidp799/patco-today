@@ -3,15 +3,18 @@ package com.davidp799.patcotoday
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.widget.ImageButton
+import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.appbar.MaterialToolbar
 
-class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+abstract class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,28 +40,37 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         }
 
         // Shared Preferences
-        PreferenceManager.getDefaultSharedPreferences(this)
-            .registerOnSharedPreferenceChangeListener(this)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        prefs.registerOnSharedPreferenceChangeListener(this)
+
+
+
 
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         val currentThemeString = getString(R.string.pref_theme_key)
+        val appVersion = getString(R.string.pref_summary_version)
         if (key == currentThemeString) {
             val pref = sharedPreferences?.getString(key, "3")
             when (pref?.toInt()) {
                 1 -> AppCompatDelegate.setDefaultNightMode(
-                        AppCompatDelegate.MODE_NIGHT_NO
-                    )
+                    AppCompatDelegate.MODE_NIGHT_NO
+                )
                 2 -> AppCompatDelegate.setDefaultNightMode(
-                        AppCompatDelegate.MODE_NIGHT_YES
-                    )
+                    AppCompatDelegate.MODE_NIGHT_YES
+                )
                 3 -> AppCompatDelegate.setDefaultNightMode(
-                        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                    )
+                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                )
             }
         }
     }
+
+    abstract fun onPreferenceClick(@NonNull preference: Preference
+
+    )
+
 
     class SettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

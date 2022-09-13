@@ -353,16 +353,22 @@ class SchedulesFragment : Fragment() {
             viewModel.specialURLs.addAll(getSpecial.url)
             viewModel.specialTexts.addAll(getSpecial.text)
             if (getSpecial.text.size > 0) {
-                val split = getSpecial.text[0].split("from ")[1].split("-")
-                for (i in split.indices) {
-                    if (split.get(i).contains("AM")) {
-                        val value = split.get(i).replace("AM", " A")
-                        viewModel.specialFromToTimes.add(value)
-                    } else if (split.get(i).contains("PM")) {
-                        val value = split.get(i).replace("PM", " P")
-                        viewModel.specialFromToTimes.add(value)
+                println(getSpecial.text.get(0))
+                try {
+                    val split = getSpecial.text[0].split("from ")[1].split("-")
+                    for (i in split.indices) {
+                        if (split.get(i).contains("AM")) {
+                            val value = split.get(i).replace("AM", " A")
+                            viewModel.specialFromToTimes.add(value)
+                        } else if (split.get(i).contains("PM")) {
+                            val value = split.get(i).replace("PM", " P")
+                            viewModel.specialFromToTimes.add(value)
+                        }
                     }
+                } catch (e: Exception) {
+                    print("!!!! oops: unknown duration for special schedules FIX ME PLS")
                 }
+
             }
             print(viewModel.specialFromToTimes)
             viewModel.specialURLs.size > 0
