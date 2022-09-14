@@ -18,7 +18,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.settings_activity)
+        setContentView(R.layout.settings_activity_scrolling)
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
@@ -29,8 +29,8 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         // User Interface
         val window = this.window
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false)
-        val topAppBar = findViewById<MaterialToolbar>(R.id.topAppBar)
-        setSupportActionBar(topAppBar)
+        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
         if (Build.VERSION.SDK_INT >= 23) {
             window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
             window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)

@@ -33,4 +33,9 @@
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="Theme.PatcoToday.AppBarOverlay" parent="ThemeOverlay.Material3.ActionBar" />
+
+    <style name="Theme.PatcoToday.PopupOverlay" parent="ThemeOverlay.Material3.Light" />
+
 </resources>

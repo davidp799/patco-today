@@ -32,4 +32,10 @@
         <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="Theme.PatcoToday.AppBarOverlay" parent="ThemeOverlay.Material3.Dark.ActionBar" />
+
+    <style name="Theme.PatcoToday.PopupOverlay" parent="ThemeOverlay.Material3.Dark" />
+
+
 </resources>
