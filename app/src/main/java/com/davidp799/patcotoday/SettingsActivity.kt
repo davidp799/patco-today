@@ -14,7 +14,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.appbar.MaterialToolbar
 
-abstract class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,10 +67,8 @@ abstract class SettingsActivity : AppCompatActivity(), SharedPreferences.OnShare
         }
     }
 
-    abstract fun onPreferenceClick(@NonNull preference: Preference
-
-    )
-
+    fun onPreferenceClick(@NonNull preference: Preference) {
+    }
 
     class SettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
