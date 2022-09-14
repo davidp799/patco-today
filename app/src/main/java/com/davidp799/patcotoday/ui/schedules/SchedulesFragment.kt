@@ -367,6 +367,7 @@ class SchedulesFragment : Fragment() {
                     }
                 } catch (e: Exception) {
                     print("!!!! oops: unknown duration for special schedules FIX ME PLS")
+                    viewModel.specialFromToTimes.add("Various Times")
                 }
 
             }
