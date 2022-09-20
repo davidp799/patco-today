@@ -74,9 +74,9 @@ git clone --recursive https://github.com/Davidp799/patco-today.git
 
 Here are a few contribution tips:
 
-- You can use either Kotlin or, preferably, Java.
+- You can use either Java or, preferably, Kotlin.
 
-- Make sure your code is logical and well formatted. If using Java, see the [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
+- Make sure your code is logical and well formatted. If using Kotlin, see the [Google Kotlin Style Guide](https://developer.android.com/kotlin/style-guide).
 
 ## Translate
 
