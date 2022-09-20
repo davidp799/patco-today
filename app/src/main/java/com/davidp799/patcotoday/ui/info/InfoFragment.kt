@@ -7,10 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.databinding.FragmentInfoBinding
 import com.google.android.material.transition.MaterialFadeThrough
@@ -35,7 +35,8 @@ class InfoFragment : Fragment() {
         enterTransition = MaterialFadeThrough()
 
         // listview items
-        val infoListView = root.findViewById<View>(R.id.infoListView) as ListView
+
+        val infoListView = root.findViewById<View>(R.id.info_list_view) as ListView
         val infoGeneralAdapter = InfoListAdapter(
             requireActivity(),
             android.R.layout.simple_list_item_1,
@@ -48,6 +49,21 @@ class InfoFragment : Fragment() {
                 val openLinksIntent = Intent(Intent.ACTION_VIEW, Uri.parse(infoViewModel.infoLinks[position]))
                 requireContext().startActivity(openLinksIntent)
             }
+
+        val infoRecyclerView = root.findViewById<View>(R.id.info_recycler_view) as RecyclerView
+        val infoRecyclerAdapter = InfoRecyclerAdapter(
+            requireActivity(),
+            android.R.layout.simple_list_item_1,
+            infoViewModel.infoItems
+        )
+        infoRecyclerView.adapter = infoRecyclerAdapter
+        infoRecyclerView.isTransitionGroup = true
+//        infoRecyclerView.performClick() =
+//            AdapterView.OnItemClickListener { parent, view, position, id ->
+//                val openLinksIntent = Intent(Intent.ACTION_VIEW, Uri.parse(infoViewModel.infoLinks[position]))
+//                requireContext().startActivity(openLinksIntent)
+//            }
+
 
         return root
     }

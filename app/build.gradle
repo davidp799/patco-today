@@ -37,6 +37,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.davidp799.patcotoday'
 }
 
 dependencies {

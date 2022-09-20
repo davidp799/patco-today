@@ -7,24 +7,34 @@
     tools:context=".ui.info.InfoFragment">
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/linearLayoutCompat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="100sp"
         android:layout_marginBottom="96sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/info_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </androidx.recyclerview.widget.RecyclerView>
 
         <ListView
-            android:id="@+id/infoListView"
+            android:id="@+id/info_list_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".5"
             android:autoLink="email"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
