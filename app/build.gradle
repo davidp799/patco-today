@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId "com.davidp799.patcotoday"
         minSdk 22
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
