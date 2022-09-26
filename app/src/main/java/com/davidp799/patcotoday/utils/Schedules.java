@@ -164,8 +164,6 @@ public class Schedules {
      *  @param travelTime minutes between source and destination station
      *  @return ArrayList of strings */
     public ArrayList<String> getFormatString(ArrayList<String> schedules, int travelTime) {
-        final long MILLISECONDS = 60000; //milliseconds
-
         for (int i=0; i<schedules.size(); i++) {
             String aTime = schedules.get(i);
             String[] split = aTime.split(":",8);
@@ -187,7 +185,6 @@ public class Schedules {
                 Date _24HourDt = _24HourSDF.parse(_24HourTime);
                 // compute trip finish time from train arrival time
                 assert _24HourDt != null;
-                Date arrivedDt = new Date(_24HourDt.getTime() + (travelTime * MILLISECONDS));
                 schedules.set(i, String.format("%s", _12HourSDF.format(_24HourDt)));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -204,8 +201,6 @@ public class Schedules {
         ArrayList<Arrival> arrivals = new ArrayList<>();
 
         for (int i=0; i<schedules.size(); i++) {
-            String aTime = schedules.get(i);
-            String[] split = aTime.split(":",8);
             try {
                 // convert to dateTime object, format as 24hr time
                 String _24HourTime = schedules.get(i);
