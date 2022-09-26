@@ -1,6 +1,7 @@
 package com.davidp799.patcotoday.ui.schedules;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
 
     private final Context mContext;
     private final int mResource;
+    private final int mScrollValue;
 
     /**
      * Holds variables in a View
@@ -33,16 +35,17 @@ public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
     /**
      * Default constructor for the PersonListAdapter
      */
-    public SchedulesListAdapter(Context context, int resource, ArrayList<Arrival> objects) {
+    public SchedulesListAdapter(Context context, int resource, ArrayList<Arrival> objects, int scrollValue) {
         super(context, resource, objects);
         mContext = context;
         mResource = resource;
+        mScrollValue = scrollValue;
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        //get the persons information
+        //get the arrival information
         String arrivalTime = getItem(position).getArrivalTime();
         String travelTime = getItem(position).getTravelTime();
         //Create the person object with the information
@@ -75,6 +78,12 @@ public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
 
         holder.arrives.setText(arrival.getArrivalTime());
         holder.travels.setText(arrival.getTravelTime());
+
+        // TODO: fix this??? partially working
+        if (position == mScrollValue && mScrollValue != 0) {
+            holder.arrives.setTypeface(holder.arrives.getTypeface(), Typeface.BOLD);
+            holder.travels.setTypeface(holder.travels.getTypeface(), Typeface.BOLD);
+        }
 
         return convertView;
     }

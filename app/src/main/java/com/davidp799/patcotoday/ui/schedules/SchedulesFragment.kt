@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelLazy
 import com.davidp799.patcotoday.R
@@ -28,7 +29,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-
+// TODO: Fix bolding text and scrollvalue (too many items bold)
 class SchedulesFragment : Fragment() {
     private var _binding: FragmentSchedulesBinding? = null
 
@@ -130,7 +131,8 @@ class SchedulesFragment : Fragment() {
                     SchedulesListAdapter(
                         context,
                         R.layout.adapter_view_layout,
-                        viewModel.schedulesArrayList
+                        viewModel.schedulesArrayList,
+                        0
                     )
                 /* Set progressbar as visible while working */
                 specialShimmerContainer.visibility = View.VISIBLE
@@ -153,7 +155,8 @@ class SchedulesFragment : Fragment() {
                     SchedulesListAdapter(
                         context,
                         R.layout.adapter_view_layout,
-                        viewModel.schedulesArrayList
+                        viewModel.schedulesArrayList,
+                        0
                     )
                 /* Set progressbar as visible while working */
                 specialShimmerContainer.visibility = View.VISIBLE
@@ -182,7 +185,8 @@ class SchedulesFragment : Fragment() {
                 SchedulesListAdapter(
                     context,
                     R.layout.adapter_view_layout,
-                    viewModel.schedulesArrayList
+                    viewModel.schedulesArrayList,
+                    0
                 )
             /* Set progressbar as visible while working */
             specialShimmerContainer.visibility = View.VISIBLE
@@ -292,7 +296,8 @@ class SchedulesFragment : Fragment() {
             SchedulesListAdapter(
                 context,
                 R.layout.adapter_view_layout,
-                viewModel.specialSchedulesArrayList
+                viewModel.specialSchedulesArrayList,
+                0
             )
         listView.adapter = specialArrayAdapter
         specialArrayAdapter.notifyDataSetChanged()
@@ -640,9 +645,12 @@ class SchedulesFragment : Fragment() {
             SchedulesListAdapter(
                 context,
                 R.layout.adapter_view_layout,
-                viewModel.schedulesArrayList
+                viewModel.schedulesArrayList,
+                scrollValue
             )
         listView.adapter = schedulesAdapter
+        //        holder.arrives.setTypeface(holder.arrives.getTypeface(), Typeface.BOLD);
+
         schedulesAdapter.notifyDataSetChanged()
         listView.smoothScrollToPositionFromTop(scrollValue, 0, 120)
         // TODO: set current arrival listview text as bold
