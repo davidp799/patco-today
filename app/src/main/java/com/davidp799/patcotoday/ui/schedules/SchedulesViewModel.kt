@@ -3,15 +3,17 @@ package com.davidp799.patcotoday.ui.schedules
 import androidx.lifecycle.ViewModel
 import com.davidp799.patcotoday.utils.Arrival
 import com.davidp799.patcotoday.utils.Schedules
-import java.util.*
+import java.time.DayOfWeek
+import java.time.LocalDate
 import kotlin.collections.ArrayList
 
 class SchedulesViewModel : ViewModel() {
     // Station options
-    var isReversed = false;
+    var isReversed = false
     // Station Data
-    var weekday =
-        Calendar.DAY_OF_WEEK // weekday in java starts on monday
+    private var today: LocalDate = LocalDate.now()
+    private var dayOfWeek: DayOfWeek = today.dayOfWeek
+    var dayOfWeekNumber = dayOfWeek.value
     var fromSelection = 0
     var toSelection = 0
     // directory
@@ -21,7 +23,6 @@ class SchedulesViewModel : ViewModel() {
     var special = false
     var downloaded = false
     var converted = false
-    var parsed = false
     var schedules = Schedules()
 
     // Background Lists - arrivals list
