@@ -13,7 +13,7 @@ class SchedulesViewModel : ViewModel() {
     var isReversed = false;
     // Station Data
     var weekday =
-        Calendar.getInstance()[Calendar.DAY_OF_WEEK] - 1 // weekday in java starts on sunday
+        Calendar.DAY_OF_WEEK // weekday in java starts on monday
     var fromSelection = 0
     var toSelection = 0
     // directory

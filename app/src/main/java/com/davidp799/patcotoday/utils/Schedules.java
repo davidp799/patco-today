@@ -59,47 +59,46 @@ public class Schedules {
      * @param weekday integer value representing day of week
      * @return ArrayList of integers */
     public ArrayList<Integer> getServiceID(int weekday) {
-        String code = calCodes.get(weekday);
+        String code = calCodes.get(weekday-1);
+        System.out.println("@code = " + code);
+        int weekdayId = 0, saturdayId = 0, sundayId = 0;
         ArrayList<Integer> result = new ArrayList<>();
-        if (code.equals("1,1,1,1,1,0,0")) {
-            result.add(50); // debug
-            result.add(69);
-        } else if (code.equals("0,0,0,0,0,1,0")) {
-            result.add(51); // debug
-            result.add(70);
-        } else {
-            result.add(52); // debug
-            result.add(71);
-        } return result;
-        /*String code = calCodes.get(weekday);
-        ArrayList<String> serviceIDs = new ArrayList<>();
-        ArrayList<Integer> result = new ArrayList<>();
-        String filename = "/calendar.txt";
-        // open trips.txt file as read only
+        String filename = fileDir + "/calendar.txt";
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(filename));
             String line = reader.readLine();
             while (line != null) {
-                // split line, pull service_id and add to tripID list
-                List<String> c = Arrays.asList(line.split(",", 128));
-
-                String currentCode = String.format("%s,%s,%s,%s,%s",
-                        c.get(1), c.get(2), c.get(3), c.get(4), c.get(5));
-                if (code.equals(currentCode)) {
-                    serviceIDs.add(c.get(0));
+                List<String> splitLine = Arrays.asList(line.split(",", 12));
+                System.out.println("@line = " + splitLine);
+                String currentCode = String.format("%s,%s,%s,%s,%s,%s,%s",
+                        splitLine.get(1), splitLine.get(2), splitLine.get(3), splitLine.get(4), splitLine.get(5), splitLine.get(6), splitLine.get(7));
+                switch (currentCode) {
+                    case "1,1,1,1,1,0,0":
+                        weekdayId = Integer.parseInt(splitLine.get(0));
+                        break;
+                    case "0,0,0,0,0,1,0":
+                        saturdayId = Integer.parseInt(splitLine.get(0));
+                        break;
+                    case "0,0,0,0,0,0,1":
+                        sundayId = Integer.parseInt(splitLine.get(0));
+                        break;
                 }
-
                 line = reader.readLine();
-            } reader.close();
-            result.add(Integer.parseInt(serviceIDs.get(serviceIDs.size()-1)));
-            result.add(Integer.valueOf(serviceIDs.get(serviceIDs.size()-2)));
-
+            }
         } catch (IOException e) {
             e.printStackTrace();
+        } if (code.equals("1,1,1,1,1,0,0")) {
+            result.add(weekdayId);
+        } else if (code.equals("0,0,0,0,0,1,0")) {
+            result.add(saturdayId);
+        } else {
+            result.add(sundayId);
         }
-        return result;*/
+        System.out.println("@result = " + result);
+        return result;
     }
+
     /** Function which reads the trips.txt data file to determine the
      *  trip_id based on the given route_id and service_id.
      * @param route_id integer value representing travel direction
