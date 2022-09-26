@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.*
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelLazy
 import com.davidp799.patcotoday.R
@@ -368,15 +367,15 @@ class SchedulesFragment : Fragment() {
             viewModel.specialURLs.addAll(getSpecial.url)
             viewModel.specialTexts.addAll(getSpecial.text)
             if (getSpecial.text.size > 0) {
-                println(getSpecial.text.get(0))
+                println(getSpecial.text[0])
                 try {
                     val split = getSpecial.text[0].split("from ")[1].split("-")
                     for (i in split.indices) {
-                        if (split.get(i).contains("AM")) {
-                            val value = split.get(i).replace("AM", " A")
+                        if (split[i].contains("AM")) {
+                            val value = split[i].replace("AM", " A")
                             viewModel.specialFromToTimes.add(value)
-                        } else if (split.get(i).contains("PM")) {
-                            val value = split.get(i).replace("PM", " P")
+                        } else if (split[i].contains("PM")) {
+                            val value = split[i].replace("PM", " P")
                             viewModel.specialFromToTimes.add(value)
                         }
                     }
@@ -487,8 +486,8 @@ class SchedulesFragment : Fragment() {
                 val parsePDF = ParsePDF(viewModel.runnableConvertedStrings[i], viewModel.specialFromToTimes)
                 viewModel.parsedArrivals.addAll(parsePDF.arrivalLines)
             }
-            viewModel.specialWestBound.addAll(viewModel.parsedArrivals.get(0))
-            viewModel.specialEastBound.addAll(viewModel.parsedArrivals.get(1))
+            viewModel.specialWestBound.addAll(viewModel.parsedArrivals[0])
+            viewModel.specialEastBound.addAll(viewModel.parsedArrivals[1])
             true
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
