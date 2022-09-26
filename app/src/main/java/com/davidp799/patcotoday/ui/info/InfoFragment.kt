@@ -50,14 +50,14 @@ class InfoFragment : Fragment() {
                 requireContext().startActivity(openLinksIntent)
             }
 
-        val infoRecyclerView = root.findViewById<View>(R.id.info_recycler_view) as RecyclerView
-        val infoRecyclerAdapter = InfoRecyclerAdapter(
-            requireActivity(),
-            android.R.layout.simple_list_item_1,
-            infoViewModel.infoItems
-        )
-        infoRecyclerView.adapter = infoRecyclerAdapter
-        infoRecyclerView.isTransitionGroup = true
+//        val infoRecyclerView = root.findViewById<View>(R.id.info_recycler_view) as RecyclerView
+//        val infoRecyclerAdapter = InfoRecyclerAdapter(
+//            requireActivity(),
+//            android.R.layout.simple_list_item_1,
+//            infoViewModel.infoItems
+//        )
+//        infoRecyclerView.adapter = infoRecyclerAdapter
+//        infoRecyclerView.isTransitionGroup = true
 //        infoRecyclerView.performClick() =
 //            AdapterView.OnItemClickListener { parent, view, position, id ->
 //                val openLinksIntent = Intent(Intent.ACTION_VIEW, Uri.parse(infoViewModel.infoLinks[position]))
