@@ -1,10 +1,8 @@
 package com.davidp799.patcotoday.ui.schedules
 
 import androidx.lifecycle.ViewModel
-import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.utils.Arrival
 import com.davidp799.patcotoday.utils.Schedules
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -41,7 +39,7 @@ class SchedulesViewModel : ViewModel() {
     var specialSchedulesArrayList = ArrayList<Arrival>()
 
     // List objects
-    var stationOptions = listOf(
+    val stationOptions = listOf(
         "Lindenwold",
         "Ashland",
         "Woodcrest",

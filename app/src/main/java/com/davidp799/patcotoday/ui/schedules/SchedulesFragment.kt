@@ -189,8 +189,18 @@ class SchedulesFragment : Fragment() {
             CoroutineScope(Dispatchers.IO).launch {
                 checkSpecialBackgroundRequest(requireContext(), viewModel.fromSelection, viewModel.toSelection, specialShimmerContainer, root)
             }
+
+            // Initialize array adapter for stations dropdown menu
+            val stationsArrayAdapter = ArrayAdapter(
+                requireContext(),
+                R.layout.dropdown_item,
+                viewModel.stationOptions
+            )
             fromAutoCompleteTV.setText(viewModel.stationOptions[viewModel.fromSelection])
             toAutoCompleteTV.setText(viewModel.stationOptions[viewModel.toSelection])
+            // connect textViews to stations options arrayAdapter
+            fromAutoCompleteTV.setAdapter(stationsArrayAdapter)
+            toAutoCompleteTV.setAdapter(stationsArrayAdapter)
         }
 
         return root
