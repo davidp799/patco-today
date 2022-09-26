@@ -206,16 +206,6 @@ public class Schedules {
         for (int i=0; i<schedules.size(); i++) {
             String aTime = schedules.get(i);
             String[] split = aTime.split(":",8);
-            int curMin = Integer.parseInt(split[1]);
-            // remove duplicates
-            if (i < schedules.size()-1) {
-                String nextTime = schedules.get(i+1);
-                String[] nextSplit = nextTime.split(":", 8);
-                int nextMin = Integer.parseInt(nextSplit[1]);
-                if (nextMin < curMin+3 && nextMin > curMin-3) { // not sure of acceptance interval yet
-                    schedules.remove(i+1);
-                }
-            }
             try {
                 // convert to dateTime object, format as 24hr time
                 String _24HourTime = schedules.get(i);
