@@ -103,7 +103,7 @@ class SchedulesFragment : Fragment() {
             root.findViewById<ImageButton>(R.id.reverseStationsButton)
 
         // Initialize array adapter for stations dropdown menu
-        val stationsArrayAdapter = ArrayAdapter(
+        var stationsArrayAdapter = ArrayAdapter(
             requireContext(),
             R.layout.dropdown_item,
             viewModel.stationOptions
@@ -191,7 +191,7 @@ class SchedulesFragment : Fragment() {
             }
 
             // Initialize array adapter for stations dropdown menu
-            val stationsArrayAdapter = ArrayAdapter(
+            stationsArrayAdapter = ArrayAdapter(
                 requireContext(),
                 R.layout.dropdown_item,
                 viewModel.stationOptions
@@ -645,6 +645,7 @@ class SchedulesFragment : Fragment() {
         listView.adapter = schedulesAdapter
         schedulesAdapter.notifyDataSetChanged()
         listView.smoothScrollToPositionFromTop(scrollValue, 0, 120)
+        // TODO: set current arrival listview text as bold
         arrivalsShimmerContainer.visibility = View.GONE
     }
     // Logger function for background tasks (or other tasks...)
