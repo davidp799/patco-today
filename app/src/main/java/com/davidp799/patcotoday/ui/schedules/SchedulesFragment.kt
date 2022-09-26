@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -246,7 +245,7 @@ class SchedulesFragment : Fragment() {
         val travelTime = viewModel.schedules.getTravelTime(source_id, destination_id)
         val routeId = viewModel.schedules.getRouteID(source_id, destination_id)
         // Retrieve lists of base data
-        val serviceIdList = viewModel.schedules.getServiceID(viewModel.weekday)
+        val serviceIdList = viewModel.schedules.getServiceID(viewModel.dayOfWeekNumber)
         val tripIdList = viewModel.schedules.getTripID(routeId, serviceIdList)
         // Retrieve unformatted list of arrival times
         val schedulesList = viewModel.schedules.getSchedulesList(tripIdList, viewModel.fromSelection)
@@ -585,26 +584,18 @@ class SchedulesFragment : Fragment() {
         // register activity with the connectivity manager service
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         // if Android M or greater, use NetworkCapabilities to check which network has connection
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // Returns Network object corresponding to active default data network.
-            val network = connectivityManager.activeNetwork ?: return false
-            // Representation of the capabilities of an active network.
-            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+        // Returns Network object corresponding to active default data network.
+        val network = connectivityManager.activeNetwork ?: return false
+        // Representation of the capabilities of an active network.
+        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
 
-            return when {
-                // Indicates this network uses a Wi-Fi transport, or WiFi has connectivity
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                // Indicates this network uses a Cellular transport, or Cellular has connectivity
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                // else return false
-                else -> false
-            }
-        } else {
-            // if the android version is below M
-            @Suppress("DEPRECATION") val networkInfo =
-                connectivityManager.activeNetworkInfo ?: return false
-            @Suppress("DEPRECATION")
-            return networkInfo.isConnected
+        return when {
+            // Indicates this network uses a Wi-Fi transport, or WiFi has connectivity
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            // Indicates this network uses a Cellular transport, or Cellular has connectivity
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            // else return false
+            else -> false
         }
     }
     private suspend fun setInternetStatusOnMainThread(input: Boolean) {
