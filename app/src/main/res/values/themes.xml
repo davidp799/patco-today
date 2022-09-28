@@ -6,14 +6,17 @@
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
+        <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/md_theme_light_secondary</item>
         <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
         <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
         <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+        <!-- Tertiary brand color. -->
         <item name="colorTertiary">@color/md_theme_light_tertiary</item>
         <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
         <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
         <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
+        <!-- Other brand color. -->
         <item name="colorError">@color/md_theme_light_error</item>
         <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
         <item name="colorOnError">@color/md_theme_light_onError</item>
@@ -30,7 +33,7 @@
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightStatusBar" >true</item>
         <!-- Customize your theme here. -->
     </style>
 

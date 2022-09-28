@@ -99,13 +99,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Set status bar and navigation bar colors
-        if (Build.VERSION.SDK_INT >= 23) { // status bar and navigation bar colors
-            window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
-        } else {
-            window.statusBarColor = ContextCompat.getColor(this, R.color.opaque_black)
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.opaque_black)
-        }
+        window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
 
         // Bottom Navigation View
         val navView: BottomNavigationView = binding.navView
@@ -214,26 +209,18 @@ class MainActivity : AppCompatActivity() {
         // register activity with the connectivity manager service
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         // if Android M or greater, use NetworkCapabilities to check which network has connection
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // Returns Network object corresponding to active default data network.
-            val network = connectivityManager.activeNetwork ?: return false
-            // Representation of the capabilities of an active network.
-            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+        // Returns Network object corresponding to active default data network.
+        val network = connectivityManager.activeNetwork ?: return false
+        // Representation of the capabilities of an active network.
+        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
 
-            return when {
-                // Indicates this network uses a Wi-Fi transport, or WiFi has connectivity
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                // Indicates this network uses a Cellular transport, or Cellular has connectivity
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                // else return false
-                else -> false
-            }
-        } else {
-            // if the android version is below M
-            @Suppress("DEPRECATION") val networkInfo =
-                connectivityManager.activeNetworkInfo ?: return false
-            @Suppress("DEPRECATION")
-            return networkInfo.isConnected
+        return when {
+            // Indicates this network uses a Wi-Fi transport, or WiFi has connectivity
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            // Indicates this network uses a Cellular transport, or Cellular has connectivity
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            // else return false
+            else -> false
         }
     }
 
