@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:clipToPadding="false"
-    tools:context=".ui.info.InfoFragment">
+    tools:context=".ui.map.MapFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -29,10 +29,10 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/Theme.PatcoToday.PopupOverlay"
-                app:title="@string/title_info">
+                app:title="@string/title_map">
 
                 <ImageButton
-                    android:id="@+id/info_settings_button"
+                    android:id="@+id/map_settings_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
@@ -46,6 +46,6 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/fragment_info_content" />
+    <include layout="@layout/fragment_map_content" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

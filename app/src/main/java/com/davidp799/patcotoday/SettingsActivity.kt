@@ -31,13 +31,8 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false)
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        if (Build.VERSION.SDK_INT >= 23) {
-            window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
-            window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
-        } else {
-            window.statusBarColor = ContextCompat.getColor(this, R.color.opaque_black)
-            window.statusBarColor = ContextCompat.getColor(this, R.color.opaque_black)
-        }
+        window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
 
         // Shared Preferences
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)

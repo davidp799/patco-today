@@ -6,6 +6,7 @@
 
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="bottom_nav_height">56dp</dimen>
+    <dimen name="bottom_nav_height_plus">76dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="padding_10">10dp</dimen>
