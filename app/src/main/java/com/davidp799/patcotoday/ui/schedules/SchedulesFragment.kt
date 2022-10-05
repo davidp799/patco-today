@@ -52,6 +52,7 @@ class SchedulesFragment : Fragment() {
 
         val arrivalsShimmerContainer: ShimmerFrameLayout = root.findViewById(R.id.arrivalsShimmerContainer)
         arrivalsShimmerContainer.visibility = View.GONE
+        arrivalsShimmerContainer.isTransitionGroup = true
         val specialViewButton: Button = root.findViewById(R.id.specialScheduleViewButton)
         specialViewButton.visibility = View.GONE
 
@@ -80,7 +81,7 @@ class SchedulesFragment : Fragment() {
         // Initialize schedules ListView
 
         val schedulesListView = root.findViewById<ListView>(R.id.arrivalsListView)
-        schedulesListView.isTransitionGroup
+        schedulesListView.isTransitionGroup = true
         arrivalsShimmerContainer.visibility = View.VISIBLE
 
         // update listview with actual arrivals

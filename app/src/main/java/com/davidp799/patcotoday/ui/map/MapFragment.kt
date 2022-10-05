@@ -15,13 +15,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.davidp799.patcotoday.MainActivity
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.SettingsActivity
-import com.davidp799.patcotoday.databinding.FragmentMapScrollingBinding
+import com.davidp799.patcotoday.databinding.FragmentMapBinding
 import com.davidp799.patcotoday.utils.EnableNestedScrolling
 import com.google.android.material.transition.MaterialFadeThrough
 
 class MapFragment : Fragment() {
 
-    private var _binding: FragmentMapScrollingBinding? = null
+    private var _binding: FragmentMapBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -34,18 +34,18 @@ class MapFragment : Fragment() {
     ): View {
         val mapViewModel =
             ViewModelProvider(this)[MapViewModel::class.java]
-        _binding = FragmentMapScrollingBinding.inflate(inflater, container, false)
+        _binding = FragmentMapBinding.inflate(inflater, container, false)
         val root: View = binding.root
         enterTransition = MaterialFadeThrough()
 
         // settings button for top bar
-        val settingsButton: ImageButton = root.findViewById(R.id.map_settings_button)
+/*        val settingsButton: ImageButton = root.findViewById(R.id.map_settings_button)
         settingsButton.setOnClickListener {
             activity?.let {
                 val intent = Intent(it, SettingsActivity::class.java)
                 startActivity(intent)
             }
-        }
+        }*/
 
         // listView items
         val stationMap = root.findViewById<View>(R.id.stationMap) as ListView
