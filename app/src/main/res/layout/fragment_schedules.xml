@@ -17,9 +17,7 @@
             android:id="@+id/schedulesConfigHorizLayout"
             android:layout_width="match_parent"
             android:layout_height="120sp"
-            android:orientation="horizontal"
-            android:background="@drawable/round_bottom"
-            >
+            android:orientation="horizontal">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/stationIconsVertLayout"
@@ -125,10 +123,16 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@drawable/drawable_drop_shadow"/>
+
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/arrivalsShimmerContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:layout_constraintTop_toBottomOf="@id/schedulesConfigHorizLayout"
             android:layout_marginBottom="96sp">
 
             <LinearLayout
