@@ -51,6 +51,8 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.2'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.2'
     implementation 'androidx.preference:preference:1.2.0'
+    // androidx.activity alpha for predictive back gesture
+    implementation "androidx.activity:activity:1.7.0-alpha01"
     // Kotlin Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
     // itextpdf converter
