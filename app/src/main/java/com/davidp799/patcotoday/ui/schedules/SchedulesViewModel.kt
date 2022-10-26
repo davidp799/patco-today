@@ -10,12 +10,15 @@ import kotlin.collections.ArrayList
 class SchedulesViewModel : ViewModel() {
     // Station options
     var isReversed = false
-    // Station Data
+    // Dates
     private var today: LocalDate = LocalDate.now()
     private var dayOfWeek: DayOfWeek = today.dayOfWeek
     var dayOfWeekNumber = dayOfWeek.value
-    var fromSelection = 0
-    var toSelection = 0
+    // Station Data
+    var fromIndex = 0
+    var fromString = "Lindenwold"
+    var toIndex = 0
+    var toString = "15-16th & Locust"
     // directory
     val directory: String = "/data/data/com.davidp799.patcotoday/files/data/"
     // Job Management
