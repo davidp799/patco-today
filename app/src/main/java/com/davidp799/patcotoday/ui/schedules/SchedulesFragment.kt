@@ -31,8 +31,7 @@ import java.util.*
 class SchedulesFragment : Fragment() {
     private var _binding: FragmentSchedulesBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
     private val viewModel: SchedulesViewModel by ViewModelLazy(
@@ -46,80 +45,57 @@ class SchedulesFragment : Fragment() {
     ): View {
         _binding = FragmentSchedulesBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        
-        // Configure User Interface
-        enterTransition = MaterialFadeThrough()
-        val arrivalsShimmerFrameLayout: ShimmerFrameLayout = root.findViewById(R.id.arrivalsShimmerFrameLayout)
-        val specialViewButton: Button = root.findViewById(R.id.specialScheduleViewButton)
-        specialViewButton.isEnabled = false
-        
-        // Configure SharedPreferences
+
+        // Declare Global Variables
         val sharedPreferences = requireActivity().getSharedPreferences("com.davidp799.patcotoday_preferences", Context.MODE_PRIVATE)
-        
-        // Initialize From and To Selections from SharedPreferences
         viewModel.fromString = sharedPreferences.getString("default_source", "Lindenwold").toString()
         viewModel.fromIndex = viewModel.stationOptions.indexOf(viewModel.fromString)
         viewModel.toString = sharedPreferences.getString("default_dest", "15-16th & Locust").toString()
         viewModel.toIndex = viewModel.stationOptions.indexOf(viewModel.toString)
+        
+        // Declare User Interface Elements
+        val fromTextView =
+            root.findViewById<AutoCompleteTextView>(R.id.fromTextView)
+        val toTextView =
+            root.findViewById<AutoCompleteTextView>(R.id.toTextView)
+        var stationsArrayAdapter =
+            ArrayAdapter(requireContext(), R.layout.dropdown_item, viewModel.stationOptions)
+        val reverseStationsButton =
+            root.findViewById<ImageButton>(R.id.reverseStationsButton)
+        val arrivalsListView =
+            root.findViewById<ListView>(R.id.arrivalsListView)
+        val arrivalsShimmerFrameLayout: ShimmerFrameLayout =
+            root.findViewById(R.id.arrivalsShimmerFrameLayout)
+        val specialShimmerFrameLayout: ShimmerFrameLayout =
+            root.findViewById(R.id.specialShimmerFrameLayout)
+        val specialViewButton: Button =
+            root.findViewById(R.id.specialScheduleViewButton)
 
-        // Manage Special Schedules Progress Bar
-        val specialShimmerContainer: ShimmerFrameLayout =
-            root.findViewById(R.id.specialShimmerContainer)
-        specialShimmerContainer.visibility = View.VISIBLE
+        // Configure User Interface Elements
+        enterTransition = MaterialFadeThrough()
+        fromTextView.setText(viewModel.fromString)
+        toTextView.setText(viewModel.toString)
+        fromTextView.setAdapter(stationsArrayAdapter)
+        toTextView.setAdapter(stationsArrayAdapter)
+        specialViewButton.isEnabled = false
 
-        // Background Activities - internet, special, etc...
+        // Background Activities: Check Internet, Update Arrivals ListView, and Processing Special Schedules
         CoroutineScope(Dispatchers.IO).launch {
             checkInternetBackgroundRequest(requireContext())
+            updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, arrivalsListView, arrivalsShimmerFrameLayout)
+            checkSpecialBackgroundRequest(requireContext(), viewModel.fromIndex, viewModel.toIndex, specialShimmerFrameLayout, root)
         }
-
-        // Initialize schedules ListView
-        val schedulesListView = root.findViewById<ListView>(R.id.arrivalsListView)
-        schedulesListView.isTransitionGroup = true
-        arrivalsShimmerFrameLayout.visibility = View.VISIBLE
-
-        // update listview with actual arrivals
-        CoroutineScope(Dispatchers.IO).launch {
-            updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, schedulesListView, arrivalsShimmerFrameLayout)
-        }
-
-        /* Set progressbar as visible while working */
-        CoroutineScope(Dispatchers.IO).launch {
-            checkSpecialBackgroundRequest(requireContext(), viewModel.fromIndex, viewModel.toIndex, specialShimmerContainer, root)
-        }
-
-        // Initialize from and to textViews
-        val fromAutoCompleteTV =
-            root.findViewById<AutoCompleteTextView>(R.id.fromTextView)
-        val toAutoCompleteTV =
-            root.findViewById<AutoCompleteTextView>(R.id.toTextView)
-        val stationReverse =
-            root.findViewById<ImageButton>(R.id.reverseStationsButton)
-
-        // Initialize array adapter for stations dropdown menu
-        var stationsArrayAdapter = ArrayAdapter(
-            requireContext(),
-            R.layout.dropdown_item,
-            viewModel.stationOptions
-        )
-
-        // set default text for both textViews
-        fromAutoCompleteTV.setText(viewModel.fromString) // fromAutoCompleteTV.setText(viewModel.fromString)
-        toAutoCompleteTV.setText(viewModel.toString) // fromAutoCompleteTV.setText(viewModel.toString)
-
-        // connect textViews to stations options arrayAdapter
-        fromAutoCompleteTV.setAdapter(stationsArrayAdapter)
-        toAutoCompleteTV.setAdapter(stationsArrayAdapter)
 
         // Listen for station selections: from and to respectively
-        fromAutoCompleteTV.onItemClickListener =
+        fromTextView.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 viewModel.fromIndex = position // set source station to index of selected array position
                 // reload listview and scroll to next train
                 arrivalsShimmerFrameLayout.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, schedulesListView, arrivalsShimmerFrameLayout)
+                    updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, arrivalsListView, arrivalsShimmerFrameLayout)
                 }
-                schedulesListView.adapter =
+                arrivalsListView.adapter =
                     SchedulesListAdapter(
                         context,
                         R.layout.adapter_view_layout,
@@ -127,12 +103,12 @@ class SchedulesFragment : Fragment() {
                         0
                     )
                 /* Set progressbar as visible while working */
-                specialShimmerContainer.visibility = View.VISIBLE
+                specialShimmerFrameLayout.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    checkSpecialBackgroundRequest(requireContext(), viewModel.fromIndex, viewModel.toIndex, specialShimmerContainer, root)
+                    checkSpecialBackgroundRequest(requireContext(), viewModel.fromIndex, viewModel.toIndex, specialShimmerFrameLayout, root)
                 }
             }
-        toAutoCompleteTV.onItemClickListener =
+        toTextView.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
 
                 // save from selection as variable
@@ -141,9 +117,9 @@ class SchedulesFragment : Fragment() {
                 // reload listview with new array and adapter and scroll to next train
                 arrivalsShimmerFrameLayout.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, schedulesListView, arrivalsShimmerFrameLayout)
+                    updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, arrivalsListView, arrivalsShimmerFrameLayout)
                 }
-                schedulesListView.adapter =
+                arrivalsListView.adapter =
                     SchedulesListAdapter(
                         context,
                         R.layout.adapter_view_layout,
@@ -151,18 +127,18 @@ class SchedulesFragment : Fragment() {
                         0
                     )
                 /* Set progressbar as visible while working */
-                specialShimmerContainer.visibility = View.VISIBLE
+                specialShimmerFrameLayout.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    checkSpecialBackgroundRequest(requireContext(), viewModel.fromIndex, viewModel.toIndex, specialShimmerContainer, root)
+                    checkSpecialBackgroundRequest(requireContext(), viewModel.fromIndex, viewModel.toIndex, specialShimmerFrameLayout, root)
                 }
             }
-        stationReverse.setOnClickListener {
+        reverseStationsButton.setOnClickListener {
             // rotate counter clock-wise if reversed, else rotate clock-wise
             if (viewModel.isReversed) {
-                stationReverse.animate().setDuration(180).rotationBy(-180f).start()
+                reverseStationsButton.animate().setDuration(180).rotationBy(-180f).start()
                 viewModel.isReversed = false
             } else {
-                stationReverse.animate().setDuration(180).rotationBy(180f).start()
+                reverseStationsButton.animate().setDuration(180).rotationBy(180f).start()
                 viewModel.isReversed = true
             }
             val tempIndex = viewModel.fromIndex
@@ -174,9 +150,9 @@ class SchedulesFragment : Fragment() {
 
             arrivalsShimmerFrameLayout.visibility = View.VISIBLE
             CoroutineScope(Dispatchers.IO).launch {
-                updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, schedulesListView, arrivalsShimmerFrameLayout)
+                updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, arrivalsListView, arrivalsShimmerFrameLayout)
             }
-            schedulesListView.adapter =
+            arrivalsListView.adapter =
                 SchedulesListAdapter(
                     context,
                     R.layout.adapter_view_layout,
@@ -184,9 +160,9 @@ class SchedulesFragment : Fragment() {
                     0
                 )
             /* Set progressbar as visible while working */
-            specialShimmerContainer.visibility = View.VISIBLE
+            specialShimmerFrameLayout.visibility = View.VISIBLE
             CoroutineScope(Dispatchers.IO).launch {
-                checkSpecialBackgroundRequest(requireContext(), viewModel.fromIndex, viewModel.toIndex, specialShimmerContainer, root)
+                checkSpecialBackgroundRequest(requireContext(), viewModel.fromIndex, viewModel.toIndex, specialShimmerFrameLayout, root)
             }
 
             // Initialize array adapter for stations dropdown menu
@@ -195,16 +171,16 @@ class SchedulesFragment : Fragment() {
                 R.layout.dropdown_item,
                 viewModel.stationOptions
             )
-            fromAutoCompleteTV.setText(viewModel.stationOptions[viewModel.fromIndex])
-            toAutoCompleteTV.setText(viewModel.stationOptions[viewModel.toIndex])
+            fromTextView.setText(viewModel.stationOptions[viewModel.fromIndex])
+            toTextView.setText(viewModel.stationOptions[viewModel.toIndex])
             // connect textViews to stations options arrayAdapter
-            fromAutoCompleteTV.setAdapter(stationsArrayAdapter)
-            toAutoCompleteTV.setAdapter(stationsArrayAdapter)
+            fromTextView.setAdapter(stationsArrayAdapter)
+            toTextView.setAdapter(stationsArrayAdapter)
         }
 
         return root
     }
-
+    // TODO: Utilize onResume and onPause to store last saved data when moving btwn fragments
     override fun onResume() {
         super.onResume()
 
@@ -213,9 +189,9 @@ class SchedulesFragment : Fragment() {
         // shared preferences
         val sharedPreferences = requireActivity().getSharedPreferences("com.davidp799.patcotoday_preferences", Context.MODE_PRIVATE)
         // 'from' and 'to' textViews
-        val fromAutoCompleteTV =
+        val fromTextView =
             root.findViewById<AutoCompleteTextView>(R.id.fromTextView)
-        val toAutoCompleteTV =
+        val toTextView =
             root.findViewById<AutoCompleteTextView>(R.id.toTextView)
         // array adapter for stations dropdown menu
         val stationsArrayAdapter = ArrayAdapter(
@@ -224,11 +200,11 @@ class SchedulesFragment : Fragment() {
             viewModel.stationOptions
         )
         // set default text for both textViews
-        fromAutoCompleteTV.setText(viewModel.fromString) // fromAutoCompleteTV.setText(viewModel.fromString)
-        toAutoCompleteTV.setText(viewModel.toString) // fromAutoCompleteTV.setText(viewModel.toString)
+        fromTextView.setText(viewModel.fromString) // fromTextView.setText(viewModel.fromString)
+        toTextView.setText(viewModel.toString) // fromTextView.setText(viewModel.toString)
         // connect textViews to stations options arrayAdapter
-        fromAutoCompleteTV.setAdapter(stationsArrayAdapter)
-        toAutoCompleteTV.setAdapter(stationsArrayAdapter)
+        fromTextView.setAdapter(stationsArrayAdapter)
+        toTextView.setAdapter(stationsArrayAdapter)
     }
 
     override fun onDestroyView() {
@@ -323,7 +299,7 @@ class SchedulesFragment : Fragment() {
     //
     //
     /* Function which manages background tasks using Kotlin coroutines */
-    private suspend fun checkSpecialBackgroundRequest(context: Context, source: Int, destination: Int, specialShimmerContainer: ShimmerFrameLayout, view: View) {
+    private suspend fun checkSpecialBackgroundRequest(context: Context, source: Int, destination: Int, specialShimmerFrameLayout: ShimmerFrameLayout, view: View) {
         logThread("\n*** checkSpecialBackgroundRequest Active ***\n")
         // step 1: check internet status
         val internetStatus = checkInternet(context)
@@ -344,16 +320,16 @@ class SchedulesFragment : Fragment() {
                         if (parseStatus) {
                             // step 6: update main ui thread with special schedule data
                             val specialArrivals = getSpecialArrivalsBackground(source, destination)
-                            setSpecialArrivalsOnMainThread(specialArrivals, specialShimmerContainer, view, specialStatus)
+                            setSpecialArrivalsOnMainThread(specialArrivals, specialShimmerFrameLayout, view, specialStatus)
                         }
                     }
 
                 }
             } else {
-                configureBottomSheetOnMainThread(view, specialStatus, specialShimmerContainer)
+                configureBottomSheetOnMainThread(view, specialStatus, specialShimmerFrameLayout)
             }
         } else {
-            configureBottomSheetOnMainThread(view, false, specialShimmerContainer)
+            configureBottomSheetOnMainThread(view, false, specialShimmerFrameLayout)
         }
     }
     private fun checkSpecial(): Boolean {
@@ -499,12 +475,12 @@ class SchedulesFragment : Fragment() {
             ArrayList()
         }
     }
-    private suspend fun setSpecialArrivalsOnMainThread(input: ArrayList<Arrival>, specialShimmerContainer: ShimmerFrameLayout, view: View, specialStatus: Boolean) {
+    private suspend fun setSpecialArrivalsOnMainThread(input: ArrayList<Arrival>, specialShimmerFrameLayout: ShimmerFrameLayout, view: View, specialStatus: Boolean) {
         withContext (Main) {
-            setSpecialArrivals(input, specialShimmerContainer, view, specialStatus)
+            setSpecialArrivals(input, specialShimmerFrameLayout, view, specialStatus)
         }
     }
-    private fun setSpecialArrivals(input: ArrayList<Arrival>, specialShimmerContainer: ShimmerFrameLayout, view: View, specialStatus: Boolean){
+    private fun setSpecialArrivals(input: ArrayList<Arrival>, specialShimmerFrameLayout: ShimmerFrameLayout, view: View, specialStatus: Boolean){
         viewModel.specialSchedulesArrayList.clear()
         viewModel.specialSchedulesArrayList.addAll(input)
         configureBottomSheet(view, specialStatus)
@@ -512,35 +488,48 @@ class SchedulesFragment : Fragment() {
         val specialListView = view.findViewById<ListView>(R.id.specialArrivalsListView)
         val specialAbout = view.findViewById<TextView>(R.id.specialScheduleAbout)
         updateSpecialData(specialListView, specialAbout)
-        specialShimmerContainer.visibility = View.GONE
+        specialShimmerFrameLayout.visibility = View.GONE
     }
-    private suspend fun configureBottomSheetOnMainThread(view: View, specialStatus: Boolean, specialShimmerContainer: ShimmerFrameLayout) {
+    private suspend fun configureBottomSheetOnMainThread(view: View, specialStatus: Boolean, specialShimmerFrameLayout: ShimmerFrameLayout) {
         withContext (Main) {
             configureBottomSheet(view, specialStatus)
-            specialShimmerContainer.visibility = View.GONE
+            specialShimmerFrameLayout.visibility = View.GONE
         }
     }
     private fun configureBottomSheet(view: View, specialStatus: Boolean ) {
         /* Initialize Bottom Sheet and Special Loading Parameters */
-        val mBottomSheetLayout = view.findViewById<LinearLayout>(R.id.bottom_sheet_layout)
-        val sheetBehavior: BottomSheetBehavior<LinearLayout> = BottomSheetBehavior.from(mBottomSheetLayout)
+        val bottomSheetLayout = view.findViewById<LinearLayout>(R.id.bottom_sheet_layout)
+        val bottomSheetBehavior: BottomSheetBehavior<LinearLayout> = BottomSheetBehavior.from(bottomSheetLayout)
+        // Add Bounce Animation to BottomSheet
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_SETTLING) {
+                    bottomSheet.animate().translationY(0f)
+                }
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    bottomSheet.animate().setDuration(150).translationY(20f)
+                }
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    bottomSheet.animate().setDuration(100).translationY(-20f)
+                }
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    bottomSheet.animate().setDuration(150).translationY(-20f)
+                }
+            }
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            }
+        })
 
         if (!specialStatus) {
-            println("\n\n\n\n\n!!!!!!!! $specialStatus")
-            sheetBehavior.peekHeight = 0
-            sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED) // hide bottom sheet
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         } else {
-            println("\n\n\n\n\n!!!!!!!! $specialStatus")
-
-            // Implement bottom sheet call
             if (!viewModel.internet) {
-                sheetBehavior.peekHeight = 0
-                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED) // hide bottom sheet
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             } else {
                 if (!viewModel.special) {
-                    sheetBehavior.peekHeight = 0
-                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 } else {
+                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     // initialize about and button for schedules
                     val specialAbout: TextView = view.findViewById(R.id.specialScheduleAbout)
                     val specialViewButton: Button = view.findViewById(R.id.specialScheduleViewButton)
@@ -569,8 +558,7 @@ class SchedulesFragment : Fragment() {
             }
         }
     }
-    //
-    //
+
     // Threads which update internet status and get special schedules in background
     private suspend fun checkInternetBackgroundRequest(context: Context) {
         logThread("\n*** checkInternetBackgroundRequest Active ***\n")
@@ -600,11 +588,10 @@ class SchedulesFragment : Fragment() {
             setInternetStatus(input)
         }
     }
-    private fun setInternetStatus(input: Boolean){
+    private fun setInternetStatus(input: Boolean) {
         viewModel.internet = input
     }
-    //
-    //
+
     // Threads which update listView contents in background
     private suspend fun updateListViewBackgroundRequest(source: Int, destination: Int, listView: ListView, arrivalsShimmerFrameLayout: ShimmerFrameLayout) {
         logThread("\n*** updateListViewBackgroundRequest Active ***\n")

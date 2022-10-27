@@ -44,7 +44,7 @@
                 android:text="@string/special_schedule_download" />
 
             <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/specialShimmerContainer"
+                android:id="@+id/specialShimmerFrameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
