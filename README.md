@@ -41,20 +41,13 @@ Coming Soon:
 
 ## Screenshots
 
-[<img src="/readme/PatcoTodayFramed1.png" align="left"
-width="100" hspace="10" vspace="10">](/readme/PatcoTodayFramed1.png)
-
-[<img src="/readme/PatcoTodayFramed2.png" align="center"
-width="100" hspace="10" vspace="10">](/readme/PatcoTodayFramed2.png)
-
-[<img src="/readme/PatcoTodayFramed3.png" align="center"
-width="100" hspace="10" vspace="10">](/readme/PatcoTodayFramed3.png)
-
-[<img src="/readme/PatcoTodayFramed4.png" align="center"
-width="100" hspace="10" vspace="10">](/readme/PatcoToday4.png)
-
-[<img src="/readme/PatcoTodayFramed5.png" align="center"
-width="100" hspace="10" vspace="10">](/readme/PatcoToday5.png)
+<p float="left">
+	<img src="/readme/PatcoTodayFramed1.png" width="100" />
+	<img src="/readme/PatcoTodayFramed2.png" width="100" /> 
+	<img src="/readme/PatcoTodayFramed3.png" width="100" />
+	<img src="/readme/PatcoTodayFramed4.png" width="100" /> 
+	<img src="/readme/PatcoTodayFramed5.png" width="100" />
+</p>
 
 ## Permissions
 
