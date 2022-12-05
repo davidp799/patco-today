@@ -15,3 +15,7 @@
 local.properties
 .idea/deploymentTargetDropDown.xml
 .idea/misc.xml
+.idea/vcs.xml
+.idea/.name
+.idea/compiler.xml
+.idea/gradle.xml
