@@ -8,17 +8,17 @@ Patco Today is a free, open-source transit app for Android. Primarily utilizing 
 Patco Today is (soon to be) available on the Google Play Store and F-Droid.
 
 <p align="left">
-<a href="https://play.google.com/store/apps/NOT_YET">
-    <img alt="Get it on Google Play"
-        height="80"
-        src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" />
-</a>  
-<a href="https://f-droid.org/app/NOT_YET">
-    <img alt="Get it on F-Droid"
-        height="80"
-        src="https://f-droid.org/badge/get-it-on.png" />
-        </a>
-        </p>
+	<a href="https://play.google.com/store/apps/NOT_YET">
+	    <img alt="Get it on Google Play"
+		height="80"
+		src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" />
+	</a>  
+	<a href="https://f-droid.org/app/NOT_YET">
+	    <img alt="Get it on F-Droid"
+		height="80"
+		src="https://f-droid.org/badge/get-it-on.png" />
+	</a>
+</p>
         
 ## Features
 
@@ -41,12 +41,12 @@ Coming Soon:
 
 ## Screenshots
 
-<p float="left">
-	<img src="/readme/PatcoTodayFramed1.png" width="100" />
-	<img src="/readme/PatcoTodayFramed2.png" width="100" /> 
-	<img src="/readme/PatcoTodayFramed3.png" width="100" />
-	<img src="/readme/PatcoTodayFramed4.png" width="100" /> 
-	<img src="/readme/PatcoTodayFramed5.png" width="100" />
+<p float="middle">
+	<img src="/readme/PatcoTodayFramed1.png" width="18%"/>
+	<img src="/readme/PatcoTodayFramed2.png" width="18%" /> 
+	<img src="/readme/PatcoTodayFramed3.png" width="18%" />
+	<img src="/readme/PatcoTodayFramed4.png" width="18%" /> 
+	<img src="/readme/PatcoTodayFramed5.png" width="18%" />
 </p>
 
 ## Permissions
