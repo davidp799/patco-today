@@ -1,5 +1,6 @@
 package com.davidp799.patcotoday.utils;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -29,12 +30,6 @@ public class Schedules {
     private final List<String> calCodes = Arrays.asList("1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
             "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1");
 
-    /** Function which returns the name of the given station index.
-     * @param source_id station corresponding to stopCodes index
-     * @return string value of station name */
-    public String getStopCode(int source_id) {
-        return stopCodes.get(source_id);
-    }
     /** Function which returns the length in minutes between source
      *  station and destination station.
      * @param source_id starting point
@@ -157,39 +152,6 @@ public class Schedules {
             e.printStackTrace();
         } Collections.sort(result);
         return result;
-    }
-    /** Function which formats list of trip by removing duplicate arrivals,
-     *  setting arrivals to 12 hour format, and appending travel times.
-     *  @param schedules unformatted list of arrival times
-     *  @param travelTime minutes between source and destination station
-     *  @return ArrayList of strings */
-    public ArrayList<String> getFormatString(ArrayList<String> schedules, int travelTime) {
-        for (int i=0; i<schedules.size(); i++) {
-            String aTime = schedules.get(i);
-            String[] split = aTime.split(":",8);
-            int curMin = Integer.parseInt(split[1]);
-            // remove duplicates
-            if (i < schedules.size()-1) {
-                String nextTime = schedules.get(i+1);
-                String[] nextSplit = nextTime.split(":", 8);
-                int nextMin = Integer.parseInt(nextSplit[1]);
-                if (nextMin < curMin+3 && nextMin > curMin-3) { // not sure of acceptance interval yet
-                    schedules.remove(i+1);
-                }
-            }
-            try {
-                // convert to dateTime object, format as 24hr time
-                String _24HourTime = schedules.get(i);
-                SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm", Locale.US);
-                SimpleDateFormat _12HourSDF = new SimpleDateFormat("h:mm a", Locale.US);
-                Date _24HourDt = _24HourSDF.parse(_24HourTime);
-                // compute trip finish time from train arrival time
-                assert _24HourDt != null;
-                schedules.set(i, String.format("%s", _12HourSDF.format(_24HourDt)));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } return schedules;
     }
     /** Function which formats list of trip by removing duplicate arrivals,
      *  setting arrivals to 12 hour format, and appending travel times as Arrival objects.
