@@ -1,8 +1,5 @@
 package com.davidp799.patcotoday.utils;
 
-import com.davidp799.patcotoday.ui.schedules.SchedulesViewModel;
-
-import java.sql.SQLOutput;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

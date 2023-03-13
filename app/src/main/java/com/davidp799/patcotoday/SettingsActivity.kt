@@ -1,10 +1,7 @@
 package com.davidp799.patcotoday
 
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
-import android.widget.ImageButton
-import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
@@ -37,10 +34,6 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         // Shared Preferences
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.registerOnSharedPreferenceChangeListener(this)
-
-
-
-
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -62,7 +55,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         }
     }
 
-    fun onPreferenceClick(@NonNull preference: Preference) {
+    fun onPreferenceClick( preference: Preference) {
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
