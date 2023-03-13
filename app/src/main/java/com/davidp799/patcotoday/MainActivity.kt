@@ -2,6 +2,7 @@ package com.davidp799.patcotoday
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
@@ -54,63 +55,43 @@ class MainActivity : AppCompatActivity() {
     )
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var sharedPreferences: SharedPreferences
+    private val PREFS_NAME = "com.davidp799.patcotoday_preferences"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        /* Perform background tasks in following order:
-        *  1.) Check Internet;
-        *  2.) Check if files up to date;
-        *  3.) If updated == false, download files;
-        *  4.) if downloaded == true, extract files; */
+        // CHECK IF FIRST RUN OR UPGRADE OCCURRED
+        checkFirstRun()
+
+        // Perform background tasks in following order: (check internet, check if files up to date, if updated == false -> download files, if true -> extract files)
         CoroutineScope(Dispatchers.IO).launch {
             backgroundTasksRequest()
         }
 
         // Configure Shared Preferences
-        val sharedPreferences =
-            getSharedPreferences("com.davidp799.patcotoday_preferences", MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         val currentTheme = sharedPreferences.getString("device_theme", "")
 
-        // Support Material Toolbar
-        val window = this.window
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false)
+        // UI Elements: Fit status bar; material toolbar; set light/dark mode; status/nav bar color
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         val topAppBar = findViewById<MaterialToolbar>(R.id.topAppBar)
         setSupportActionBar(topAppBar)
-
-        // Add 'home' button to toolbar
-        supportActionBar?.setDisplayHomeAsUpEnabled(true) // show home button
-        topAppBar.setNavigationIcon(R.drawable.ic_update_tt)
-        topAppBar.navigationContentDescription = "Check for updates"
-
-        // Set current theme (light/dark/auto)
-        when (currentTheme) {
-            "1" -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-            "2" -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }
-            else -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            }
+        when (currentTheme) { // Set current theme (light/dark/auto)
+            "1" -> { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) }
+            "2" -> { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) }
+            else -> { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) }
         }
-
-        // Set status bar and navigation bar colors
         window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
         window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
 
         // Bottom Navigation View
         val navView: BottomNavigationView = binding.navView
-
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
-        // Passing each menu ID as a set of Ids because each menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info
-            )
+            setOf( R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
@@ -129,14 +110,33 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
             return true
-        } else if (item.itemId == android.R.id.home) {
-            Toast.makeText(this, "Updating Schedules", Toast.LENGTH_SHORT).show()
-            // call download zip coroutine here
-            // extract file contents
-            // check if updated == true
-            return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    /* Function to check if first run or upgrade */
+    private fun checkFirstRun() {
+        val PREF_VERSION_CODE_KEY = "version_code"
+        val DOESNT_EXIST = -1
+        // get version of code
+        val currentVersionCode = BuildConfig.VERSION_CODE
+        // get saved version of code
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val savedVersionCode = sharedPreferences.getInt(PREF_VERSION_CODE_KEY, DOESNT_EXIST)
+        // check for first run or upgrade
+        if (currentVersionCode == savedVersionCode) {
+            // normal run
+            println("&&& VERSION CODE SAME, NORMAL RUN &&&")
+            return
+        } else if (savedVersionCode == DOESNT_EXIST) {
+            // TODO: this is a new install (make tasks for new install)
+            println("&&& VERSION CODE DOESN'T EXIST, NEW INSTALL &&&")
+        } else if (currentVersionCode > savedVersionCode) {
+            // TODO: this is an upgrade (MAKE TASKS FOR UPGRADE)
+            println("&&& VERSION CODE NEW, UPGRADED &&&")
+        }
+        // update shared prefs with current version code
+        sharedPreferences.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply()
     }
 
     /* Background Tasks using Kotlin Coroutine: internet, update, download, extract */
@@ -144,6 +144,7 @@ class MainActivity : AppCompatActivity() {
         println("debug: ${methodName}: ${Thread.currentThread().name}")
     }
 
+    // Status setting functions
     private fun setInternetStatus(input: Boolean){
         viewModel.internet = input
     }
@@ -206,20 +207,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkInternet(context: Context): Boolean {
-        // register activity with the connectivity manager service
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        // if Android M or greater, use NetworkCapabilities to check which network has connection
-        // Returns Network object corresponding to active default data network.
         val network = connectivityManager.activeNetwork ?: return false
-        // Representation of the capabilities of an active network.
         val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
-
         return when {
-            // Indicates this network uses a Wi-Fi transport, or WiFi has connectivity
             activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-            // Indicates this network uses a Cellular transport, or Cellular has connectivity
             activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-            // else return false
             else -> false
         }
     }
