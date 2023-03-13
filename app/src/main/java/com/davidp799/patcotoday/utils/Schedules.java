@@ -1,6 +1,5 @@
 package com.davidp799.patcotoday.utils;
 
-import android.annotation.SuppressLint;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -20,28 +19,19 @@ import java.util.Locale;
 public class Schedules {
     // Default file directory
     private final File fileDir = new File("/data/data/com.davidp799.patcotoday/files/data");
-    // Names for station ID's at specified indices
-    private final List<String> stopCodes = Arrays.asList( "Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont",
-            "Collingswood", "Ferry Avenue", "Broadway", "City Hall", "8th and Market",
-            "9-10th and Locust", "12-13th and Locust", "15-16th and Locust" );
     // Travel times between stations at specified indices; |idx(src) - idx(dst)| = travelTime
     private final List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 24, 26, 27, 28);
     // Codes representing weekday or weekend status; Used to determine service_id
     private final List<String> calCodes = Arrays.asList("1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0", "1,1,1,1,1,0,0",
             "1,1,1,1,1,0,0", "0,0,0,0,0,1,0", "0,0,0,0,0,0,1");
 
-    /** Function which returns the length in minutes between source
-     *  station and destination station.
-     * @param source_id starting point
-     * @param destination_id ending point
+    /** Function which returns the length in minutes between source station and destination station.
      * @return integer value of distance in minutes */
     public int getTravelTime(int source_id, int destination_id) {
         return Math.abs(timeBetween.get(source_id) - timeBetween.get(destination_id));
     }
-    /** Function which returns the routeID which represents
-     *  the direction of the desired train (Eastbound / Westbound).
-     * @param source_id starting point
-     * @param destination_id ending point
+    /** Function which returns the routeID which represents the direction
+     *  of the desired train (Eastbound / Westbound).
      * @return integer route code (1 = Westbound, 2 = Eastbound) */
     public int getRouteID(int source_id, int destination_id) {
         if (destination_id < source_id) {
@@ -51,11 +41,9 @@ public class Schedules {
 
     /** Function which returns the service_id and determines whether a
      *  weekday or weekend schedule is used.
-     * @param weekday integer value representing day of week
      * @return ArrayList of integers */
     public ArrayList<Integer> getServiceID(int weekday) {
         String code = calCodes.get(weekday-1);
-        System.out.println("@code = " + code);
         int weekdayId = 0, saturdayId = 0, sundayId = 0;
         ArrayList<Integer> result = new ArrayList<>();
         String filename = fileDir + "/calendar.txt";
@@ -65,9 +53,9 @@ public class Schedules {
             String line = reader.readLine();
             while (line != null) {
                 List<String> splitLine = Arrays.asList(line.split(",", 12));
-                System.out.println("@line = " + splitLine);
                 String currentCode = String.format("%s,%s,%s,%s,%s,%s,%s",
-                        splitLine.get(1), splitLine.get(2), splitLine.get(3), splitLine.get(4), splitLine.get(5), splitLine.get(6), splitLine.get(7));
+                        splitLine.get(1), splitLine.get(2), splitLine.get(3), splitLine.get(4),
+                        splitLine.get(5), splitLine.get(6), splitLine.get(7));
                 switch (currentCode) {
                     case "1,1,1,1,1,0,0":
                         weekdayId = Integer.parseInt(splitLine.get(0));
@@ -90,20 +78,17 @@ public class Schedules {
         } else {
             result.add(sundayId);
         }
-        System.out.println("@result = " + result);
         return result;
     }
 
-    /** Function which reads the trips.txt data file to determine the
-     *  trip_id based on the given route_id and service_id.
+    /** Function which reads the trips.txt data file to determine the trip_id based
+     *  on the given route_id and service_id.
      * @param route_id integer value representing travel direction
-     * @param service_ids list of service codes which determine which
-     *        weekday or weekend schedule is used.
+     * @param service_ids list of service codes to determine if weekday or weekend schedule is used.
      * @return ArrayList of strings */
     public ArrayList<String> getTripID(int route_id, ArrayList<Integer> service_ids) {
         ArrayList<String> tripIDs = new ArrayList<>();
         String filename = fileDir + "/trips.txt";
-        // open trips.txt file as read only
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(filename));
@@ -129,7 +114,6 @@ public class Schedules {
      * @param source_id integer representing source station (will add 1)
      * @return ArrayList of strings */
     public ArrayList<String> getSchedulesList(ArrayList<String> trip_id, int source_id) {
-        // init variables
         ArrayList<String> result = new ArrayList<>();
         // open stop_times dataset and search for arrival times
         String filename = fileDir + "/stop_times.txt";
@@ -161,7 +145,6 @@ public class Schedules {
     public ArrayList<Arrival> getFormatArrival(ArrayList<String> schedules, int travelTime) {
         final long MILLISECONDS = 60000; //milliseconds
         ArrayList<Arrival> arrivals = new ArrayList<>();
-
         for (int i=0; i<schedules.size(); i++) {
             try {
                 // convert to dateTime object, format as 24hr time
@@ -172,15 +155,13 @@ public class Schedules {
                 // compute trip finish time from train arrival time
                 assert _24HourDt != null;
                 Date arrivedDt = new Date(_24HourDt.getTime() + (travelTime * MILLISECONDS));
-
                 // append formatted arrival times as Arrival objects
                 Arrival thisArrival = new Arrival(_12HourSDF.format(_24HourDt), _12HourSDF.format(arrivedDt));
                 arrivals.add(i, thisArrival);
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } return arrivals;
+        }
+        return arrivals;
     }
-
 }
