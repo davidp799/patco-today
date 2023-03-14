@@ -1,9 +1,9 @@
 package com.davidp799.patcotoday.utils;
 
+import java.sql.SQLOutput;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -97,15 +97,22 @@ public class ParsePDF {
                             /* Check if next time is less than current time [switch from wb to eb] */
                             try {
                                 Date current24HourDt = _24HourSDF.parse(currentTime);
-                                Date next24HourDt = _24HourSDF.parse(nextTime);
-                                assert next24HourDt != null;
-                                if (next24HourDt.before(current24HourDt)) {
-                                    isWestbound += 1;
-                                } else {
+                                if (nextTime.equals("99:99")) {
                                     isWestbound += 0;
+                                    System.out.println("$$$ OOPS 99:99 FOUND");
+                                } else {
+                                    Date next24HourDt = _24HourSDF.parse(nextTime);
+                                    System.out.println("%%% next24HourDt = " + next24HourDt);
+                                    assert next24HourDt != null;
+                                    if (next24HourDt.before(current24HourDt)) {
+                                        isWestbound += 1;
+                                    } else {
+                                        isWestbound += 0;
+                                    }
                                 }
                             } catch (ParseException e) {
                                 e.printStackTrace();
+                                System.out.println("$$$ ERROR CHECKING TIMES");
                             }
                         }
                     }
@@ -158,6 +165,8 @@ public class ParsePDF {
                 }
                 /* Split allTimes into Westbound and Eastbound arrivals */
                 int isWestbound = 0; // assume current time is westbound [since LtR is WB->EB]
+                System.out.println("$$$ alltimes.size = " + allTimes.size());
+                System.out.println(allTimes.size() / 2);
                 for (int j=0; j<allTimes.size(); j++) { // iterate through all arrival times
 //                    System.out.println("@@@ ALL TIMES = " + allTimes.get(j));
                     /* Add current time to proper array, based on previously determined isWestbound boolean value */
@@ -174,15 +183,22 @@ public class ParsePDF {
                         /* Check if next time is less than current time [switch from wb to eb] */
                         try {
                             Date current24HourDt = _24HourSDF.parse(currentTime);
-                            Date next24HourDt = _24HourSDF.parse(nextTime);
-                            assert next24HourDt != null;
-                            if (next24HourDt.before(current24HourDt)) {
-                                isWestbound += 1;
-                            } else {
+                            if (nextTime.equals("99:99")) {
                                 isWestbound += 0;
+                                System.out.println("$$$ OOPS 99:99 FOUND: parsed as = " + _24HourSDF.parse(nextTime));
+                                allTimes.set(j+1, allTimes.get(j));
+                            } else {
+                                Date next24HourDt = _24HourSDF.parse(nextTime);
+                                assert next24HourDt != null;
+                                if (next24HourDt.before(current24HourDt)) {
+                                    isWestbound += 1;
+                                } else {
+                                    isWestbound += 0;
+                                }
                             }
                         } catch (ParseException e) {
                             e.printStackTrace();
+                            System.out.println("$$$ ERROR CHECKING TIMES");
                         }
                     }
                 }
