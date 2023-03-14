@@ -170,6 +170,7 @@ public class ParsePDF {
                 for (int j=0; j<allTimes.size(); j++) { // iterate through all arrival times
 //                    System.out.println("@@@ ALL TIMES = " + allTimes.get(j));
                     /* Add current time to proper array, based on previously determined isWestbound boolean value */
+                    // TODO: fix determinant for westbound or eastbound. almost there. Maybe check if i % 13 == 0?
                     if (isWestbound > 0) {
                         eastbound.add(allTimes.get(j));
                     } else {
