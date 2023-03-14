@@ -300,7 +300,7 @@ class SchedulesFragment : Fragment() {
     //
     /* Function which manages background tasks using Kotlin coroutines */
     private suspend fun checkSpecialBackgroundRequest(context: Context, source: Int, destination: Int, specialShimmerFrameLayout: ShimmerFrameLayout, view: View) {
-        logThread("\n*** checkSpecialBackgroundRequest Active ***\n")
+        logThread("\n$$$ checkSpecialBackgroundRequest: ACTIVE\n")
         // step 1: check internet status
         val internetStatus = checkInternet(context)
         setInternetStatusOnMainThread(internetStatus)
@@ -352,12 +352,12 @@ class SchedulesFragment : Fragment() {
                         }
                     }
                 } catch (e: Exception) {
-                    print("!!!! oops: unknown duration for special schedules FIX ME PLS")
+                    print("$$$ oops: unknown duration for special schedules: FIX ME")
                     viewModel.specialFromToTimes.add("Various Times")
                 }
 
             }
-            print(viewModel.specialFromToTimes)
+            println("$$$ " + viewModel.specialFromToTimes)
             viewModel.specialURLs.size > 0
         } catch (e: IOException) {
             e.printStackTrace()
@@ -441,11 +441,11 @@ class SchedulesFragment : Fragment() {
                 viewModel.runnableConvertedStrings.add(convertPDF.text)
             }
             viewModel.converted = true
-            println("\n\n### CONVERTED PDF ###")
-            for (i in 0 until viewModel.runnableConvertedStrings.size) {
-                println(viewModel.runnableConvertedStrings[i])
-            }
-            println("###\n\n")
+//            println("\n\n### CONVERTED PDF ###")
+//            for (i in 0 until viewModel.runnableConvertedStrings.size) {
+//                println(viewModel.runnableConvertedStrings[i])
+//            }
+//            println("###\n\n")
             true
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
@@ -467,7 +467,7 @@ class SchedulesFragment : Fragment() {
         }
     }
     private fun getSpecialArrivalsBackground(source: Int, destination: Int): ArrayList<Arrival> {
-        logThread("\n*** getSpecialArrivalsBackgroundRequest Active ***\n")
+        logThread("\n$$$ getSpecialArrivalsBackgroundRequest: ACTIVE\n")
         return try {
             getSpecialSchedules(source, destination)
         } catch (e: Error) {
@@ -547,7 +547,7 @@ class SchedulesFragment : Fragment() {
                     println("\n\n### PARSED PDF ###")
                     if (viewModel.specialSchedulesArrayList.size > 0 ) {
                         for (i in 0 until viewModel.specialSchedulesArrayList.size) {
-                            println(viewModel.specialSchedulesArrayList[i])
+                            println(viewModel.specialSchedulesArrayList[i].arrivalTime + ", " + viewModel.specialSchedulesArrayList[i].travelTime)
                         }
 
                     } else {
@@ -561,7 +561,7 @@ class SchedulesFragment : Fragment() {
 
     // Threads which update internet status and get special schedules in background
     private suspend fun checkInternetBackgroundRequest(context: Context) {
-        logThread("\n*** checkInternetBackgroundRequest Active ***\n")
+        logThread("\n$$$ checkInternetBackgroundRequest: ACTIVE\n")
         val status = checkInternet(context)
         setInternetStatusOnMainThread(status)
     }
@@ -594,7 +594,7 @@ class SchedulesFragment : Fragment() {
 
     // Threads which update listView contents in background
     private suspend fun updateListViewBackgroundRequest(source: Int, destination: Int, listView: ListView, arrivalsShimmerFrameLayout: ShimmerFrameLayout) {
-        logThread("\n*** updateListViewBackgroundRequest Active ***\n")
+        logThread("\n$$$ updateListViewBackgroundRequest: ACTIVE\n")
         val arrivals = getArrivalsBackground(source, destination)
         val value = scrollToNext(arrivals)
         setArrivalsOnMainThread(arrivals, listView, value, arrivalsShimmerFrameLayout)
@@ -632,6 +632,6 @@ class SchedulesFragment : Fragment() {
     }
     // Logger function for background tasks (or other tasks...)
     private fun logThread(methodName: String){
-        println("debug: ${methodName}: ${Thread.currentThread().name}")
+        println("-----------------\n$$$ DEBUGGING $$$\n----------------- ${methodName}: ${Thread.currentThread().name}")
     }
 }

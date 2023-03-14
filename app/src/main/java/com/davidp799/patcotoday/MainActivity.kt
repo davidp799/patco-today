@@ -126,14 +126,20 @@ class MainActivity : AppCompatActivity() {
         // check for first run or upgrade
         if (currentVersionCode == savedVersionCode) {
             // normal run
-            println("&&& VERSION CODE SAME, NORMAL RUN &&&")
+            println("-------------------------------------\n"
+                    + "$$$ VERSION CODE SAME, NORMAL RUN $$$\n"
+                    + "-------------------------------------")
             return
         } else if (savedVersionCode == DOESNT_EXIST) {
             // TODO: this is a new install (make tasks for new install)
-            println("&&& VERSION CODE DOESN'T EXIST, NEW INSTALL &&&")
+            println("-------------------------------------\n"
+                    + "$$$ VERSION CODE DOESN'T EXIST, NEW INSTALL $$$\n"
+                    + "-------------------------------------")
         } else if (currentVersionCode > savedVersionCode) {
             // TODO: this is an upgrade (MAKE TASKS FOR UPGRADE)
-            println("&&& VERSION CODE NEW, UPGRADED &&&")
+            println("-------------------------------------\n"
+                    + "$$$ VERSION CODE NEW, UPGRADED $$$\n"
+                    + "-------------------------------------")
         }
         // update shared prefs with current version code
         sharedPreferences.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply()
@@ -189,7 +195,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun backgroundTasksRequest() {
-        logThread("\n*** backgroundTasksRequest Active ***\n")
+        logThread("\n$$$ backgroundTasksRequest: ACTIVE\n")
         cleanUpFiles()
         val connected = checkInternet(this) // wait until job is done
         setInternetStatusOnMainThread(connected)
@@ -236,12 +242,12 @@ class MainActivity : AppCompatActivity() {
             val latestRelease = Date("12/4/2021") // TODO: Scrape latest release date from web
             val formatter = SimpleDateFormat("M/d/yyyy", Locale.US)
             val formattedDateString: String = formatter.format(lastModified)
-            print("!!!! Zip modified on $formattedDateString")
+            print("$$$ Zip modified on $formattedDateString")
             if (lastModified < latestRelease) {
                 updated++
-                print(" !!!!! FILES OUT OF DATE")
+                print(": FILES OUT OF DATE\n")
             } else {
-                print("!!!!! FILES UP TO DATE")
+                print(": FILES UP TO DATE\n")
             }
 
             // check if files downloaded and extracted

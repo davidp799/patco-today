@@ -3,6 +3,7 @@ package com.davidp799.patcotoday.utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -14,18 +15,6 @@ public class ParsePDF {
     public ParsePDF(String pdfText, ArrayList<String> specialFromToTimes) {
         this.pdfLines = pdfText.split("\n", 1024);
         this.specialFromToTimes = specialFromToTimes;
-    }
-    public int getSpecialRouteID() {
-        // split pdfText into list of pdfLines
-        // if direction line contains EASTBOUND, return 1; otherwise return 2
-        for (String line : pdfLines) {
-            if (line.equals("EASTBOUND")) {
-                return 1;
-            } else if (line.equals("WESTBOUND")) {
-                return 2;
-            }
-        }
-        return 3;
     }
     /** Function which adds arrival time lines by finding start and end point
      *  and converts into indexed list of arrival times for each source station.
@@ -39,12 +28,8 @@ public class ParsePDF {
         /* Set collect line status to 0 [do not collect] */
         int collect = 0;
         /* Search for lines containing special arrivals */
-        for (int i=0; i<pdfLines.length; i++) { // TODO: implement binary search algorithm
-            System.out.println("@@@@@@@@ " + specialFromToTimes.size());
-            System.out.println("@@@@@@@@ " + specialFromToTimes);
-
+        for (int i=0; i<pdfLines.length; i++) {
             /* Parse only lines containing special arrivals; only parse when collect == 1 */
-            System.out.println("######## " + pdfLines[i] + "########");
             if (specialFromToTimes.size() > 1) {
                 if (pdfLines[i].contains(specialFromToTimes.get(0))) {
                     collect = 1; // ready to parse special arrivals in following line
@@ -54,15 +39,20 @@ public class ParsePDF {
                     /* Strip white-space from string */
                     String str = pdfLines[i];
                     str = str.replaceAll("\\s","");
+                    str = str.replaceAll("à", "99:99A");
                     /* Split string into array of AM arrival times and remove blanks */
-                    String[] splitAM = str.split("A", 512); // split line at A (not P yet)
+//                    System.out.println("@@@ CURRENT STRING = " + str);
+                    String[] splitAM = str.split("[A]", 512); // split line at A (not P yet)
+//                    System.out.println("@@@ SPLIT STRING = " + Arrays.toString(splitAM));
                     ArrayList<String> allTimes = new ArrayList<>(); // split line at A (not P yet)
                     for (String s : splitAM) {
                         if (s.length() > 0) {
                             /* Check for un-parsed PM times */
                             if (s.contains("P")) { // check for incomplete "PM" times
                                 /* Split strings into array of PM arrival times and remove blanks */
+//                                System.out.println("@@@ CURRENT PM STRING = " + str);
                                 String[] splitPM = s.split("P", 512); // split line at P
+//                                System.out.println("@@@ SPLIT PM STRING = " + Arrays.toString(splitPM));
                                 for (String t : splitPM) {
                                     if (t.length() > 0) {
                                         /* Change PM times to 24hr format */
@@ -108,6 +98,7 @@ public class ParsePDF {
                             try {
                                 Date current24HourDt = _24HourSDF.parse(currentTime);
                                 Date next24HourDt = _24HourSDF.parse(nextTime);
+                                assert next24HourDt != null;
                                 if (next24HourDt.before(current24HourDt)) {
                                     isWestbound += 1;
                                 } else {
@@ -119,13 +110,17 @@ public class ParsePDF {
                         }
                     }
                 }
-            } else {
+            }
+            else {
                 // parse current line for special arrivals
                 /* Strip white-space from string */
                 String str = pdfLines[i];
                 str = str.replaceAll("\\s","");
+                str = str.replaceAll("à", "99:99A");
                 /* Split string into array of AM arrival times and remove blanks */
-                String[] splitAM = str.split("A", 512); // split line at A (not P yet)
+//                System.out.println("@@@ CURRENT STRING = " + str);
+                String[] splitAM = str.split("[A]", 512); // split line at A (not P yet)
+//                System.out.println("@@@ SPLIT STRING = " + Arrays.toString(splitAM));
                 ArrayList<String> allTimes = new ArrayList<>(); // split line at A (not P yet)
                 for (String s : splitAM) {
                     if (s.length() > 0 && !s.matches(".*[BCDEFGHIJKLNOQRSTUVWXYZbcdefghijklnoqrstuvwxyz,.].*")) {
@@ -138,7 +133,7 @@ public class ParsePDF {
                                     /* Change PM times to 24hr format */
                                     if (!t.contains("12:")) { // add 12 to all PM hours except 12pm
                                         String[] split = t.split(":");
-                                        System.out.println("$$$$$$$$" + split[0]);
+//                                        System.out.println("$$$$$$$$" + split[0]);
                                         int hour = Integer.parseInt(split[0]);
                                         String arrivalTime;
                                         if (hour == 11) {
@@ -164,6 +159,7 @@ public class ParsePDF {
                 /* Split allTimes into Westbound and Eastbound arrivals */
                 int isWestbound = 0; // assume current time is westbound [since LtR is WB->EB]
                 for (int j=0; j<allTimes.size(); j++) { // iterate through all arrival times
+//                    System.out.println("@@@ ALL TIMES = " + allTimes.get(j));
                     /* Add current time to proper array, based on previously determined isWestbound boolean value */
                     if (isWestbound > 0) {
                         eastbound.add(allTimes.get(j));
@@ -179,6 +175,7 @@ public class ParsePDF {
                         try {
                             Date current24HourDt = _24HourSDF.parse(currentTime);
                             Date next24HourDt = _24HourSDF.parse(nextTime);
+                            assert next24HourDt != null;
                             if (next24HourDt.before(current24HourDt)) {
                                 isWestbound += 1;
                             } else {
@@ -191,6 +188,8 @@ public class ParsePDF {
                 }
             }
         }
+        System.out.println("@@@ WESTBOUND TIMES = " + westbound);
+        System.out.println("@@@ EASTBOUND TIMES = " + eastbound);
         allArrivals.add(westbound);
         allArrivals.add(eastbound);
         return allArrivals;

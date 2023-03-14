@@ -5,10 +5,12 @@ import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 
 public class ConvertPDF {
     private String fileName, fileDir;
+
     public ConvertPDF(String fileDir, String fileName) {
         setFileName(fileName);
         setFileDir(fileDir);
     }
+
     /**
      * Function which extracts text from given pdf file
      * @return output String form of pdf text data
