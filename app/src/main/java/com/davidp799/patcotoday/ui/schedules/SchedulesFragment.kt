@@ -214,15 +214,9 @@ class SchedulesFragment : Fragment() {
 
     /** Function used to retrieve arrival times from Schedules class.  */
     private fun getSchedules(source_id: Int, destination_id: Int): ArrayList<Arrival> {
-        // Initialize travel duration and routeId for current trip
         val travelTime = viewModel.schedules.getTravelTime(source_id, destination_id)
         val routeId = viewModel.schedules.getRouteID(source_id, destination_id)
-        // Retrieve lists of base data
-        val serviceIdList = viewModel.schedules.getServiceID(viewModel.dayOfWeekNumber)
-        val tripIdList = viewModel.schedules.getTripID(routeId, serviceIdList)
-        // Retrieve unformatted list of arrival times
-        val schedulesList = viewModel.schedules.getSchedulesList(tripIdList, viewModel.fromIndex)
-        // Return formatted list of arrival times for current trip
+        val schedulesList = viewModel.schedules.getSchedulesList(this.context, routeId, viewModel.fromIndex)
         return viewModel.schedules.getFormatArrival(schedulesList, travelTime)
     }
 

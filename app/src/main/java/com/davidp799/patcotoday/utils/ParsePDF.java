@@ -1,6 +1,5 @@
 package com.davidp799.patcotoday.utils;
 
-import java.sql.SQLOutput;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,17 +27,17 @@ public class ParsePDF {
         /* Set collect line status to 0 [do not collect] */
         int collect = 0;
         /* Search for lines containing special arrivals */
-        for (int i=0; i<pdfLines.length; i++) {
+        for (String pdfLine : pdfLines) {
             /* Parse only lines containing special arrivals; only parse when collect == 1 */
             if (specialFromToTimes.size() > 1) {
-                if (pdfLines[i].contains(specialFromToTimes.get(0))) {
+                if (pdfLine.contains(specialFromToTimes.get(0))) {
                     collect = 1; // ready to parse special arrivals in following line
-                } else if (pdfLines[i].contains(specialFromToTimes.get(1))) { // TRAIN RETURNS TO NORMAL SCHEDULE. REFER TO TIMETABLE FOR DEPARTURE TIMES.
+                } else if (pdfLine.contains(specialFromToTimes.get(1))) { // TRAIN RETURNS TO NORMAL SCHEDULE. REFER TO TIMETABLE FOR DEPARTURE TIMES.
                     collect = 2; // finish parsing special arrivals at this line
                 } else if (collect == 1) { // parse current line for special arrivals
                     /* Strip white-space from string */
-                    String str = pdfLines[i];
-                    str = str.replaceAll("\\s","");
+                    String str = pdfLine;
+                    str = str.replaceAll("\\s", "");
                     str = str.replaceAll("à", "99:99A");
                     /* Split string into array of AM arrival times and remove blanks */
 //                    System.out.println("@@@ CURRENT STRING = " + str);
@@ -82,7 +81,7 @@ public class ParsePDF {
                     }
                     /* Split allTimes into Westbound and Eastbound arrivals */
                     int isWestbound = 0; // assume current time is westbound [since LtR is WB->EB]
-                    for (int j=0; j<allTimes.size(); j++) { // iterate through all arrival times
+                    for (int j = 0; j < allTimes.size(); j++) { // iterate through all arrival times
                         /* Add current time to proper array, based on previously determined isWestbound boolean value */
                         if (isWestbound > 0) {
                             eastbound.add(allTimes.get(j));
@@ -90,7 +89,7 @@ public class ParsePDF {
                             westbound.add(allTimes.get(j));
                         }
                         /* Check if next time is less than current time */
-                        if (j < allTimes.size()-1) { // do not check last arrival time or PM times
+                        if (j < allTimes.size() - 1) { // do not check last arrival time or PM times
                             String currentTime = allTimes.get(j);
                             String nextTime = allTimes.get(j + 1);
                             SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm", Locale.US);
@@ -99,10 +98,10 @@ public class ParsePDF {
                                 Date current24HourDt = _24HourSDF.parse(currentTime);
                                 if (nextTime.equals("99:99")) {
                                     isWestbound += 0;
-                                    System.out.println("$$$ OOPS 99:99 FOUND");
+//                                    System.out.println("$$$ OOPS 99:99 FOUND");
                                 } else {
                                     Date next24HourDt = _24HourSDF.parse(nextTime);
-                                    System.out.println("%%% next24HourDt = " + next24HourDt);
+//                                    System.out.println("%%% next24HourDt = " + next24HourDt);
                                     assert next24HourDt != null;
                                     if (next24HourDt.before(current24HourDt)) {
                                         isWestbound += 1;
@@ -112,17 +111,16 @@ public class ParsePDF {
                                 }
                             } catch (ParseException e) {
                                 e.printStackTrace();
-                                System.out.println("$$$ ERROR CHECKING TIMES");
+//                                System.out.println("$$$ ERROR CHECKING TIMES");
                             }
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 // parse current line for special arrivals
                 /* Strip white-space from string */
-                String str = pdfLines[i];
-                str = str.replaceAll("\\s","");
+                String str = pdfLine;
+                str = str.replaceAll("\\s", "");
                 str = str.replaceAll("à", "99:99A");
                 /* Split string into array of AM arrival times and remove blanks */
 //                System.out.println("@@@ CURRENT STRING = " + str);
@@ -136,7 +134,7 @@ public class ParsePDF {
                             /* Split strings into array of PM arrival times and remove blanks */
                             String[] splitPM = s.split("P", 512); // split line at P
                             for (String t : splitPM) {
-                                if(t.length() > 0 && !t.matches(".*[BCDEFGHIJKLNOQRSTUVWXYZbcdefghijklnoqrstuvwxyz,.].*")) {
+                                if (t.length() > 0 && !t.matches(".*[BCDEFGHIJKLNOQRSTUVWXYZbcdefghijklnoqrstuvwxyz,.].*")) {
                                     /* Change PM times to 24hr format */
                                     if (!t.contains("12:")) { // add 12 to all PM hours except 12pm
                                         String[] split = t.split(":");
@@ -165,9 +163,9 @@ public class ParsePDF {
                 }
                 /* Split allTimes into Westbound and Eastbound arrivals */
                 int isWestbound = 0; // assume current time is westbound [since LtR is WB->EB]
-                System.out.println("$$$ alltimes.size = " + allTimes.size());
-                System.out.println(allTimes.size() / 2);
-                for (int j=0; j<allTimes.size(); j++) { // iterate through all arrival times
+//                System.out.println("$$$ alltimes.size = " + allTimes.size());
+//                System.out.println(allTimes.size() / 2);
+                for (int j = 0; j < allTimes.size(); j++) { // iterate through all arrival times
 //                    System.out.println("@@@ ALL TIMES = " + allTimes.get(j));
                     /* Add current time to proper array, based on previously determined isWestbound boolean value */
                     // TODO: fix determinant for westbound or eastbound. almost there. Maybe check if i % 13 == 0?
@@ -177,7 +175,7 @@ public class ParsePDF {
                         westbound.add(allTimes.get(j));
                     }
                     /* Check if next time is less than current time */
-                    if (j < allTimes.size()-1) { // do not check last arrival time or PM times
+                    if (j < allTimes.size() - 1) { // do not check last arrival time or PM times
                         String currentTime = allTimes.get(j);
                         String nextTime = allTimes.get(j + 1);
                         SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm", Locale.US);
@@ -186,8 +184,8 @@ public class ParsePDF {
                             Date current24HourDt = _24HourSDF.parse(currentTime);
                             if (nextTime.equals("99:99")) {
                                 isWestbound += 0;
-                                System.out.println("$$$ OOPS 99:99 FOUND: parsed as = " + _24HourSDF.parse(nextTime));
-                                allTimes.set(j+1, allTimes.get(j));
+//                                System.out.println("$$$ OOPS 99:99 FOUND: parsed as = " + _24HourSDF.parse(nextTime));
+                                allTimes.set(j + 1, allTimes.get(j));
                             } else {
                                 Date next24HourDt = _24HourSDF.parse(nextTime);
                                 assert next24HourDt != null;
@@ -199,14 +197,14 @@ public class ParsePDF {
                             }
                         } catch (ParseException e) {
                             e.printStackTrace();
-                            System.out.println("$$$ ERROR CHECKING TIMES");
+//                            System.out.println("$$$ ERROR CHECKING TIMES");
                         }
                     }
                 }
             }
         }
-        System.out.println("@@@ WESTBOUND TIMES = " + westbound);
-        System.out.println("@@@ EASTBOUND TIMES = " + eastbound);
+//        System.out.println("@@@ WESTBOUND TIMES = " + westbound);
+//        System.out.println("@@@ EASTBOUND TIMES = " + eastbound);
         allArrivals.add(westbound);
         allArrivals.add(eastbound);
         return allArrivals;
