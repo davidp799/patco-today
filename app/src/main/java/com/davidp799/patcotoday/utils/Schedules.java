@@ -37,9 +37,9 @@ public class Schedules {
         if (dayOfWeekNumber >= 1 && dayOfWeekNumber <= 5) { // weekday, start at line 2 and end at 92 (idx start at 0)
             result.add(2);
             result.add(92);
-        } else if (dayOfWeekNumber == 6) { // saturday, start at line 94 and end at 153
+        } else if (dayOfWeekNumber == 6) { // saturday, start at line 94 and end at 152
             result.add(94);
-            result.add(153);
+            result.add(152);
         } else { // sunday, start at line 155 and end at 197
             result.add(155);
             result.add(197);
@@ -50,9 +50,9 @@ public class Schedules {
      * @return integer route code (1 = Westbound, 2 = Eastbound) */
     public int getRouteID(int source_id, int destination_id) {
         System.out.println("$$$: source, dest id = " + source_id + ", " + destination_id);
-        if (source_id < destination_id) {
-            return 2;
-        } else { return 1; }
+        if (destination_id < source_id) {
+            return 1;
+        } else { return 2; }
     }
 
     /** Function which reads the stop_times.txt data file to determine the
