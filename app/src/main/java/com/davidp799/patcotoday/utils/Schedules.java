@@ -23,7 +23,6 @@ public class Schedules {
     // Codes representing weekday or weekend status; Used to determine service_id
     private final int dayOfWeekNumber = LocalDate.now().getDayOfWeek().getValue();
 
-
     /** Function which returns the length in minutes between source station and destination station.
      * @return integer value of distance in minutes */
     public int getTravelTime(int source_id, int destination_id) {
@@ -32,75 +31,63 @@ public class Schedules {
     /** Function which returns the routeID which represents the direction
      *  of the desired train (Eastbound / Westbound).
      * @return integer route code (1 = Westbound, 2 = Eastbound) */
-    public ArrayList<Integer> getTripId() {
-        ArrayList<Integer> result = new ArrayList<>();
-        if (dayOfWeekNumber >= 1 && dayOfWeekNumber <= 5) { // weekday, start at line 2 and end at 92 (idx start at 0)
-            result.add(2);
-            result.add(92);
-        } else if (dayOfWeekNumber == 6) { // saturday, start at line 94 and end at 152
-            result.add(94);
-            result.add(152);
-        } else { // sunday, start at line 155 and end at 197
-            result.add(155);
-            result.add(197);
-        } return result;
+    public String getTripId() {
+        if (dayOfWeekNumber >= 1 && dayOfWeekNumber <= 5) { // weekdays, concatenate first half as weekdays
+            return "weekdays-";
+        } else if (dayOfWeekNumber == 6) { // saturdays
+            return "saturdays-";
+        } else { // sundays
+            return "sundays-";
+        }
     }
     /** Function which returns the routeID which represents the direction
      *  of the desired train (Eastbound / Westbound).
      * @return integer route code (1 = Westbound, 2 = Eastbound) */
-    public int getRouteID(int source_id, int destination_id) {
+    public String getRouteID(String trip_id, int source_id, int destination_id) {
         System.out.println("$$$: source, dest id = " + source_id + ", " + destination_id);
-        if (destination_id < source_id) {
-            return 1;
-        } else { return 2; }
+        if (destination_id > source_id) {
+            return trip_id + "west.csv";
+        } else {
+            return trip_id + "east.csv";
+        }
     }
 
     /** Function which reads the stop_times.txt data file to determine the
      *  trip_id based on the given route_id and service_id.
      * @return ArrayList of strings */
-    public ArrayList<String> getSchedulesList(Context context, int route_id, int source_id) {
+    public ArrayList<String> getSchedulesList(Context context, String route_id, int source_id) {
         AssetManager am = context.getAssets();
         ArrayList<String> result = new ArrayList<>();
-        ArrayList<Integer> tripId = getTripId();
         BufferedReader reader;
         InputStream databaseStream = null;
         try {
-            databaseStream = am.open("arrivals_database.csv");
+            databaseStream = am.open(route_id);
             reader = new BufferedReader(new InputStreamReader(databaseStream));
             String line = reader.readLine();
-            System.out.println("$$$: trip id = " + tripId);
-            int lineIndex = 0;
+            System.out.println("$$$: trip id = " + route_id);
             while ( line != null ) {
-                if (lineIndex >= tripId.get(0) && lineIndex <= tripId.get(1)) {
-                    List<String> c;
-                    ArrayList<String> newC = new ArrayList<>();
-                    String[] split = line.split("-1,");
-                    System.out.println("$$$ currentLine = " + line);
-                    if (route_id == 1) { // return westbound
-                        c = Arrays.asList(split[1].split(",", 128));
-                    } else {
-                        c = Arrays.asList(split[0].split(",", 128));
+                List<String> c;
+                ArrayList<String> newC = new ArrayList<>();
+                String[] split = line.split(",", 128);
+                System.out.println("$$$ currentLine = " + line);
+                for (int j=0; j<split.length; j++) {
+                    String oldString = split[j];
+                    if (oldString.contains("A")) {
+                        String newString = oldString.replace("A", "");
+                        newC.add(newString);
+                    } else if (oldString.contains("P") && !oldString.contains("12:")) {
+                        String newString = oldString.replace("P", "");
+                        String[] newParts = newString.split(":");
+                        int newHour = Integer.parseInt(newParts[0]) + 12;
+                        newString = newHour + ":" + newParts[1];
+                        newC.add(newString);
+                    } else if (oldString.contains("P") && oldString.contains("12:")) {
+                        String newString = oldString.replace("P", "");
+                        newC.add(newString);
                     }
-                    for (int j=0; j<c.size(); j++) {
-                        String oldString = c.get(j);
-                        if (oldString.contains("A")) {
-                            String newString = oldString.replace("A", "");
-                            newC.add(newString);
-                        } else if (oldString.contains("P") && !oldString.contains("12:")) {
-                            String newString = oldString.replace("P", "");
-                            String[] newParts = newString.split(":");
-                            int newHour = Integer.parseInt(newParts[0]) + 12;
-                            newString = newHour + ":" + newParts[1];
-                            newC.add(newString);
-                        } else if (oldString.contains("P") && oldString.contains("12:")) {
-                            String newString = oldString.replace("P", "");
-                            newC.add(newString);
-                        }
-                    }
-                    result.add(newC.get(source_id));
                 }
+                result.add(newC.get(source_id));
                 line = reader.readLine();
-                lineIndex += 1;
             }
             reader.close();
         } catch (Exception e) {

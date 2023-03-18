@@ -215,7 +215,8 @@ class SchedulesFragment : Fragment() {
     /** Function used to retrieve arrival times from Schedules class.  */
     private fun getSchedules(source_id: Int, destination_id: Int): ArrayList<Arrival> {
         val travelTime = viewModel.schedules.getTravelTime(source_id, destination_id)
-        val routeId = viewModel.schedules.getRouteID(source_id, destination_id)
+        val tripId = viewModel.schedules.tripId
+        val routeId = viewModel.schedules.getRouteID(tripId, source_id, destination_id)
         val schedulesList = viewModel.schedules.getSchedulesList(this.context, routeId, viewModel.fromIndex)
         return viewModel.schedules.getFormatArrival(schedulesList, travelTime)
     }
@@ -225,11 +226,17 @@ class SchedulesFragment : Fragment() {
         specialArrivals.add(viewModel.specialWestBound)
         specialArrivals.add(viewModel.specialEastBound)
         val travelTime = viewModel.schedules.getTravelTime(source_id, destination_id)
-        val routeId = viewModel.schedules.getRouteID(source_id, destination_id)
+        val tripId = viewModel.schedules.tripId
+        val routeId = viewModel.schedules.getRouteID(tripId, source_id, destination_id)
         // retrieve list of base data
         var position = 0
-        val theArrivals =
-            specialArrivals[kotlin.math.abs(routeId - 2)] // i made an oopsie with the routeid
+        var theArrivals =
+            specialArrivals[0] // i made an oopsie with the routeid
+        if (routeId.contains("west")) {
+            theArrivals = specialArrivals[0]
+        } else {
+            theArrivals = specialArrivals[1]
+        }
         val temp = ArrayList<String>()
         try { // check for null
             for (i in theArrivals.indices) {

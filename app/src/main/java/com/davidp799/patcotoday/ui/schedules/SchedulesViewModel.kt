@@ -17,7 +17,7 @@ class SchedulesViewModel : ViewModel() {
     // Station Data
     var fromIndex = 0
     var fromString = "Lindenwold"
-    var toIndex = 0
+    var toIndex = 12
     var toString = "15-16th & Locust"
     // directory
     val directory: String = "/data/data/com.davidp799.patcotoday/files/data/"
