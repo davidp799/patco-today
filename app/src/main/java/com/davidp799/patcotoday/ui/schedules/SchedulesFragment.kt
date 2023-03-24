@@ -48,9 +48,10 @@ class SchedulesFragment : Fragment() {
 
         // Declare Global Variables
         val sharedPreferences = requireActivity().getSharedPreferences("com.davidp799.patcotoday_preferences", Context.MODE_PRIVATE)
-        viewModel.fromString = sharedPreferences.getString("default_source", "Lindenwold").toString()
+        var editor = sharedPreferences.edit()
+        viewModel.fromString = sharedPreferences.getString("last_source", "Lindenwold").toString()
         viewModel.fromIndex = viewModel.stationOptions.indexOf(viewModel.fromString)
-        viewModel.toString = sharedPreferences.getString("default_dest", "15-16th & Locust").toString()
+        viewModel.toString = sharedPreferences.getString("last_dest", "15-16th & Locust").toString()
         viewModel.toIndex = viewModel.stationOptions.indexOf(viewModel.toString)
         
         // Declare User Interface Elements
@@ -75,6 +76,7 @@ class SchedulesFragment : Fragment() {
         enterTransition = MaterialFadeThrough()
         fromTextView.setText(viewModel.fromString)
         toTextView.setText(viewModel.toString)
+
         fromTextView.setAdapter(stationsArrayAdapter)
         toTextView.setAdapter(stationsArrayAdapter)
         specialViewButton.isEnabled = false
@@ -90,6 +92,10 @@ class SchedulesFragment : Fragment() {
         fromTextView.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 viewModel.fromIndex = position // set source station to index of selected array position
+                viewModel.fromString = viewModel.stationOptions[viewModel.fromIndex]
+                editor.putString("last_source", viewModel.fromString)
+                editor.apply()
+
                 // reload listview and scroll to next train
                 arrivalsShimmerFrameLayout.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
@@ -112,8 +118,10 @@ class SchedulesFragment : Fragment() {
             AdapterView.OnItemClickListener { parent, view, position, id ->
 
                 // save from selection as variable
-                viewModel.toIndex =
-                    position // set destination station to index of selected array position
+                viewModel.toIndex = position // set destination station to index of selected array position
+                viewModel.toString = viewModel.stationOptions[viewModel.toIndex]
+                editor.putString("last_dest", viewModel.toString)
+                editor.apply()
                 // reload listview with new array and adapter and scroll to next train
                 arrivalsShimmerFrameLayout.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
@@ -145,8 +153,14 @@ class SchedulesFragment : Fragment() {
             val tempString = viewModel.fromString
             viewModel.fromIndex = viewModel.toIndex
             viewModel.fromString = viewModel.toString
+            editor.putString("last_source", viewModel.fromString)
             viewModel.toIndex = tempIndex
             viewModel.toString = tempString
+            editor.putString("last_dest", viewModel.toString)
+            editor.apply()
+
+
+
 
             arrivalsShimmerFrameLayout.visibility = View.VISIBLE
             CoroutineScope(Dispatchers.IO).launch {
@@ -173,6 +187,9 @@ class SchedulesFragment : Fragment() {
             )
             fromTextView.setText(viewModel.stationOptions[viewModel.fromIndex])
             toTextView.setText(viewModel.stationOptions[viewModel.toIndex])
+            editor.putString("last_source", viewModel.fromString)
+            editor.putString("last_dest", viewModel.toString)
+            editor.apply()
             // connect textViews to stations options arrayAdapter
             fromTextView.setAdapter(stationsArrayAdapter)
             toTextView.setAdapter(stationsArrayAdapter)

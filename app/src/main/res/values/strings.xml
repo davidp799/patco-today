@@ -10,7 +10,7 @@
     <string name="special_schedule_header">Special Schedule(s):</string>
     <string name="special_schedule_about">Checking for special schedules . . .</string>
     <string name="special_schedule_download">View Schedule</string>
-    <string name="special_schedule_link"></string>
+    <string name="special_schedule_link" />
     <string name="menu_refresh">Refresh</string>
     <string name="menu_settings">Settings</string>
     <string name="hint_noArrivals">No Arrivals Found</string>
@@ -26,12 +26,12 @@
         <item>Broadway</item>
         <item>City Hall</item>
         <item>8th &amp; Market</item>
-        <item>9-10th &amp; Locust</item>
-        <item>12-13th &amp; Locust</item>
-        <item>15-16th &amp; Locust</item>
+        <item>9–10th &amp; Locust</item>
+        <item>12–13th &amp; Locust</item>
+        <item>15–16th &amp; Locust</item>
     </string-array>
 
-    <!-- Settings Preferences-->
+<!-- Settings Preferences-->
     <string name="title_activity_settings">SettingsActivity</string>
     <!-- Dynamic Colors -->
     <string name="pref_dynamic">Dynamic Colors</string>
@@ -58,15 +58,10 @@
     <string name="privacy_summary">More Information</string>
     <string name="terms_title">Terms and Conditions</string>
     <string name="terms_summary">More Information</string>
-
-
-
-
     <string name="arrow">Arrow</string>
     <string name="menu_reverse">Reverse Direction</string>
     <string name="info_icon_desc">Info Icon</string>
     <string name="map_state_divider_text">New Jersey</string>
-
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
@@ -79,6 +74,5 @@
         <item>Dark</item>
         <item>Follow device theme</item>
     </string-array>
-
 
 </resources>

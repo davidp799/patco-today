@@ -17,20 +17,20 @@
     <PreferenceCategory
         app:iconSpaceReserved="false"
         android:title="Travel">
-        <ListPreference
-            app:iconSpaceReserved="false"
-            android:key="default_source"
-            android:title="Favorite Source Station"
-            android:entries="@array/stations_list"
-            android:entryValues="@array/stations_list"
-            android:summary="%s"/>
-        <ListPreference
-            app:iconSpaceReserved="false"
-            android:key="default_dest"
-            android:title="Favorite Destination Station"
-            android:entries="@array/stations_list"
-            android:entryValues="@array/stations_list"
-            android:summary="%s"/>
+<!--        <ListPreference-->
+<!--            app:iconSpaceReserved="false"-->
+<!--            android:key="default_source"-->
+<!--            android:title="Favorite Source Station"-->
+<!--            android:entries="@array/stations_list"-->
+<!--            android:entryValues="@array/stations_list"-->
+<!--            android:summary="%s"/>-->
+<!--        <ListPreference-->
+<!--            app:iconSpaceReserved="false"-->
+<!--            android:key="default_dest"-->
+<!--            android:title="Favorite Destination Station"-->
+<!--            android:entries="@array/stations_list"-->
+<!--            android:entryValues="@array/stations_list"-->
+<!--            android:summary="%s"/>-->
         <!-- // debug, will add later when functional
         <Preference
             android:key="pref_commuter"
