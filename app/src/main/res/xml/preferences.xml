@@ -12,11 +12,18 @@
             android:entries="@array/pref_themeOptions_entries"
             android:entryValues="@array/pref_theme_values"
             android:summary="%s"/>
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            android:key="dynamic_colors"
+            android:title="@string/pref_dynamic"
+            android:defaultValue="false"
+            android:summary="@string/pref_dynamic_summary"
+            />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        app:iconSpaceReserved="false"
-        android:title="Travel">
+<!--    <PreferenceCategory-->
+<!--        app:iconSpaceReserved="false"-->
+<!--        android:title="Travel">-->
 <!--        <ListPreference-->
 <!--            app:iconSpaceReserved="false"-->
 <!--            android:key="default_source"-->
@@ -31,21 +38,21 @@
 <!--            android:entries="@array/stations_list"-->
 <!--            android:entryValues="@array/stations_list"-->
 <!--            android:summary="%s"/>-->
-        <!-- // debug, will add later when functional
-        <Preference
-            android:key="pref_commuter"
-            android:title="Commuter Mode"
-            android:summary="Reverse travel direction at a given time">
+<!--        &lt;!&ndash; // debug, will add later when functional-->
+<!--        <Preference-->
+<!--            android:key="pref_commuter"-->
+<!--            android:title="Commuter Mode"-->
+<!--            android:summary="Reverse travel direction at a given time">-->
 
-        </Preference>
+<!--        </Preference>-->
 
-        <Preference
-            android:key="pref_notifications"
-            android:title="Arrival Notifications"
-            android:summary="Set train notifications">
-        </Preference>-->
+<!--        <Preference-->
+<!--            android:key="pref_notifications"-->
+<!--            android:title="Arrival Notifications"-->
+<!--            android:summary="Set train notifications">-->
+<!--        </Preference>&ndash;&gt;-->
 
-    </PreferenceCategory>
+<!--    </PreferenceCategory>-->
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
