@@ -15,13 +15,13 @@
             android:layout_width="100sp"
             android:layout_height="@dimen/placeholderTextHeight"
             android:textSize="22sp"
-            android:background="@color/shimmer_placeholder" />
+            android:background="@drawable/rounded_corner" />
         <TextView
             android:layout_width="85sp"
             android:layout_height="@dimen/placeholderTextHeight"
             android:textSize="22sp"
             android:layout_marginTop="5dp"
-            android:background="@color/shimmer_placeholder" />
+            android:background="@drawable/rounded_corner" />
     </LinearLayout>
 
     <ImageView
@@ -42,13 +42,13 @@
             android:layout_width="100sp"
             android:layout_height="@dimen/placeholderTextHeight"
             android:textSize="22sp"
-            android:background="@color/shimmer_placeholder" />
+            android:background="@drawable/rounded_corner" />
         <TextView
             android:layout_width="85sp"
             android:layout_height="@dimen/placeholderTextHeight"
             android:textSize="22sp"
             android:layout_marginTop="5dp"
-            android:background="@color/shimmer_placeholder" />
+            android:background="@drawable/rounded_corner" />
     </LinearLayout>
 
 </LinearLayout>
