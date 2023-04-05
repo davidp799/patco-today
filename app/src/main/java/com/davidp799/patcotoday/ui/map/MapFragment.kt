@@ -42,7 +42,7 @@ class MapFragment : Fragment() {
         stationMap.isTransitionGroup = true
         stationMap.adapter = stationMapGeneralAdapter
         stationMap.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
+            AdapterView.OnItemClickListener { _, _, position, _ ->
                 val openLinksIntent = Intent(Intent.ACTION_VIEW, Uri.parse(mapViewModel.stationLinks[position]))
                 requireContext().startActivity(openLinksIntent)
             }
