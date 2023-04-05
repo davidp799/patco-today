@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -28,57 +27,44 @@ import kotlinx.coroutines.Dispatchers.Main
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
-import java.text.SimpleDateFormat
+import java.text.DateFormat
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 class MainActivity : AppCompatActivity() {
-    private val dataFiles = listOf(
-        "agency.txt",
-        "calendar.txt",
-        "calendar_dates.txt",
-        "fare_attributes.txt",
-        "fare_rules.txt",
-        "feed_info.txt",
-        "frequencies.txt",
-        "routes.txt",
-        "shapes.txt",
-        "stop_times.txt",
-        "stops.txt",
-        "transfers.txt",
-        "trips.txt"
+    private val dataFiles = listOf("agency.txt", "calendar.txt", "calendar_dates.txt",
+        "fare_attributes.txt", "fare_rules.txt", "feed_info.txt", "frequencies.txt",
+        "routes.txt", "shapes.txt", "stop_times.txt", "stops.txt", "transfers.txt", "trips.txt"
     )
-
     private val viewModel: MainViewModel by ViewModelLazy(
         MainViewModel::class, {viewModelStore }, { defaultViewModelProviderFactory }
     )
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var sharedPreferences: SharedPreferences
-    private val PREFS_NAME = "com.davidp799.patcotoday_preferences"
+    private val prefsName = "com.davidp799.patcotoday_preferences"
+    private val urlString = "http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip"
+    private val gtfsFileName = "gtfs.zip"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val dataDirectory = this.filesDir.absolutePath + "/data/"
 
-        // CHECK IF FIRST RUN OR UPGRADE OCCURRED
+        print("$$$ DATA_DIRECTORY2 = $dataDirectory")
+
+        // Start-up Tasks
         checkFirstRun()
-
-        // Perform background tasks in following order: (check internet, check if files up to date, if updated == false -> download files, if true -> extract files)
         CoroutineScope(Dispatchers.IO).launch {
-            backgroundTasksRequest()
+            backgroundTasksRequest() // check internet, check if files up to date, if updated == false -> download files, if true -> extract files
         }
-
-        // Configure Shared Preferences
-        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(prefsName, MODE_PRIVATE)
         val currentTheme = sharedPreferences.getString("device_theme", "")
 
-        // UI Elements: Fit status bar; material toolbar; set light/dark mode; status/nav bar color
+        // UI: Status/Nav-bars, Theme, Bottom-Navigation
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val topAppBar = findViewById<MaterialToolbar>(R.id.topAppBar)
-        setSupportActionBar(topAppBar)
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.topAppBar))
         when (currentTheme) { // Set current theme (light/dark/auto)
             "1" -> { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) }
             "2" -> { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) }
@@ -86,8 +72,6 @@ class MainActivity : AppCompatActivity() {
         }
         window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
         window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
-
-        // Bottom Navigation View
         val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         val appBarConfiguration = AppBarConfiguration(
@@ -97,14 +81,12 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    /* Initialize Settings Button for Top App Bar */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_settings, menu)
         return true
     }
 
-    /* Open Activity on Button Click */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.settings) {
             val intent = Intent(this, SettingsActivity::class.java)
@@ -116,63 +98,53 @@ class MainActivity : AppCompatActivity() {
 
     /* Function to check if first run or upgrade */
     private fun checkFirstRun() {
-        val PREF_VERSION_CODE_KEY = "version_code"
-        val DOESNT_EXIST = -1
-        // get version of code
+        val prefVersionKeyCode = "version_code"
+        val doesNotExist = -1
         val currentVersionCode = BuildConfig.VERSION_CODE
-        // get saved version of code
-        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        val savedVersionCode = sharedPreferences.getInt(PREF_VERSION_CODE_KEY, DOESNT_EXIST)
-        // check for first run or upgrade
-        if (currentVersionCode == savedVersionCode) {
-            // normal run
-            println("-------------------------------------\n"
-                    + "$$$ VERSION CODE SAME, NORMAL RUN $$$\n"
-                    + "-------------------------------------")
+        sharedPreferences = getSharedPreferences(prefsName, MODE_PRIVATE)
+        val savedVersionCode = sharedPreferences.getInt(prefVersionKeyCode, doesNotExist)
+        if (currentVersionCode == savedVersionCode) { // normal run
+            println("$$$ checkFirstRun = NORMAL")
             return
-        } else if (savedVersionCode == DOESNT_EXIST) {
+        } else if (savedVersionCode == doesNotExist) {
             // TODO: this is a new install (make tasks for new install)
-            println("-------------------------------------\n"
-                    + "$$$ VERSION CODE DOESN'T EXIST, NEW INSTALL $$$\n"
-                    + "-------------------------------------")
+            println("$$$ checkFirstRun = NEW")
         } else if (currentVersionCode > savedVersionCode) {
             // TODO: this is an upgrade (MAKE TASKS FOR UPGRADE)
-            println("-------------------------------------\n"
-                    + "$$$ VERSION CODE NEW, UPGRADED $$$\n"
-                    + "-------------------------------------")
+            println("$$$ checkFirstRun = UPGRADE")
         }
         // update shared prefs with current version code
-        sharedPreferences.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply()
+        sharedPreferences.edit().putInt(prefVersionKeyCode, currentVersionCode).apply()
     }
 
-    /* Background Tasks using Kotlin Coroutine: internet, update, download, extract */
-    private fun logThread(methodName: String){
-        println("debug: ${methodName}: ${Thread.currentThread().name}")
+    // Set status for background tasks on main thread
+    private fun setInternetStatus(internetStatus: Boolean){
+        viewModel.internet = internetStatus
     }
 
-    // Status setting functions
-    private fun setInternetStatus(input: Boolean){
-        viewModel.internet = input
-    }
-    private suspend fun setInternetStatusOnMainThread(input: Boolean) {
+    private suspend fun setInternetStatusOnMainThread(internetAvailable: Boolean) {
         withContext (Main) {
-            setInternetStatus(input)
-            if (!input) {
+            setInternetStatus(internetAvailable)
+            if (!internetAvailable) {
                 Toast.makeText(this@MainActivity, "No internet connection. Working offline", Toast.LENGTH_SHORT).show()
             }
         }
     }
-    private fun setUpdatedStatus(input: Boolean){
-        viewModel.updated = input
+
+    private fun setUpdatedStatus(updatedStatus: Boolean){
+        viewModel.updated = updatedStatus
     }
-    private suspend fun setUpdatedStatusOnMainThread(input: Boolean) {
+
+    private suspend fun setUpdatedStatusOnMainThread(updatedStatus: Boolean) {
         withContext (Main) {
-            setUpdatedStatus(input)
+            setUpdatedStatus(updatedStatus)
         }
     }
+
     private fun setDownloadedStatus(input: Boolean){
         viewModel.downloaded = input
     }
+
     private suspend fun setDownloadedStatusOnMainThread(input: Boolean) {
         withContext (Main) {
             Toast.makeText(this@MainActivity, "Downloading new schedules", Toast.LENGTH_LONG).show()
@@ -182,30 +154,33 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    private fun setExtractedStatus(input: Boolean){
-        viewModel.extracted = input
+
+    private fun setExtractedStatus(extractedStatus: Boolean){
+        viewModel.extracted = extractedStatus
     }
-    private suspend fun setExtractedStatusOnMainThread(input: Boolean) {
+
+    private suspend fun setExtractedStatusOnMainThread(extractedStatus: Boolean) {
         withContext (Main) {
-            setExtractedStatus(input)
-            if (!input) {
+            setExtractedStatus(extractedStatus)
+            if (!extractedStatus) {
                 Toast.makeText(this@MainActivity, "Unable to configure schedule data", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    // Parent function which calls all background tasks and sends status to main thread
     private suspend fun backgroundTasksRequest() {
-        logThread("\n$$$ backgroundTasksRequest: ACTIVE\n")
+        print("$$$ backgroundTasksRequest = Active\n")
         cleanUpFiles()
-        val connected = checkInternet(this) // wait until job is done
-        setInternetStatusOnMainThread(connected)
-        if (connected) {
+        val internetAvailable = checkInternet(this) // wait until job is done
+        setInternetStatusOnMainThread(internetAvailable)
+        if (internetAvailable) {
             setUpdatedStatusOnMainThread(updateFiles())
             if (!viewModel.updated) {
-                val downloaded = downloadZip("http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip", viewModel.directory + "gtfs.zip")
+                val downloaded = downloadZip()
                 setDownloadedStatusOnMainThread(downloaded)
                 if (downloaded) {
-                    val extracted = extractZip(viewModel.directory + "gtfs.zip")
+                    val extracted = extractZip()
                     setExtractedStatusOnMainThread(extracted)
                 }
             }
@@ -224,8 +199,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun cleanUpFiles(){
-        File(viewModel.directory + "special/").walk().forEach {
-            val specialPdfFile = File(viewModel.directory + "special/" + it)
+        val dataDirectory = this.filesDir.absolutePath + "/data/"
+        File(dataDirectory + "special/").walk().forEach {
+            val specialPdfFile = File(dataDirectory + "special/" + it)
             val lastModified = Date(specialPdfFile.lastModified())
             if (lastModified < Date() ) {
                 it.delete()
@@ -234,42 +210,39 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateFiles(): Boolean {
+        val dataDirectory = this.filesDir.absolutePath + "/data/"
         return try {
             // check if new version released
             var updated = 0
-            val zipFile = File(viewModel.directory + "gtfs.zip")
+            val zipFile = File(dataDirectory + gtfsFileName)
             val lastModified = Date(zipFile.lastModified())
-            val latestRelease = Date("12/4/2021") // TODO: Scrape latest release date from web
-            val formatter = SimpleDateFormat("M/d/yyyy", Locale.US)
-            val formattedDateString: String = formatter.format(lastModified)
-            print("$$$ Zip modified on $formattedDateString")
+            val latestRelease = DateFormat.getDateInstance().parse("8/15/2022")// TODO: Scrape latest release date from web
             if (lastModified < latestRelease) {
                 updated++
-                print(": FILES OUT OF DATE\n")
+                print("$$$ updateFiles = OUT OF DATE\n")
             } else {
-                print(": FILES UP TO DATE\n")
+                print("$$$ updateFiles = UP TO DATE\n")
             }
-
-            // check if files downloaded and extracted
             var notFound = 0
-            for (fileName in dataFiles) { // Check for data files
-                val tempFile = File(viewModel.directory + fileName)
+            for (fileName in dataFiles) { // Check if all files exist
+                val tempFile = File(dataDirectory + fileName)
                 if (!tempFile.exists()) notFound++
             }
             notFound += updated
             notFound <= 0
         } catch (e: Exception) {
-            println("Error: Files not up to date!")
+            println("$$$ Error: updateFiles = Files not up to date!")
             false
         }
     }
 
-    private fun downloadZip(urlStr: String?, destinationFilePath: String): Boolean {
+    private fun downloadZip(): Boolean {
+        val dataDirectory = this.filesDir.absolutePath + "/data/"
         var input: InputStream? = null
         var output: OutputStream? = null
         var connection: HttpURLConnection? = null
         try {
-            val url = URL(urlStr)
+            val url = URL(urlString)
             connection = url.openConnection() as HttpURLConnection
             connection.connect()
             if (connection.responseCode != HttpURLConnection.HTTP_OK) {
@@ -280,11 +253,11 @@ class MainActivity : AppCompatActivity() {
             }
             // download the file
             input = connection.inputStream
-            Log.d("downloadZipFile", "destinationFilePath=$destinationFilePath")
-            val newFile = File(destinationFilePath)
+            Log.d("$$$ downloadZipFile: ", "destinationFilePath=$dataDirectory + $gtfsFileName")
+            val newFile = File(dataDirectory+gtfsFileName)
             newFile.parentFile?.mkdirs()
             newFile.createNewFile()
-            output = FileOutputStream(destinationFilePath)
+            output = FileOutputStream(dataDirectory+gtfsFileName)
             val data = ByteArray(4096)
             var count: Int
             while (input.read(data).also { count = it } != -1) {
@@ -305,14 +278,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun extractZip(filePath: String): Boolean {
+    private fun extractZip(): Boolean {
+        val dataDirectory = this.filesDir.absolutePath + "/data/"
         val inputStream: InputStream
         val zipInputStream: ZipInputStream
         try {
-            val zipFile = File(filePath)
+            val zipFile = File(dataDirectory+gtfsFileName)
             val parentFolder = zipFile.parentFile?.path
             var fileName: String
-            inputStream = FileInputStream(filePath)
+            inputStream = FileInputStream(dataDirectory+gtfsFileName)
             zipInputStream = ZipInputStream(BufferedInputStream(inputStream))
             var zipEntry: ZipEntry?
             val buffer = ByteArray(1024)
