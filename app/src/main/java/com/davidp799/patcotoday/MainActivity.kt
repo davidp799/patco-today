@@ -27,7 +27,6 @@ import kotlinx.coroutines.Dispatchers.Main
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
-import java.text.DateFormat
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -42,7 +41,7 @@ class MainActivity : AppCompatActivity() {
     )
     private lateinit var binding: ActivityMainBinding
     private lateinit var sharedPreferences: SharedPreferences
-    private val prefsName = "com.davidp799.patcotoday_preferences"
+    private val preferencesName = "com.davidp799.patcotoday_preferences"
     private val urlString = "http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip"
     private val gtfsFileName = "gtfs.zip"
 
@@ -59,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             backgroundTasksRequest() // check internet, check if files up to date, if updated == false -> download files, if true -> extract files
         }
-        sharedPreferences = getSharedPreferences(prefsName, MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
         val currentTheme = sharedPreferences.getString("device_theme", "")
 
         // UI: Status/Nav-bars, Theme, Bottom-Navigation
@@ -101,7 +100,7 @@ class MainActivity : AppCompatActivity() {
         val prefVersionKeyCode = "version_code"
         val doesNotExist = -1
         val currentVersionCode = BuildConfig.VERSION_CODE
-        sharedPreferences = getSharedPreferences(prefsName, MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
         val savedVersionCode = sharedPreferences.getInt(prefVersionKeyCode, doesNotExist)
         if (currentVersionCode == savedVersionCode) { // normal run
             println("$$$ checkFirstRun = NORMAL")

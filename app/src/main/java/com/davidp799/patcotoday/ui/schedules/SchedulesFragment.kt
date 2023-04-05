@@ -2,6 +2,7 @@ package com.davidp799.patcotoday.ui.schedules
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
@@ -27,16 +28,15 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-// TODO: Fix bolding text and scrollvalue (too many items bold)
+// TODO: Fix bolding text and scroll-value (too many items bold)
 class SchedulesFragment : Fragment() {
     private var _binding: FragmentSchedulesBinding? = null
-
-    // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
-
     private val viewModel: SchedulesViewModel by ViewModelLazy(
         SchedulesViewModel::class, {viewModelStore }, { defaultViewModelProviderFactory }
     )
+    private lateinit var sharedPreferences: SharedPreferences
+    private val preferencesName = "com.davidp799.patcotoday_preferences"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,15 +46,14 @@ class SchedulesFragment : Fragment() {
         _binding = FragmentSchedulesBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        // Declare Global Variables
-        val sharedPreferences = requireActivity().getSharedPreferences("com.davidp799.patcotoday_preferences", Context.MODE_PRIVATE)
+        sharedPreferences = requireActivity().getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         viewModel.fromString = sharedPreferences.getString("last_source", "Lindenwold").toString()
         viewModel.fromIndex = viewModel.stationOptions.indexOf(viewModel.fromString)
         viewModel.toString = sharedPreferences.getString("last_dest", "15-16th & Locust").toString()
         viewModel.toIndex = viewModel.stationOptions.indexOf(viewModel.toString)
         
-        // Declare User Interface Elements
+        // Attach interface elements to layout
         val fromTextView =
             root.findViewById<AutoCompleteTextView>(R.id.fromTextView)
         val toTextView =
@@ -76,7 +75,6 @@ class SchedulesFragment : Fragment() {
         enterTransition = MaterialFadeThrough()
         fromTextView.setText(viewModel.fromString)
         toTextView.setText(viewModel.toString)
-
         fromTextView.setAdapter(stationsArrayAdapter)
         toTextView.setAdapter(stationsArrayAdapter)
         specialViewButton.isEnabled = false
@@ -84,22 +82,29 @@ class SchedulesFragment : Fragment() {
         // Background Activities: Check Internet, Update Arrivals ListView, and Processing Special Schedules
         CoroutineScope(Dispatchers.IO).launch {
             checkInternetBackgroundRequest(requireContext())
-            updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, arrivalsListView, arrivalsShimmerFrameLayout)
-            checkSpecialBackgroundRequest(requireContext(), viewModel.fromIndex, viewModel.toIndex, specialShimmerFrameLayout, root)
+            updateListViewBackgroundRequest(
+                viewModel.fromIndex, viewModel.toIndex,
+                arrivalsListView, arrivalsShimmerFrameLayout
+            )
+            checkSpecialBackgroundRequest(
+                requireContext(), viewModel.fromIndex, viewModel.toIndex,
+                specialShimmerFrameLayout, root
+            )
         }
 
-        // Listen for station selections: from and to respectively
+        // Listen for station selections
         fromTextView.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
+            AdapterView.OnItemClickListener { _, _, position, _ ->
                 viewModel.fromIndex = position // set source station to index of selected array position
                 viewModel.fromString = viewModel.stationOptions[viewModel.fromIndex]
-                editor.putString("last_source", viewModel.fromString)
-                editor.apply()
-
+                editor.putString("last_source", viewModel.fromString).apply()
                 // reload listview and scroll to next train
                 arrivalsShimmerFrameLayout.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, arrivalsListView, arrivalsShimmerFrameLayout)
+                    updateListViewBackgroundRequest(
+                        viewModel.fromIndex, viewModel.toIndex,
+                        arrivalsListView, arrivalsShimmerFrameLayout
+                    )
                 }
                 arrivalsListView.adapter =
                     SchedulesListAdapter(
@@ -115,17 +120,17 @@ class SchedulesFragment : Fragment() {
                 }
             }
         toTextView.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
-
-                // save from selection as variable
-                viewModel.toIndex = position // set destination station to index of selected array position
+            AdapterView.OnItemClickListener { _, _, position, _ ->
+                viewModel.toIndex = position // set destination station to index(position)
                 viewModel.toString = viewModel.stationOptions[viewModel.toIndex]
-                editor.putString("last_dest", viewModel.toString)
-                editor.apply()
+                editor.putString("last_dest", viewModel.toString).apply()
                 // reload listview with new array and adapter and scroll to next train
                 arrivalsShimmerFrameLayout.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, arrivalsListView, arrivalsShimmerFrameLayout)
+                    updateListViewBackgroundRequest(
+                        viewModel.fromIndex, viewModel.toIndex,
+                        arrivalsListView, arrivalsShimmerFrameLayout
+                    )
                 }
                 arrivalsListView.adapter =
                     SchedulesListAdapter(
@@ -134,10 +139,13 @@ class SchedulesFragment : Fragment() {
                         viewModel.schedulesArrayList,
                         0
                     )
-                /* Set progressbar as visible while working */
+                // Set progressbar as visible while working
                 specialShimmerFrameLayout.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
-                    checkSpecialBackgroundRequest(requireContext(), viewModel.fromIndex, viewModel.toIndex, specialShimmerFrameLayout, root)
+                    checkSpecialBackgroundRequest(
+                        requireContext(), viewModel.fromIndex, viewModel.toIndex,
+                        specialShimmerFrameLayout, root
+                    )
                 }
             }
         reverseStationsButton.setOnClickListener {
@@ -159,12 +167,12 @@ class SchedulesFragment : Fragment() {
             editor.putString("last_dest", viewModel.toString)
             editor.apply()
 
-
-
-
             arrivalsShimmerFrameLayout.visibility = View.VISIBLE
             CoroutineScope(Dispatchers.IO).launch {
-                updateListViewBackgroundRequest(viewModel.fromIndex, viewModel.toIndex, arrivalsListView, arrivalsShimmerFrameLayout)
+                updateListViewBackgroundRequest(
+                    viewModel.fromIndex, viewModel.toIndex,
+                    arrivalsListView, arrivalsShimmerFrameLayout
+                )
             }
             arrivalsListView.adapter =
                 SchedulesListAdapter(
@@ -173,10 +181,13 @@ class SchedulesFragment : Fragment() {
                     viewModel.schedulesArrayList,
                     0
                 )
-            /* Set progressbar as visible while working */
+            // Set progressbar as visible while working
             specialShimmerFrameLayout.visibility = View.VISIBLE
             CoroutineScope(Dispatchers.IO).launch {
-                checkSpecialBackgroundRequest(requireContext(), viewModel.fromIndex, viewModel.toIndex, specialShimmerFrameLayout, root)
+                checkSpecialBackgroundRequest(
+                    requireContext(), viewModel.fromIndex, viewModel.toIndex,
+                    specialShimmerFrameLayout, root
+                )
             }
 
             // Initialize array adapter for stations dropdown menu
@@ -197,12 +208,10 @@ class SchedulesFragment : Fragment() {
 
         return root
     }
-    // TODO: Utilize onResume and onPause to store last saved data when moving btwn fragments
+
     override fun onResume() {
         super.onResume()
         val root: View = binding.root
-
-        // 'from' and 'to' textViews
         val fromTextView =
             root.findViewById<AutoCompleteTextView>(R.id.fromTextView)
         val toTextView =
@@ -217,6 +226,9 @@ class SchedulesFragment : Fragment() {
         fromTextView.setText(viewModel.fromString) // fromTextView.setText(viewModel.fromString)
         toTextView.setText(viewModel.toString) // fromTextView.setText(viewModel.toString)
         // connect textViews to stations options arrayAdapter
+        fromTextView.setAdapter(stationsArrayAdapter)
+        toTextView.setAdapter(stationsArrayAdapter)
+
     }
 
     override fun onDestroyView() {
@@ -242,12 +254,10 @@ class SchedulesFragment : Fragment() {
         val routeId = viewModel.schedules.getRouteID(tripId, source_id, destination_id)
         // retrieve list of base data
         var position = 0
-        var theArrivals =
-            specialArrivals[0] // i made an oopsie with the routeid
-        if (routeId.contains("west")) {
-            theArrivals = specialArrivals[0]
+        val theArrivals = if (routeId.contains("west")) {
+            specialArrivals[0]
         } else {
-            theArrivals = specialArrivals[1]
+            specialArrivals[1]
         }
         val temp = ArrayList<String>()
         try { // check for null
@@ -333,13 +343,13 @@ class SchedulesFragment : Fragment() {
                         if (parseStatus) {
                             // step 6: update main ui thread with special schedule data
                             val specialArrivals = getSpecialArrivalsBackground(source, destination)
-                            setSpecialArrivalsOnMainThread(specialArrivals, specialShimmerFrameLayout, view, specialStatus)
+                            setSpecialArrivalsOnMainThread(specialArrivals, specialShimmerFrameLayout, view, true)
                         }
                     }
 
                 }
             } else {
-                configureBottomSheetOnMainThread(view, specialStatus, specialShimmerFrameLayout)
+                configureBottomSheetOnMainThread(view, false, specialShimmerFrameLayout)
             }
         } else {
             configureBottomSheetOnMainThread(view, false, specialShimmerFrameLayout)
