@@ -48,7 +48,7 @@ class SchedulesFragment : Fragment() {
 
         // Declare Global Variables
         val sharedPreferences = requireActivity().getSharedPreferences("com.davidp799.patcotoday_preferences", Context.MODE_PRIVATE)
-        var editor = sharedPreferences.edit()
+        val editor = sharedPreferences.edit()
         viewModel.fromString = sharedPreferences.getString("last_source", "Lindenwold").toString()
         viewModel.fromIndex = viewModel.stationOptions.indexOf(viewModel.fromString)
         viewModel.toString = sharedPreferences.getString("last_dest", "15-16th & Locust").toString()
