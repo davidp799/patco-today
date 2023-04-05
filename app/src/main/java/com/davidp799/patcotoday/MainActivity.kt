@@ -145,11 +145,11 @@ class MainActivity : AppCompatActivity() {
         viewModel.downloaded = input
     }
 
-    private suspend fun setDownloadedStatusOnMainThread(input: Boolean) {
+    private suspend fun setDownloadedStatusOnMainThread(downloadedStatus: Boolean) {
         withContext (Main) {
             Toast.makeText(this@MainActivity, "Downloading new schedules", Toast.LENGTH_LONG).show()
-            setDownloadedStatus(input)
-            if (!input) {
+            setDownloadedStatus(downloadedStatus)
+            if (!downloadedStatus) {
                 Toast.makeText(this@MainActivity, "Unable to download schedules", Toast.LENGTH_SHORT).show()
             }
         }
@@ -216,7 +216,7 @@ class MainActivity : AppCompatActivity() {
             var updated = 0
             val zipFile = File(dataDirectory + gtfsFileName)
             val lastModified = Date(zipFile.lastModified())
-            val latestRelease = DateFormat.getDateInstance().parse("8/15/2022")// TODO: Scrape latest release date from web
+            val latestRelease = Date("08/15/2022")// TODO: Scrape latest release date from web
             if (lastModified < latestRelease) {
                 updated++
                 print("$$$ updateFiles = OUT OF DATE\n")

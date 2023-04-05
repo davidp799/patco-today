@@ -200,11 +200,8 @@ class SchedulesFragment : Fragment() {
     // TODO: Utilize onResume and onPause to store last saved data when moving btwn fragments
     override fun onResume() {
         super.onResume()
-
         val root: View = binding.root
 
-        // shared preferences
-        val sharedPreferences = requireActivity().getSharedPreferences("com.davidp799.patcotoday_preferences", Context.MODE_PRIVATE)
         // 'from' and 'to' textViews
         val fromTextView =
             root.findViewById<AutoCompleteTextView>(R.id.fromTextView)
@@ -220,8 +217,6 @@ class SchedulesFragment : Fragment() {
         fromTextView.setText(viewModel.fromString) // fromTextView.setText(viewModel.fromString)
         toTextView.setText(viewModel.toString) // fromTextView.setText(viewModel.toString)
         // connect textViews to stations options arrayAdapter
-        fromTextView.setAdapter(stationsArrayAdapter)
-        toTextView.setAdapter(stationsArrayAdapter)
     }
 
     override fun onDestroyView() {
