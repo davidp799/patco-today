@@ -32,6 +32,7 @@ Current features of Patco Today include the following:
 - Application theming:
 	* Light, Dark, and System Modes
 	* Support for Material 3 Dynamic Colors
+	* Now supports Monet (12+) Monochrome App Icon
 
 Coming Soon:
 - Ability to change date for schedule viewing.
