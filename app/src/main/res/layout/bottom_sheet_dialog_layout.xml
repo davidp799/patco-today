@@ -5,17 +5,17 @@
     android:id="@+id/bottom_sheet_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="602sp"
+    android:layout_height="wrap_content"
     android:elevation="2dp"
     app:behavior_hideable="true"
-    app:behavior_peekHeight="120sp"
+    app:behavior_peekHeight="32dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
     <!-- Drag handle for accessibility -->
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
         android:id="@+id/drag_handle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -27,7 +27,6 @@
             android:layout_height="wrap_content"
             android:background="@color/transparent"
             android:orientation="vertical"
-            android:padding="10dp"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <TextView
@@ -35,13 +34,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/special_schedule_about"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:layout_margin="10dp"/>
 
             <Button
                 android:id="@+id/specialScheduleViewButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/special_schedule_download" />
+                android:text="@string/special_schedule_download"
+                android:layout_margin="10dp"/>
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/specialShimmerFrameLayout"
@@ -69,7 +70,7 @@
             <ListView
                 android:id="@+id/specialArrivalsListView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
