@@ -11,6 +11,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.color.DynamicColors
 import kotlin.random.Random
 
 class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -41,6 +42,8 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         val currentThemeString = getString(R.string.pref_theme_key)
         val appVersion = getString(R.string.pref_summary_version)
+        val isDynamicString= getString(R.string.pref_dynamic_key)
+
         if (key == currentThemeString) {
             val pref = sharedPreferences?.getString(key, "3")
             when (pref?.toInt()) {
@@ -54,7 +57,13 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
                     AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                 )
             }
+        } else if (key == isDynamicString) {
+            val pref = sharedPreferences?.getBoolean(key, false)
+            if (pref == true) {
+                DynamicColors.applyToActivitiesIfAvailable(application)
+            }
         }
+        this.recreate()
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
