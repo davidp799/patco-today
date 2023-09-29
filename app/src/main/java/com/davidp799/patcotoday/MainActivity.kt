@@ -116,53 +116,50 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences.edit().putInt(prefVersionKeyCode, currentVersionCode).apply()
     }
 
-    // Set status for background tasks on main thread
-    private fun setInternetStatus(internetStatus: Boolean){
-        viewModel.internet = internetStatus
-    }
-
-    private suspend fun setInternetStatusOnMainThread(internetAvailable: Boolean) {
-        withContext (Main) {
-            setInternetStatus(internetAvailable)
-            if (!internetAvailable) {
-                Toast.makeText(this@MainActivity, "No internet connection. Working offline", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun setUpdatedStatus(updatedStatus: Boolean){
-        viewModel.updated = updatedStatus
-    }
-
-    private suspend fun setUpdatedStatusOnMainThread(updatedStatus: Boolean) {
-        withContext (Main) {
-            setUpdatedStatus(updatedStatus)
-        }
-    }
-
-    private fun setDownloadedStatus(input: Boolean){
-        viewModel.downloaded = input
-    }
-
-    private suspend fun setDownloadedStatusOnMainThread(downloadedStatus: Boolean) {
-        withContext (Main) {
-            Toast.makeText(this@MainActivity, "Downloading new schedules", Toast.LENGTH_LONG).show()
-            setDownloadedStatus(downloadedStatus)
-            if (!downloadedStatus) {
-                Toast.makeText(this@MainActivity, "Unable to download schedules", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun setExtractedStatus(extractedStatus: Boolean){
-        viewModel.extracted = extractedStatus
-    }
-
-    private suspend fun setExtractedStatusOnMainThread(extractedStatus: Boolean) {
-        withContext (Main) {
-            setExtractedStatus(extractedStatus)
-            if (!extractedStatus) {
-                Toast.makeText(this@MainActivity, "Unable to configure schedule data", Toast.LENGTH_SHORT).show()
+    private suspend fun setStatusOnMainThread(key: String, value: Boolean) {
+        withContext(Main) {
+            when (key) {
+                "internetAvailable" -> {
+                    viewModel.internet = value;
+                    if (!viewModel.internet) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "No internet connection. Working offline",
+                            Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                }
+                "updateFiles" -> {
+                    viewModel.updated = value
+                }
+                "downloadedStatus" -> {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Downloading new schedules",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    viewModel.downloaded = value;
+                    if (!viewModel.downloaded) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Unable to download schedules",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                "extractedStatus" -> {
+                    viewModel.extracted = value;
+                    if (!viewModel.extracted) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Unable to configure schedule data",
+                            Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                }
+                else -> {
+                    println("$key, $value");
+                }
             }
         }
     }
@@ -172,15 +169,15 @@ class MainActivity : AppCompatActivity() {
         print("$$$ backgroundTasksRequest = Active\n")
         cleanUpFiles()
         val internetAvailable = checkInternet(this) // wait until job is done
-        setInternetStatusOnMainThread(internetAvailable)
+        setStatusOnMainThread("internetAvailable", internetAvailable);
         if (internetAvailable) {
-            setUpdatedStatusOnMainThread(updateFiles())
+            setStatusOnMainThread("updateFiles", updateFiles());
             if (!viewModel.updated) {
                 val downloaded = downloadZip()
-                setDownloadedStatusOnMainThread(downloaded)
+                setStatusOnMainThread("downloadedStatus", downloaded)
                 if (downloaded) {
                     val extracted = extractZip()
-                    setExtractedStatusOnMainThread(extracted)
+                    setStatusOnMainThread("extractedStatus", extracted);
                 }
             }
         }
@@ -212,12 +209,12 @@ class MainActivity : AppCompatActivity() {
         val dataDirectory = this.filesDir.absolutePath + "/data/"
         return try {
             // check if new version released
-            var updated = 0
+            var updatedCount = 0
             val zipFile = File(dataDirectory + gtfsFileName)
             val lastModified = Date(zipFile.lastModified())
             val latestRelease = Date("08/15/2022")// TODO: Scrape latest release date from web
             if (lastModified < latestRelease) {
-                updated++
+                updatedCount++
                 print("$$$ updateFiles = OUT OF DATE\n")
             } else {
                 print("$$$ updateFiles = UP TO DATE\n")
@@ -227,7 +224,7 @@ class MainActivity : AppCompatActivity() {
                 val tempFile = File(dataDirectory + fileName)
                 if (!tempFile.exists()) notFound++
             }
-            notFound += updated
+            notFound += updatedCount
             notFound <= 0
         } catch (e: Exception) {
             println("$$$ Error: updateFiles = Files not up to date!")
