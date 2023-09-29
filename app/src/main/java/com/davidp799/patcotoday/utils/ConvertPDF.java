@@ -5,16 +5,10 @@ import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 
 public class ConvertPDF {
     private String fileName, fileDir;
-
     public ConvertPDF(String fileDir, String fileName) {
         setFileName(fileName);
         setFileDir(fileDir);
     }
-
-    /**
-     * Function which extracts text from given pdf file
-     * @return output String form of pdf text data
-     */
     public String getText() {
         try {
             PdfReader reader = new PdfReader(fileDir + fileName);
@@ -29,20 +23,15 @@ public class ConvertPDF {
             return "Error found is : \n" + e;
         }
     }
-
-    /* Accessor for file name */
     public String getFileName() {
         return fileName;
     }
-    /* Accessor for file directory */
     public String getFileDir() {
         return fileDir;
     }
-    /* Modifier for file name  */
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-    /* Modifier for file directory */
     public void setFileDir(String fileDir) {
         this.fileDir = fileDir;
     }
