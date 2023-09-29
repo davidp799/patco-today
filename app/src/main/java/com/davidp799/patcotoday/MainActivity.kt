@@ -47,30 +47,28 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        CoroutineScope(Dispatchers.IO).launch {
+            checkIfFirstRun()
+            runBackgroundTasks()
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val dataDirectory = this.filesDir.absolutePath + "/data/"
-
-        print("$$$ DATA_DIRECTORY2 = $dataDirectory")
-
-        // Start-up Tasks
-        checkFirstRun()
-        CoroutineScope(Dispatchers.IO).launch {
-            backgroundTasksRequest() // check internet, check if files up to date, if updated == false -> download files, if true -> extract files
-        }
         sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
-        val currentTheme = sharedPreferences.getString("device_theme", "")
-
-        // UI: Status/Nav-bars, Theme, Bottom-Navigation
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.topAppBar))
-        when (currentTheme) { // Set current theme (light/dark/auto)
-            "1" -> { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) }
-            "2" -> { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES) }
-            else -> { AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) }
-        }
         window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
         window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
+        when (sharedPreferences.getString("device_theme", "")) {
+            "1" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+            "2" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+            else -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
+        }
         val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         val appBarConfiguration = AppBarConfiguration(
@@ -95,8 +93,8 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    /* Function to check if first run or upgrade */
-    private fun checkFirstRun() {
+    /* Function to check if first run or new version */
+    private fun checkIfFirstRun() {
         val prefVersionKeyCode = "version_code"
         val doesNotExist = -1
         val currentVersionCode = BuildConfig.VERSION_CODE
@@ -115,7 +113,23 @@ class MainActivity : AppCompatActivity() {
         // update shared prefs with current version code
         sharedPreferences.edit().putInt(prefVersionKeyCode, currentVersionCode).apply()
     }
-
+    private suspend fun runBackgroundTasks() {
+        print("$$$ backgroundTasksRequest = Active\n")
+        cleanUpFiles()
+        val internetAvailable = checkInternet(this) // wait until job is done
+        setStatusOnMainThread("internetAvailable", internetAvailable);
+        if (internetAvailable) {
+            setStatusOnMainThread("updateFiles", updateFiles());
+            if (!viewModel.updated) {
+                val downloaded = downloadZip()
+                setStatusOnMainThread("downloadedStatus", downloaded)
+                if (downloaded) {
+                    val extracted = extractZip()
+                    setStatusOnMainThread("extractedStatus", extracted);
+                }
+            }
+        }
+    }
     private suspend fun setStatusOnMainThread(key: String, value: Boolean) {
         withContext(Main) {
             when (key) {
@@ -163,26 +177,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    // Parent function which calls all background tasks and sends status to main thread
-    private suspend fun backgroundTasksRequest() {
-        print("$$$ backgroundTasksRequest = Active\n")
-        cleanUpFiles()
-        val internetAvailable = checkInternet(this) // wait until job is done
-        setStatusOnMainThread("internetAvailable", internetAvailable);
-        if (internetAvailable) {
-            setStatusOnMainThread("updateFiles", updateFiles());
-            if (!viewModel.updated) {
-                val downloaded = downloadZip()
-                setStatusOnMainThread("downloadedStatus", downloaded)
-                if (downloaded) {
-                    val extracted = extractZip()
-                    setStatusOnMainThread("extractedStatus", extracted);
-                }
-            }
-        }
-    }
-
     private fun checkInternet(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
@@ -193,7 +187,6 @@ class MainActivity : AppCompatActivity() {
             else -> false
         }
     }
-
     private fun cleanUpFiles(){
         val dataDirectory = this.filesDir.absolutePath + "/data/"
         File(dataDirectory + "special/").walk().forEach {
@@ -204,7 +197,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun updateFiles(): Boolean {
         val dataDirectory = this.filesDir.absolutePath + "/data/"
         return try {
@@ -231,7 +223,6 @@ class MainActivity : AppCompatActivity() {
             false
         }
     }
-
     private fun downloadZip(): Boolean {
         val dataDirectory = this.filesDir.absolutePath + "/data/"
         var input: InputStream? = null
@@ -273,7 +264,6 @@ class MainActivity : AppCompatActivity() {
             connection?.disconnect()
         }
     }
-
     private fun extractZip(): Boolean {
         val dataDirectory = this.filesDir.absolutePath + "/data/"
         val inputStream: InputStream

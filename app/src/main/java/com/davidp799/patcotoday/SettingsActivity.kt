@@ -15,7 +15,6 @@ import com.google.android.material.color.DynamicColors
 import kotlin.random.Random
 
 class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity_scrolling)
@@ -40,27 +39,26 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        val currentThemeString = getString(R.string.pref_theme_key)
-        val appVersion = getString(R.string.pref_summary_version)
-        val isDynamicString= getString(R.string.pref_dynamic_key)
-
-        if (key == currentThemeString) {
-            val pref = sharedPreferences?.getString(key, "3")
-            when (pref?.toInt()) {
-                1 -> AppCompatDelegate.setDefaultNightMode(
-                    AppCompatDelegate.MODE_NIGHT_NO
-                )
-                2 -> AppCompatDelegate.setDefaultNightMode(
-                    AppCompatDelegate.MODE_NIGHT_YES
-                )
-                3 -> AppCompatDelegate.setDefaultNightMode(
-                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                )
+        when (key) {
+            "device_theme" -> {
+                val pref = sharedPreferences?.getString(key, "3")
+                when (pref?.toInt()) {
+                    1 -> AppCompatDelegate.setDefaultNightMode(
+                        AppCompatDelegate.MODE_NIGHT_NO
+                    )
+                    2 -> AppCompatDelegate.setDefaultNightMode(
+                        AppCompatDelegate.MODE_NIGHT_YES
+                    )
+                    3 -> AppCompatDelegate.setDefaultNightMode(
+                        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    )
+                }
             }
-        } else if (key == isDynamicString) {
-            val pref = sharedPreferences?.getBoolean(key, false)
-            if (pref == true) {
-                DynamicColors.applyToActivitiesIfAvailable(application)
+            "dynamic_colors" -> {
+                val pref = sharedPreferences?.getBoolean(key, false)
+                if (pref == true) {
+                    DynamicColors.applyToActivitiesIfAvailable(application)
+                }
             }
         }
         this.recreate()
@@ -75,7 +73,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
             "If you listen to a UNIX shell, can you hear the C?",
             "An SQL query goes into a bar, walks up to two tables and asks: 'Can I join you?'",
             "I went to a street where the houses were numbered 8k, 16k, 32k, 64k, 128k, 256k and 512k. It was a trip down Memory Lane."
-            )
+        )
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.preferences, rootKey)
@@ -86,8 +84,8 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
             if (key.equals("app_version")) {
                 easterEggCounter += 1
                 if(easterEggCounter == 5) {
-                    val easterEggSelection = Random.nextInt(0, easterEggs.size-1)
-                    Toast.makeText(context, easterEggs[easterEggSelection], Toast.LENGTH_SHORT).show()
+                    val easterEggSelection = Random.nextInt(0, easterEggs.size)
+                    Toast.makeText(context, easterEggs[easterEggSelection], Toast.LENGTH_LONG).show()
                     easterEggCounter = 0
                 }
             }
