@@ -2,8 +2,6 @@ package com.davidp799.patcotoday.utils;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -44,7 +42,6 @@ public class Schedules {
      *  of the desired train (Eastbound / Westbound).
      * @return integer route code (1 = Westbound, 2 = Eastbound) */
     public String getRouteID(String trip_id, int source_id, int destination_id) {
-        System.out.println("$$$: source, dest id = " + source_id + ", " + destination_id);
         if (destination_id > source_id) {
             return trip_id + "west.csv";
         } else {
@@ -64,14 +61,11 @@ public class Schedules {
             databaseStream = am.open(route_id);
             reader = new BufferedReader(new InputStreamReader(databaseStream));
             String line = reader.readLine();
-            System.out.println("$$$: trip id = " + route_id);
             while ( line != null ) {
                 List<String> c;
                 ArrayList<String> newC = new ArrayList<>();
                 String[] split = line.split(",", 128);
-                System.out.println("$$$ currentLine = " + line);
-                for (int j=0; j<split.length; j++) {
-                    String oldString = split[j];
+                for (String oldString : split) {
                     if (oldString.contains("A")) {
                         String newString = oldString.replace("A", "");
                         newC.add(newString);
@@ -93,7 +87,6 @@ public class Schedules {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("$$$ = " + result);
         return result;
     }
     /** Function which formats list of trip by removing duplicate arrivals,
@@ -110,14 +103,11 @@ public class Schedules {
             try {
                 Date current24HourDt = _24HourSDF.parse(currentTime);
                 if (i < schedules.size()-1 && i > 0) {
-                    String prevTime = schedules.get(i-1);
                     String nextTime = schedules.get(i+1);
                     if (currentTime.equals("99:99")) {
                         schedules.set(i, schedules.get(i-1));
-                        System.out.println("$$$ Error: 99:99 time found, parsed as = " + _24HourSDF.parse(nextTime));
                     } else if (nextTime.equals("99:99")) {
                         schedules.set(i+1, schedules.get(i));
-                        System.out.println("$$$ Error: 99:99 time found, parsed as = " + _24HourSDF.parse(nextTime));
                     }
                 }
                 // convert to dateTime object, format as 24hr time
@@ -136,7 +126,5 @@ public class Schedules {
         }
         return arrivals;
     }
-
-
 }
 

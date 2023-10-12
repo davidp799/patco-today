@@ -311,7 +311,6 @@ class SchedulesFragment : Fragment() {
             viewModel.specialURLs.addAll(getSpecial.url)
             viewModel.specialTexts.addAll(getSpecial.text)
             if (getSpecial.text.size > 0) {
-//                println(getSpecial.text[0])
                 try {
                     val split = getSpecial.text[0].split("from ")[1].split("-")
                     for (i in split.indices) {
@@ -324,7 +323,7 @@ class SchedulesFragment : Fragment() {
                         }
                     }
                 } catch (e: Exception) {
-//                    println("[checkSpecial] ERROR: Unknown duration for special schedules!")
+                    println("[checkSpecial] ERROR: Unknown duration for special schedules!")
                     viewModel.specialFromToTimes.add("Various Times")
                 }
 
@@ -473,14 +472,8 @@ class SchedulesFragment : Fragment() {
             object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {
-                    BottomSheetBehavior.STATE_COLLAPSED ->
-                        bottomSheet.animate().setDuration(100).translationY(-20f)
-                    BottomSheetBehavior.STATE_DRAGGING -> {}
                     BottomSheetBehavior.STATE_EXPANDED ->
                         bottomSheet.animate().setDuration(150).translationY(20f)
-                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {}
-                    BottomSheetBehavior.STATE_HIDDEN ->
-                        bottomSheet.animate().setDuration(150).translationY(-20f)
                     BottomSheetBehavior.STATE_SETTLING ->
                         bottomSheet.animate().translationY(0f)
                 }

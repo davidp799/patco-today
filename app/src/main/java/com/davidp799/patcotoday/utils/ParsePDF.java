@@ -1,5 +1,7 @@
 package com.davidp799.patcotoday.utils;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -64,8 +66,6 @@ public class ParsePDF {
                     finalEastbound.addAll(eastboundArrayList);
                 }
 
-            } else {
-                System.out.println("PARSE: current line not part of schedule! skipping...");
             }
         }
         allFormattedArrivals.add(finalWestbound);

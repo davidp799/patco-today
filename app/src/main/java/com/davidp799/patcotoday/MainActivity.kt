@@ -100,21 +100,20 @@ class MainActivity : AppCompatActivity() {
         val currentVersionCode = BuildConfig.VERSION_CODE
         sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
         val savedVersionCode = sharedPreferences.getInt(prefVersionKeyCode, doesNotExist)
-        if (currentVersionCode == savedVersionCode) { // normal run
-            println("$$$ checkFirstRun = NORMAL")
+        if (currentVersionCode == savedVersionCode) {
             return
         } else if (savedVersionCode == doesNotExist) {
             // TODO: this is a new install (make tasks for new install)
-            println("$$$ checkFirstRun = NEW")
+            return
         } else if (currentVersionCode > savedVersionCode) {
             // TODO: this is an upgrade (MAKE TASKS FOR UPGRADE)
-            println("$$$ checkFirstRun = UPGRADE")
+            return
         }
         // update shared prefs with current version code
         sharedPreferences.edit().putInt(prefVersionKeyCode, currentVersionCode).apply()
     }
     private suspend fun runBackgroundTasks() {
-        print("$$$ backgroundTasksRequest = Active\n")
+        print("[backgroundTasksRequest] = Active\n")
         cleanUpFiles()
         val internetAvailable = checkInternet(this) // wait until job is done
         setStatusOnMainThread("internetAvailable", internetAvailable);
@@ -207,9 +206,9 @@ class MainActivity : AppCompatActivity() {
             val latestRelease = Date("08/15/2022")// TODO: Scrape latest release date from web
             if (lastModified < latestRelease) {
                 updatedCount++
-                print("$$$ updateFiles = OUT OF DATE\n")
+                print("[updateFiles] State: OUT OF DATE\n")
             } else {
-                print("$$$ updateFiles = UP TO DATE\n")
+                print("[updateFiles] State: UP TO DATE\n")
             }
             var notFound = 0
             for (fileName in dataFiles) { // Check if all files exist
@@ -219,7 +218,7 @@ class MainActivity : AppCompatActivity() {
             notFound += updatedCount
             notFound <= 0
         } catch (e: Exception) {
-            println("$$$ Error: updateFiles = Files not up to date!")
+            println("[updateFiles] Error: Files not up to date!")
             false
         }
     }
@@ -240,7 +239,7 @@ class MainActivity : AppCompatActivity() {
             }
             // download the file
             input = connection.inputStream
-            Log.d("$$$ downloadZipFile: ", "destinationFilePath=$dataDirectory + $gtfsFileName")
+            Log.d("[downloadZipFile]: ", "destinationFilePath=$dataDirectory + $gtfsFileName")
             val newFile = File(dataDirectory+gtfsFileName)
             newFile.parentFile?.mkdirs()
             newFile.createNewFile()

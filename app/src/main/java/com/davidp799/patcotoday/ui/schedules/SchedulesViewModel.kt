@@ -58,7 +58,4 @@ class SchedulesViewModel : ViewModel() {
         "12-13th & Locust",
         "15-16th & Locust",
     )
-    
-
-
 }

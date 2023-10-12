@@ -17,6 +17,7 @@ import com.davidp799.patcotoday.R;
 import com.davidp799.patcotoday.utils.Arrival;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
 
@@ -44,10 +45,10 @@ public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         //get the arrival information
-        String arrivalTime = getItem(position).getArrivalTime();
-        String travelTime = getItem(position).getTravelTime();
+        String arrivalTime = Objects.requireNonNull(getItem(position)).getArrivalTime();
+        String travelTime = Objects.requireNonNull(getItem(position)).getTravelTime();
         //Create the person object with the information
         Arrival arrival = new Arrival(arrivalTime,travelTime);
         //create the view result for showing the animation
