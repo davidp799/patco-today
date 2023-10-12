@@ -311,7 +311,7 @@ class SchedulesFragment : Fragment() {
             viewModel.specialURLs.addAll(getSpecial.url)
             viewModel.specialTexts.addAll(getSpecial.text)
             if (getSpecial.text.size > 0) {
-                println(getSpecial.text[0])
+//                println(getSpecial.text[0])
                 try {
                     val split = getSpecial.text[0].split("from ")[1].split("-")
                     for (i in split.indices) {
@@ -324,7 +324,7 @@ class SchedulesFragment : Fragment() {
                         }
                     }
                 } catch (e: Exception) {
-                    println("[checkSpecial] ERROR: Unknown duration for special schedules!")
+//                    println("[checkSpecial] ERROR: Unknown duration for special schedules!")
                     viewModel.specialFromToTimes.add("Various Times")
                 }
 
@@ -389,7 +389,6 @@ class SchedulesFragment : Fragment() {
         return try {
             for (i in 0 until viewModel.specialURLs.size) {
                 if (viewModel.specialURLs[i].contains(".jpg")) {
-                    println("- Converting: special$i.jpg to pdf")
                     JpgToPdf(
                         requireContext(),"special$i.jpg", "special$i.pdf"
                     )
@@ -410,7 +409,7 @@ class SchedulesFragment : Fragment() {
         return try {
             for (i in 0 until viewModel.runnableConvertedStrings.size) {
                 val parsePDF =
-                    ParsePDF(viewModel.runnableConvertedStrings[i], viewModel.specialFromToTimes)
+                    ParsePDF(viewModel.runnableConvertedStrings[i])
                 viewModel.parsedArrivals.addAll(parsePDF.arrivalLines)
             }
             viewModel.specialWestBound.addAll(viewModel.parsedArrivals[0])
@@ -491,7 +490,11 @@ class SchedulesFragment : Fragment() {
         if (!specialStatus || !viewModel.internet || !viewModel.special) {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             val specialAbout: TextView = view.findViewById(R.id.specialScheduleAbout)
-            specialAbout.text = "Trains are operating on or close to schedule."
+            if (!viewModel.internet) {
+                specialAbout.text = "No network connection. Working offline."
+            } else {
+                specialAbout.text = "Trains are operating on or close to schedule."
+            }
         } else {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             val specialAbout: TextView = view.findViewById(R.id.specialScheduleAbout)
