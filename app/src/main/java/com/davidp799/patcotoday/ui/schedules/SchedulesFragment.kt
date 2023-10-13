@@ -65,6 +65,8 @@ class SchedulesFragment : Fragment() {
             root.findViewById<ListView>(R.id.arrivalsListView)
         val arrivalsShimmerFrameLayout: ShimmerFrameLayout =
             root.findViewById(R.id.arrivalsShimmerFrameLayout)
+        val specialAboutShimmerFrameLayout: ShimmerFrameLayout =
+            root.findViewById(R.id.specialAboutShimmerFrameLayout)
         val specialShimmerFrameLayout: ShimmerFrameLayout =
             root.findViewById(R.id.specialShimmerFrameLayout)
         val specialViewButton: Button =
@@ -92,6 +94,7 @@ class SchedulesFragment : Fragment() {
                 requireContext(),
                 viewModel.fromIndex,
                 viewModel.toIndex,
+                specialAboutShimmerFrameLayout,
                 specialShimmerFrameLayout,
                 root
             )
@@ -119,8 +122,12 @@ class SchedulesFragment : Fragment() {
                 specialShimmerFrameLayout.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
                     checkSpecialBackgroundTask(
-                        requireContext(), viewModel.fromIndex, viewModel.toIndex,
-                        specialShimmerFrameLayout, root
+                        requireContext(),
+                        viewModel.fromIndex,
+                        viewModel.toIndex,
+                        specialAboutShimmerFrameLayout,
+                        specialShimmerFrameLayout,
+                        root
                     )
                 }
             }
@@ -144,11 +151,16 @@ class SchedulesFragment : Fragment() {
                         viewModel.schedulesArrayList,
                         0
                     )
+                specialAboutShimmerFrameLayout.visibility = View.VISIBLE
                 specialShimmerFrameLayout.visibility = View.VISIBLE
                 CoroutineScope(Dispatchers.IO).launch {
                     checkSpecialBackgroundTask(
-                        requireContext(), viewModel.fromIndex, viewModel.toIndex,
-                        specialShimmerFrameLayout, root
+                        requireContext(),
+                        viewModel.fromIndex,
+                        viewModel.toIndex,
+                        specialAboutShimmerFrameLayout,
+                        specialShimmerFrameLayout,
+                        root
                     )
                 }
             }
@@ -185,11 +197,16 @@ class SchedulesFragment : Fragment() {
                     viewModel.schedulesArrayList,
                     0
                 )
+            specialAboutShimmerFrameLayout.visibility = View.VISIBLE
             specialShimmerFrameLayout.visibility = View.VISIBLE
             CoroutineScope(Dispatchers.IO).launch {
                 checkSpecialBackgroundTask(
-                    requireContext(), viewModel.fromIndex, viewModel.toIndex,
-                    specialShimmerFrameLayout, root
+                    requireContext(),
+                    viewModel.fromIndex,
+                    viewModel.toIndex,
+                    specialAboutShimmerFrameLayout,
+                    specialShimmerFrameLayout,
+                    root
                 )
             }
 
@@ -252,8 +269,12 @@ class SchedulesFragment : Fragment() {
     }
 
     private suspend fun checkSpecialBackgroundTask(
-        context: Context, source: Int, destination: Int,
-        specialShimmerFrameLayout: ShimmerFrameLayout, view: View
+        context: Context,
+        source: Int,
+        destination: Int,
+        specialAboutShimmerFrameLayout: ShimmerFrameLayout,
+        specialShimmerFrameLayout: ShimmerFrameLayout,
+        view: View
     ) {
         logThread("checkSpecialBackgroundTask")
         val internetStatus = checkInternet(context)
@@ -290,6 +311,7 @@ class SchedulesFragment : Fragment() {
                                     )
                                 specialSchedulesListView.adapter = specialArrayAdapter
                                 specialArrayAdapter.notifyDataSetChanged()
+                                specialAboutShimmerFrameLayout.hideShimmer()
                                 specialShimmerFrameLayout.visibility = View.GONE
                             }
 

@@ -29,13 +29,20 @@
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent">
 
-            <TextView
-                android:id="@+id/specialScheduleAbout"
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/specialAboutShimmerFrameLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/special_schedule_about"
-                android:textAlignment="center"
-                android:layout_margin="10dp"/>
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/specialScheduleAbout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/special_schedule_about"
+                    android:textAlignment="center"
+                    android:layout_margin="10dp"/>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
 
             <Button
                 android:id="@+id/specialScheduleViewButton"
