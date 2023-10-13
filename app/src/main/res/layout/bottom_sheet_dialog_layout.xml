@@ -62,6 +62,14 @@
                     <include layout="@layout/arrivals_placeholder_layout" />
                     <include layout="@layout/arrivals_placeholder_layout" />
                     <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/arrivals_placeholder_layout" />
 
                 </LinearLayout>
 
