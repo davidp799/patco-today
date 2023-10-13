@@ -468,18 +468,6 @@ class SchedulesFragment : Fragment() {
     private fun configureBottomSheet(view: View, specialStatus: Boolean ) {
         val bottomSheetLayout = view.findViewById<LinearLayout>(R.id.bottom_sheet_layout)
         val bottomSheetBehavior: BottomSheetBehavior<LinearLayout> = BottomSheetBehavior.from(bottomSheetLayout)
-        bottomSheetBehavior.addBottomSheetCallback(
-            object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_EXPANDED ->
-                        bottomSheet.animate().setDuration(150).translationY(20f)
-                    BottomSheetBehavior.STATE_SETTLING ->
-                        bottomSheet.animate().translationY(0f)
-                }
-            }
-            override fun onSlide(bottomSheet: View, slideOffset: Float) { }
-        })
         if (!specialStatus || !viewModel.internet || !viewModel.special) {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             val specialAbout: TextView = view.findViewById(R.id.specialScheduleAbout)
@@ -570,7 +558,7 @@ class SchedulesFragment : Fragment() {
                         Toast.makeText(
                             requireContext(),
                             "No special schedules today",
-                            Toast.LENGTH_SHORT
+                            Toast.LENGTH_LONG
                         ).show()
                     }
                 }
@@ -581,9 +569,6 @@ class SchedulesFragment : Fragment() {
         }
     }
     private fun logThread(methodName: String){
-        println(
-            "-----------------\n$$$ LOG DATA $$$\n-----------------" +
-            " ${methodName}: ${Thread.currentThread().name}"
-        )
+        println(" ${methodName}: ${Thread.currentThread().name}")
     }
 }
