@@ -16,7 +16,8 @@
         android:layout_width="0sp"
         android:layout_weight=".25"
         android:layout_gravity="center"
-        android:src="@drawable/ic_timeline_tt" />
+        android:src="@drawable/ic_timeline_tt"
+        android:contentDescription="@string/station_icon" />
 
     <TextView
         android:id="@+id/item_text"
@@ -31,7 +32,8 @@
         android:layout_height="match_parent"
         android:layout_width="0sp"
         android:layout_weight=".10"
-        android:src="@drawable/ic_chevron_right"/>
+        android:src="@drawable/ic_chevron_right"
+        android:contentDescription="@string/station_information_link" />
 
     <Space
         android:layout_height="match_parent"

@@ -26,6 +26,7 @@
 
     <ImageView
         android:id="@+id/middleShimmer"
+        android:contentDescription="@string/arrival_arrow_loading"
         android:layout_height="60sp"
         android:layout_width="0sp"
         android:layout_weight=".10"

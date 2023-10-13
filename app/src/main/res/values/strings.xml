@@ -63,6 +63,17 @@
     <string name="menu_reverse">Reverse Direction</string>
     <string name="info_icon_desc">Info Icon</string>
     <string name="map_state_divider_text">New Jersey</string>
+    <string name="reverse_stations">Reverse Stations</string>
+    <string name="travel_from_station">Travel from station</string>
+    <string name="travel_to_station">Travel to station</string>
+    <string name="destination_icon">Destination icon</string>
+    <string name="dots_icon">Dots icon</string>
+    <string name="source_icon">Source icon</string>
+    <string name="arrival_time_arrow">Arrival time arrow</string>
+    <string name="arrival_arrow_loading">Arrival arrow loading</string>
+    <string name="special_schedules_title">Special schedules title</string>
+    <string name="station_icon">Station icon</string>
+    <string name="station_information_link">Station information link</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
