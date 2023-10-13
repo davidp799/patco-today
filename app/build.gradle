@@ -51,15 +51,10 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.4'
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.4'
     implementation 'androidx.preference:preference-ktx:1.2.1'
-    // androidx.activity alpha for predictive back gesture
     implementation "androidx.activity:activity-ktx:1.8.0"
-    // Kotlin Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
-    // itextpdf converter
     implementation 'com.itextpdf:itextg:5.5.10'
-    // shimmer effect from facebook
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
-    // jsoup HTML parser library @ https://jsoup.org/
     implementation 'org.jsoup:jsoup:1.15.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
