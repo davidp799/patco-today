@@ -4,13 +4,16 @@ import androidx.lifecycle.ViewModel
 
 class InfoViewModel : ViewModel() {
     private val _infoLinks = arrayOf(
-        "http://www.ridepatco.org/schedules/fares.html",
+        "https://www.ridepatco.org/schedules/fares.html",
         "https://www.patcofreedomcard.org/front/account/login.jsp",
-        "https://twitter.com/RidePATCO", "tel:+1-856-772-6900",
-        "patco@ridepatco.org", "http://www.ridepatco.org/index.asp",
-        "http://www.ridepatco.org/schedules/schedules.asp",
-        "http://www.ridepatco.org/schedules/alerts_more.asp?page=25",
-        "http://www.ridepatco.org/travel/faqs.html", "http://www.ridepatco.org/safety/how_do_i.html"
+        "https://twitter.com/RidePATCO",
+        "tel:+1-856-772-6900",
+        "patco@ridepatco.org",
+        "https://www.ridepatco.org/index.asp",
+        "https://www.ridepatco.org/schedules/schedules.asp",
+        "https://www.ridepatco.org/schedules/alerts_more.asp?page=25",
+        "https://www.ridepatco.org/travel/faqs.html",
+        "https://www.ridepatco.org/safety/how_do_i.html"
     )
 
     private val _infoItems = arrayOf(

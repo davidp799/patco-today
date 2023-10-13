@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private val preferencesName = "com.davidp799.patcotoday_preferences"
     private val urlString
-        = "http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip"
+        = "https://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip"
     private val gtfsFileName = "gtfs.zip"
 
     override fun onCreate(savedInstanceState: Bundle?) {

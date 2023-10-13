@@ -10,19 +10,19 @@ class MapViewModel : ViewModel() {
         "12/13th & Locust", "15/16th & Locust"
     )
     private val _stationLinks = arrayOf(
-        "http://www.ridepatco.org/stations/lindenwold.asp",
-        "http://www.ridepatco.org/stations/ashland.asp",
-        "http://www.ridepatco.org/stations/woodcrest.asp",
-        "http://www.ridepatco.org/stations/haddonfield.asp",
-        "http://www.ridepatco.org/stations/westmont.asp",
-        "http://www.ridepatco.org/stations/collingswood.asp",
-        "http://www.ridepatco.org/stations/ferryave.asp",
-        "http://www.ridepatco.org/stations/broadway.asp",
-        "http://www.ridepatco.org/stations/cityhall.asp",
-        "http://www.ridepatco.org/stations/8th.asp",
-        "http://www.ridepatco.org/stations/9th.asp",
-        "http://www.ridepatco.org/stations/12th.asp",
-        "http://www.ridepatco.org/stations/15th.asp"
+        "https://www.ridepatco.org/stations/lindenwold.asp",
+        "https://www.ridepatco.org/stations/ashland.asp",
+        "https://www.ridepatco.org/stations/woodcrest.asp",
+        "https://www.ridepatco.org/stations/haddonfield.asp",
+        "https://www.ridepatco.org/stations/westmont.asp",
+        "https://www.ridepatco.org/stations/collingswood.asp",
+        "https://www.ridepatco.org/stations/ferryave.asp",
+        "https://www.ridepatco.org/stations/broadway.asp",
+        "https://www.ridepatco.org/stations/cityhall.asp",
+        "https://www.ridepatco.org/stations/8th.asp",
+        "https://www.ridepatco.org/stations/9th.asp",
+        "https://www.ridepatco.org/stations/12th.asp",
+        "https://www.ridepatco.org/stations/15th.asp"
     )
 
     val stationList = _stationList

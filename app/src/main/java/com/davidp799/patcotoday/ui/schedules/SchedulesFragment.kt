@@ -330,7 +330,7 @@ class SchedulesFragment : Fragment() {
     }
     private fun checkSpecial(): Boolean {
         return try {
-            val doc = Jsoup.connect("http://www.ridepatco.org/schedules/schedules.asp").get()
+            val doc = Jsoup.connect("https://www.ridepatco.org/schedules/schedules.asp").get()
             val getSpecial = GetSpecial(doc)
             viewModel.specialURLs.addAll(getSpecial.url)
             viewModel.specialTexts.addAll(getSpecial.text)
