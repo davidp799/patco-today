@@ -8,7 +8,7 @@
     android:layout_height="wrap_content"
     android:elevation="0dp"
     app:behavior_hideable="true"
-    app:behavior_peekHeight="0sp"
+    app:behavior_peekHeight="24sp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
     <!-- Drag handle for accessibility -->
