@@ -80,14 +80,27 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         } // set as xml.preferences
 
         override fun onPreferenceTreeClick(preference: Preference): Boolean {
-            val key = preference.key
-            if (key.equals("app_version")) {
-                easterEggCounter += 1
-                if(easterEggCounter == 5) {
-                    val easterEggSelection = Random.nextInt(0, easterEggs.size)
-                    Toast.makeText(context, easterEggs[easterEggSelection], Toast.LENGTH_LONG).show()
-                    easterEggCounter = 0
+            when (preference.key) {
+                "app_version" -> {
+                    easterEggCounter += 1
+                    if(easterEggCounter == 5) {
+                        val easterEggSelection = Random.nextInt(0, easterEggs.size)
+                        Toast.makeText(
+                            context,
+                            easterEggs[easterEggSelection],
+                            Toast.LENGTH_LONG
+                        ).show()
+                        easterEggCounter = 0
+                    }
                 }
+                "check_updates" -> {
+                    // TODO: check for updates here
+                    Toast.makeText(
+                        context,
+                        "Your schedules are up to date.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else -> {}
             }
             return super.onPreferenceTreeClick(preference)
         }

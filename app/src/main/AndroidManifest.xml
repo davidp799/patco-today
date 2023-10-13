@@ -19,10 +19,12 @@
         <activity
             android:name=".SettingsActivity"
             android:parentActivityName=".MainActivity"
+            android:configChanges="uiMode"
             android:exported="true"
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".MainActivity"
+            android:configChanges="uiMode"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -205,7 +205,7 @@ class MainActivity : AppCompatActivity() {
             var updatedCount = 0
             val zipFile = File(dataDirectory + gtfsFileName)
             val lastModified = Date(zipFile.lastModified())
-            val latestRelease = java.text.DateFormat.getDateInstance().parse("09/02/2023")
+            val latestRelease = Date("09/02/2023")
             if (lastModified < latestRelease) {
                 updatedCount++
                 print("[updateFiles] State: OUT OF DATE\n")
