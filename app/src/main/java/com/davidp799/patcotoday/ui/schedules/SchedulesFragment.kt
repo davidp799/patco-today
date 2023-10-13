@@ -48,8 +48,10 @@ class SchedulesFragment : Fragment() {
             requireActivity().getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
         val sharedPreferencesEditor = sharedPreferences.edit()
 
-        viewModel.fromString = sharedPreferences.getString("last_source", "Lindenwold").toString()
-        viewModel.toString = sharedPreferences.getString("last_dest", "15-16th & Locust").toString()
+        viewModel.fromString = sharedPreferences
+            .getString("last_source", "Lindenwold").toString()
+        viewModel.toString = sharedPreferences
+            .getString("last_dest", "15-16th & Locust").toString()
         viewModel.fromIndex = viewModel.stationOptions.indexOf(viewModel.fromString)
         viewModel.toIndex = viewModel.stationOptions.indexOf(viewModel.toString)
 
@@ -373,7 +375,13 @@ class SchedulesFragment : Fragment() {
                     connection = url.openConnection() as HttpURLConnection
                     connection.connect()
                     if (connection.responseCode != HttpURLConnection.HTTP_OK) {
-                        Log.d("downloadPDF", "Server ResponseCode=" + connection.responseCode.toString() + " ResponseMessage=" + connection.responseMessage)
+                        Log.d(
+                            "downloadPDF",
+                            "Server ResponseCode="
+                                    + connection.responseCode.toString()
+                                    + " ResponseMessage="
+                                    + connection.responseMessage
+                        )
                     }
                     input = connection.inputStream
                     Log.d("downloadPDF", "destinationFilePath=$filePath")
@@ -488,8 +496,10 @@ class SchedulesFragment : Fragment() {
     }
 
     private fun configureBottomSheet(view: View, specialStatus: Boolean ) {
-        val bottomSheetLayout = view.findViewById<LinearLayout>(R.id.bottom_sheet_layout)
-        val bottomSheetBehavior: BottomSheetBehavior<LinearLayout> = BottomSheetBehavior.from(bottomSheetLayout)
+        val bottomSheetLayout
+            = view.findViewById<LinearLayout>(R.id.bottom_sheet_layout)
+        val bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+            = BottomSheetBehavior.from(bottomSheetLayout)
         if (!specialStatus || !viewModel.internet || !viewModel.special) {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             val specialAbout: TextView = view.findViewById(R.id.specialScheduleAbout)
@@ -521,7 +531,8 @@ class SchedulesFragment : Fragment() {
     }
 
     private fun checkInternet(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager
+            = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
         return when {

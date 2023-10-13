@@ -42,7 +42,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var sharedPreferences: SharedPreferences
     private val preferencesName = "com.davidp799.patcotoday_preferences"
-    private val urlString = "http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip"
+    private val urlString
+        = "http://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip"
     private val gtfsFileName = "gtfs.zip"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -116,15 +117,15 @@ class MainActivity : AppCompatActivity() {
         print("[backgroundTasksRequest] = Active\n")
         cleanUpFiles()
         val internetAvailable = checkInternet(this) // wait until job is done
-        setStatusOnMainThread("internetAvailable", internetAvailable);
+        setStatusOnMainThread("internetAvailable", internetAvailable)
         if (internetAvailable) {
-            setStatusOnMainThread("updateFiles", updateFiles());
+            setStatusOnMainThread("updateFiles", updateFiles())
             if (!viewModel.updated) {
                 val downloaded = downloadZip()
                 setStatusOnMainThread("downloadedStatus", downloaded)
                 if (downloaded) {
                     val extracted = extractZip()
-                    setStatusOnMainThread("extractedStatus", extracted);
+                    setStatusOnMainThread("extractedStatus", extracted)
                 }
             }
         }
@@ -133,13 +134,13 @@ class MainActivity : AppCompatActivity() {
         withContext(Main) {
             when (key) {
                 "internetAvailable" -> {
-                    viewModel.internet = value;
+                    viewModel.internet = value
                     if (!viewModel.internet) {
                         Toast.makeText(
                             this@MainActivity,
                             "No internet connection. Working offline",
                             Toast.LENGTH_SHORT
-                        ).show();
+                        ).show()
                     }
                 }
                 "updateFiles" -> {
@@ -151,7 +152,7 @@ class MainActivity : AppCompatActivity() {
                         "Downloading new schedules",
                         Toast.LENGTH_LONG
                     ).show()
-                    viewModel.downloaded = value;
+                    viewModel.downloaded = value
                     if (!viewModel.downloaded) {
                         Toast.makeText(
                             this@MainActivity,
@@ -161,23 +162,24 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 "extractedStatus" -> {
-                    viewModel.extracted = value;
+                    viewModel.extracted = value
                     if (!viewModel.extracted) {
                         Toast.makeText(
                             this@MainActivity,
                             "Unable to configure schedule data",
                             Toast.LENGTH_SHORT
-                        ).show();
+                        ).show()
                     }
                 }
                 else -> {
-                    println("$key, $value");
+                    println("$key, $value")
                 }
             }
         }
     }
     private fun checkInternet(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager = context
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork ?: return false
         val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
         return when {
@@ -203,7 +205,7 @@ class MainActivity : AppCompatActivity() {
             var updatedCount = 0
             val zipFile = File(dataDirectory + gtfsFileName)
             val lastModified = Date(zipFile.lastModified())
-            val latestRelease = Date("08/15/2022")// TODO: Scrape latest release date from web
+            val latestRelease = java.text.DateFormat.getDateInstance().parse("09/02/2023")
             if (lastModified < latestRelease) {
                 updatedCount++
                 print("[updateFiles] State: OUT OF DATE\n")
@@ -234,12 +236,18 @@ class MainActivity : AppCompatActivity() {
             if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                 Log.d(
                     "downloadZipFile",
-                    "Server ResponseCode=" + connection.responseCode + " ResponseMessage=" + connection.responseMessage
+                    "Server ResponseCode="
+                            + connection.responseCode
+                            + " ResponseMessage="
+                            + connection.responseMessage
                 )
             }
             // download the file
             input = connection.inputStream
-            Log.d("[downloadZipFile]: ", "destinationFilePath=$dataDirectory + $gtfsFileName")
+            Log.d(
+                "[downloadZipFile]: ",
+                "destinationFilePath=$dataDirectory + $gtfsFileName"
+            )
             val newFile = File(dataDirectory+gtfsFileName)
             newFile.parentFile?.mkdirs()
             newFile.createNewFile()
