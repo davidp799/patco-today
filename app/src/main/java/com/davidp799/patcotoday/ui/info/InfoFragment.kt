@@ -32,7 +32,7 @@ class InfoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val infoViewModel =
-            ViewModelProvider(this).get(InfoViewModel::class.java)
+            ViewModelProvider(this)[InfoViewModel::class.java]
         _binding = FragmentInfoBinding.inflate(inflater, container, false)
         val root: View = binding.root
         enterTransition = MaterialFadeThrough()
@@ -49,8 +49,12 @@ class InfoFragment : Fragment() {
         infoListView.isTransitionGroup = true
         infoListView.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
-                val openLinksIntent = Intent(Intent.ACTION_VIEW, Uri.parse(infoViewModel.infoLinks[position]))
-                requireContext().startActivity(openLinksIntent)
+                try {
+                    val openLinksIntent = Intent(Intent.ACTION_VIEW, Uri.parse(infoViewModel.infoLinks[position]))
+                    requireContext().startActivity(openLinksIntent)
+                } catch (e: Error) {
+                    e.printStackTrace()
+                }
             }
 
         return root

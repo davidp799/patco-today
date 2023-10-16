@@ -8,7 +8,7 @@ class InfoViewModel : ViewModel() {
         "https://www.patcofreedomcard.org/front/account/login.jsp",
         "https://twitter.com/RidePATCO",
         "tel:+1-856-772-6900",
-        "patco@ridepatco.org",
+        "mailto:patco@ridepatco.org",
         "https://www.ridepatco.org/index.asp",
         "https://www.ridepatco.org/schedules/schedules.asp",
         "https://www.ridepatco.org/schedules/alerts_more.asp?page=25",
