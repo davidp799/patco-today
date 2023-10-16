@@ -1,5 +1,6 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
     <style name="Theme.PatcoToday" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/md_theme_dark_primary</item>
@@ -32,15 +33,9 @@
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_inversePrimary</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="android:dialogCornerRadius">16dp</item>
 
     </style>
-
-    <style name="Theme.PatcoToday.AppBarOverlay" parent="ThemeOverlay.Material3.Dark.ActionBar" />
-
-    <style name="Theme.PatcoToday.PopupOverlay" parent="ThemeOverlay.Material3.Dark" />
-
-
 </resources>
