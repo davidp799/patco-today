@@ -84,6 +84,7 @@
                     <AutoCompleteTextView
                         android:id="@+id/fromTextView"
                         android:layout_width="match_parent"
+                        android:maxWidth="488dp"
                         android:layout_height="wrap_content"
                         android:inputType="none"
                         android:maxLines="1"
@@ -111,6 +112,7 @@
                     <AutoCompleteTextView
                         android:id="@+id/toTextView"
                         android:layout_width="match_parent"
+                        android:maxWidth="488dp"
                         android:layout_height="wrap_content"
                         android:inputType="none"
                         android:maxLines="1"
