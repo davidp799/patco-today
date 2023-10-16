@@ -2,16 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:contentDescription="@string/schedules_section"
         android:id="@+id/navigation_schedules"
         android:icon="@drawable/ic_schedules_tt"
         android:title="@string/title_schedules" />
 
     <item
+        android:contentDescription="@string/stations_map_section"
         android:id="@+id/navigation_map"
         android:icon="@drawable/ic_map_tt"
         android:title="@string/title_map" />
 
     <item
+        android:contentDescription="@string/information_section"
         android:id="@+id/navigation_info"
         android:icon="@drawable/ic_info_tt"
         android:title="@string/title_info" />

@@ -75,6 +75,9 @@
     <string name="station_icon">Station icon</string>
     <string name="station_information_link">Station information link</string>
     <string name="settings_content_scrollable">Settings content scrollable</string>
+    <string name="information_section">Information section</string>
+    <string name="stations_map_section">Stations map section</string>
+    <string name="schedules_section">Schedules section</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
