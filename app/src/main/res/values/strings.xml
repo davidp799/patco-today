@@ -74,6 +74,7 @@
     <string name="special_schedules_title">Special schedules title</string>
     <string name="station_icon">Station icon</string>
     <string name="station_information_link">Station information link</string>
+    <string name="settings_content_scrollable">Settings content scrollable</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
