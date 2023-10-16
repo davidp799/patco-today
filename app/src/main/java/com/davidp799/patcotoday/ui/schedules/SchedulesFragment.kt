@@ -549,21 +549,26 @@ class SchedulesFragment : Fragment() {
         logThread("updateListViewBackgroundTask")
         val arrivalsArrayList = getArrivalsBackgroundTask(source, destination)
         val scrollIndex = scrollToNext(arrivalsArrayList)
-        withContext (Main) {
-            viewModel.schedulesArrayList.clear()
-            viewModel.schedulesArrayList.addAll(arrivalsArrayList)
-            val schedulesAdapter: ArrayAdapter<Arrival> =
-                SchedulesListAdapter(
-                    context,
-                    R.layout.adapter_view_layout,
-                    viewModel.schedulesArrayList,
-                    scrollIndex
-                )
-            listView.adapter = schedulesAdapter
-            schedulesAdapter.notifyDataSetChanged()
-            listView.smoothScrollToPositionFromTop(scrollIndex, 0, 120)
-            // TODO: set current arrival listview text as bold
-            arrivalsShimmerFrameLayout.visibility = View.GONE
+        try {
+            withContext (Main) {
+                viewModel.schedulesArrayList.clear()
+                viewModel.schedulesArrayList.addAll(arrivalsArrayList)
+                val schedulesAdapter: ArrayAdapter<Arrival> =
+                    SchedulesListAdapter(
+                        context,
+                        R.layout.adapter_view_layout,
+                        viewModel.schedulesArrayList,
+                        scrollIndex
+                    )
+                listView.adapter = schedulesAdapter
+                schedulesAdapter.notifyDataSetChanged()
+                listView.smoothScrollToPositionFromTop(scrollIndex, 0, 120)
+                // TODO: set current arrival listview text as bold
+                arrivalsShimmerFrameLayout.visibility = View.GONE
+            }
+
+        } catch (e: Error) {
+            e.printStackTrace()
         }
     }
     private fun getArrivalsBackgroundTask(sourceId: Int, destinationId: Int): ArrayList<Arrival> {
