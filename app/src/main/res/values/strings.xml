@@ -78,6 +78,8 @@
     <string name="information_section">Information section</string>
     <string name="stations_map_section">Stations map section</string>
     <string name="schedules_section">Schedules section</string>
+    <string name="no_network_connection">No network connection. Working offline.</string>
+    <string name="close_to_schedule">Trains are operating on or close to schedule.</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
