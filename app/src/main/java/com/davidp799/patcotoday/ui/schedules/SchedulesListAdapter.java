@@ -33,9 +33,6 @@ public class SchedulesListAdapter extends ArrayAdapter<Arrival> {
         TextView travels;
     }
 
-    /**
-     * Default constructor for the PersonListAdapter
-     */
     public SchedulesListAdapter(Context context, int resource, ArrayList<Arrival> objects, int scrollValue) {
         super(context, resource, objects);
         mContext = context;
