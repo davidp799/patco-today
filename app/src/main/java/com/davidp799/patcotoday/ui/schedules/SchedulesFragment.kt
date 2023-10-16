@@ -26,7 +26,10 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDateTime
 import java.util.*
+
 
 class SchedulesFragment : Fragment() {
     private var _binding: FragmentSchedulesBinding? = null
@@ -285,7 +288,28 @@ class SchedulesFragment : Fragment() {
             val specialStatus = checkSpecial()
             setStatusOnMainThread("specialStatus", specialStatus)
             if (specialStatus) {
-                val downloadStatus = downloadSpecial()
+                var continueDownload = false
+                var useFile = ""
+                val dataDirectory = context.filesDir.absolutePath + "/data/"
+                File(dataDirectory + "special/").walk().forEach {
+                    val specialPdfFile = File(dataDirectory + "special/" + it)
+                    val lastModified = LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(specialPdfFile.lastModified()),
+                        TimeZone.getDefault().toZoneId()
+                    )
+                    val now = LocalDateTime.now()
+
+                    if (lastModified > now.minusMinutes(30)) {
+                        useFile = it.absolutePath // TODO: use old files instead of downloading new
+                        continueDownload = false
+                    } else {
+                        continueDownload = true
+                    }
+                }
+                var downloadStatus = false
+                if (continueDownload) {
+                    downloadStatus = downloadSpecial()
+                }
                 if (downloadStatus) {
                     val convertStatus = convertSpecial()
                     if (convertStatus) {
@@ -407,6 +431,8 @@ class SchedulesFragment : Fragment() {
                     connection?.disconnect()
                 }
             }
+            output?.close()
+            input?.close()
             return true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -504,9 +530,9 @@ class SchedulesFragment : Fragment() {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             val specialAbout: TextView = view.findViewById(R.id.specialScheduleAbout)
             if (!viewModel.internet) {
-                specialAbout.text = "No network connection. Working offline."
+                specialAbout.setText(R.string.no_network_connection)
             } else {
-                specialAbout.text = "Trains are operating on or close to schedule."
+                specialAbout.setText(R.string.close_to_schedule)
             }
         } else {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
