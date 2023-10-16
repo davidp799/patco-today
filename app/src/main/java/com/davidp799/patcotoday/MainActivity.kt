@@ -11,7 +11,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelLazy
@@ -54,22 +53,11 @@ class MainActivity : AppCompatActivity() {
         }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.topAppBar))
         window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
         window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
-        when (sharedPreferences.getString("device_theme", "")) {
-            "1" -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-            "2" -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }
-            else -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            }
-        }
         val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         val appBarConfiguration = AppBarConfiguration(
