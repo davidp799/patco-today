@@ -211,6 +211,7 @@ class MainActivity : AppCompatActivity() {
                 print("[updateFiles] State: OUT OF DATE\n")
             } else {
                 print("[updateFiles] State: UP TO DATE\n")
+                return true
             }
             var notFound = 0
             for (fileName in dataFiles) { // Check if all files exist
