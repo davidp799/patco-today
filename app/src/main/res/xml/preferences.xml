@@ -24,6 +24,22 @@
     <PreferenceCategory
         app:iconSpaceReserved="false"
         android:title="More">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="check_updates"
+            android:title="@string/pref_title_updates"
+            android:summary="@string/pref_summary_updates">
+        </Preference>
+
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            android:key="download_on_mobile_data"
+            android:title="@string/download_on_mobile_data"
+            android:defaultValue="true"
+            android:summary="@string/download_on_mobile_data_summary"
+            />
+
         <Preference
             app:iconSpaceReserved="false"
             android:title="@string/pref_title_feedback"
@@ -34,12 +50,6 @@
             </intent>
         </Preference>
 
-        <Preference
-            app:iconSpaceReserved="false"
-            android:key="check_updates"
-            android:title="@string/pref_title_updates"
-            android:summary="@string/pref_summary_updates">
-        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory
