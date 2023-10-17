@@ -51,12 +51,16 @@ class SchedulesFragment : Fragment() {
             requireActivity().getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
         val sharedPreferencesEditor = sharedPreferences.edit()
 
+        viewModel.automaticDownloads = sharedPreferences
+            .getBoolean("download_on_mobile_data", true)
         viewModel.fromString = sharedPreferences
             .getString("last_source", "Lindenwold").toString()
         viewModel.toString = sharedPreferences
             .getString("last_dest", "15-16th & Locust").toString()
-        viewModel.fromIndex = viewModel.stationOptions.indexOf(viewModel.fromString)
-        viewModel.toIndex = viewModel.stationOptions.indexOf(viewModel.toString)
+        viewModel.fromIndex = viewModel
+            .stationOptions.indexOf(viewModel.fromString)
+        viewModel.toIndex = viewModel
+            .stationOptions.indexOf(viewModel.toString)
 
         val fromTextView =
             root.findViewById<AutoCompleteTextView>(R.id.fromTextView)
@@ -288,29 +292,46 @@ class SchedulesFragment : Fragment() {
             val specialStatus = checkSpecial()
             setStatusOnMainThread("specialStatus", specialStatus)
             if (specialStatus) {
-                var continueDownload = false
-                var useFile = ""
+                var continueDownload = true
+                var downloadStatus = false
+                var existingPdfFilePath = ""
                 val dataDirectory = context.filesDir.absolutePath + "/data/"
-                File(dataDirectory + "special/").walk().forEach {
-                    val specialPdfFile = File(dataDirectory + "special/" + it)
-                    val lastModified = LocalDateTime.ofInstant(
-                        Instant.ofEpochMilli(specialPdfFile.lastModified()),
+                if (File(dataDirectory + "special/special0.pdf").exists()) {
+                    val existingPdfFile = File(dataDirectory + "special/special0.pdf")
+                    val lastModifiedDateTime = LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(
+                            existingPdfFile.lastModified()
+                        ),
                         TimeZone.getDefault().toZoneId()
                     )
-                    val now = LocalDateTime.now()
+                    val currentDateTime = LocalDateTime.now()
 
-                    if (lastModified > now.minusMinutes(30)) {
-                        useFile = it.absolutePath // TODO: use old files instead of downloading new
+                    if (lastModifiedDateTime > currentDateTime.minusHours(1)) {
+                        existingPdfFilePath = existingPdfFile.absolutePath // TODO: use old files instead of downloading new
                         continueDownload = false
                     } else {
+                        Log.d("[fileCheck]", "deleting existing pdf file")
+                        existingPdfFile.delete()
                         continueDownload = true
                     }
+                } else {
+                    Log.d("[fileCheck]", "no existing pdf files found")
                 }
-                var downloadStatus = false
-                if (continueDownload) {
+                if (viewModel.automaticDownloads && continueDownload) {
                     downloadStatus = downloadSpecial()
+                } else {
+                    withContext (Main) {
+                        configureBottomSheet(view, true)
+                        val specialSchedulesTextView =
+                            view.findViewById<TextView>(R.id.specialScheduleAbout)
+                        if (viewModel.specialText.size > 0) {
+                            specialSchedulesTextView.text = viewModel.specialText[0]
+                        }
+                        specialAboutShimmerFrameLayout.hideShimmer()
+                        specialShimmerFrameLayout.visibility = View.GONE
+                    }
                 }
-                if (downloadStatus) {
+                if (downloadStatus || (existingPdfFilePath != "")) {
                     val convertStatus = convertSpecial()
                     if (convertStatus) {
                         val parseStatus = parseSpecial()
@@ -340,10 +361,8 @@ class SchedulesFragment : Fragment() {
                                 specialAboutShimmerFrameLayout.hideShimmer()
                                 specialShimmerFrameLayout.visibility = View.GONE
                             }
-
                         }
                     }
-
                 }
             } else {
                 configureBottomSheetOnMainThread(view, false, specialShimmerFrameLayout)
@@ -371,10 +390,9 @@ class SchedulesFragment : Fragment() {
                         }
                     }
                 } catch (e: Exception) {
-                    println("[checkSpecial] ERROR: Unknown duration for special schedules!")
+                    Log.w("[checkSpecial]", "unknown duration for special schedules")
                     viewModel.specialFromToTimes.add("Various Times")
                 }
-
             }
             viewModel.specialURLs.size > 0
         } catch (e: IOException) {
@@ -400,7 +418,7 @@ class SchedulesFragment : Fragment() {
                     connection.connect()
                     if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                         Log.d(
-                            "downloadPDF",
+                            "[downloadPDF]",
                             "Server ResponseCode="
                                     + connection.responseCode.toString()
                                     + " ResponseMessage="
@@ -408,10 +426,11 @@ class SchedulesFragment : Fragment() {
                         )
                     }
                     input = connection.inputStream
-                    Log.d("downloadPDF", "destinationFilePath=$filePath")
+                    Log.d("[downloadPDF] ", "file download successful")
                     val newFile = File(filePath)
                     newFile.parentFile!!.mkdirs()
                     newFile.createNewFile()
+                    newFile.setLastModified(System.currentTimeMillis())
                     output = FileOutputStream(filePath)
                     val data = ByteArray(4096)
                     var count: Int
@@ -419,6 +438,8 @@ class SchedulesFragment : Fragment() {
                         output.write(data, 0, count)
                     }
                     viewModel.downloaded = true
+                    val newPdfFile = File(filePath)
+                    newPdfFile.setLastModified(System.currentTimeMillis())
                 } catch (e: Exception) {
                     e.printStackTrace()
                 } finally {
@@ -624,15 +645,18 @@ class SchedulesFragment : Fragment() {
                             "No special schedules today",
                             Toast.LENGTH_LONG
                         ).show()
-                    }
+                    } else { }
                 }
                 else -> {
-                    println("[setStatusOnMainThread] Unknown key / value pair: $key, $value")
+                    Log.d(
+                        "[setStatusOnMainThread]",
+                        "unknown key / value pair: $key, $value"
+                    )
                 }
             }
         }
     }
     private fun logThread(methodName: String){
-        println(" ${methodName}: ${Thread.currentThread().name}")
+        Log.d(methodName, Thread.currentThread().name)
     }
 }
