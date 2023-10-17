@@ -49,7 +49,7 @@
     <string name="pref_title_feedback">Send App Feedback</string>
     <string name="pref_summary_feedback">Email developer</string>
     <string name="pref_title_version">Application Version</string>
-    <string name="pref_summary_version">1.0.1</string>
+    <string name="pref_summary_version">1.0.3</string>
     <string name="pref_title_licenses">Open Source Licenses</string>
     <string name="pref_summary_licenses">View the GNU General Public License</string>
     <string name="pref_title_updates">Check for Updates</string>
@@ -80,6 +80,8 @@
     <string name="schedules_section">Schedules section</string>
     <string name="no_network_connection">No network connection. Working offline.</string>
     <string name="close_to_schedule">Trains are operating on or close to schedule.</string>
+    <string name="download_on_mobile_data">Download schedules using cellular data</string>
+    <string name="download_on_mobile_data_summary">Automatically download special schedules when WiFi is not available</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
