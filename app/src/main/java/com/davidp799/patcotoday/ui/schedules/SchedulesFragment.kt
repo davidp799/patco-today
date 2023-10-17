@@ -8,27 +8,50 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelLazy
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding
-import com.davidp799.patcotoday.utils.*
+import com.davidp799.patcotoday.utils.Arrival
+import com.davidp799.patcotoday.utils.ConvertPDF
+import com.davidp799.patcotoday.utils.GetSpecial
+import com.davidp799.patcotoday.utils.JpgToPdf
+import com.davidp799.patcotoday.utils.ParsePDF
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.transition.MaterialFadeThrough
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
-import java.io.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 
 class SchedulesFragment : Fragment() {
@@ -292,10 +315,11 @@ class SchedulesFragment : Fragment() {
             val specialStatus = checkSpecial()
             setStatusOnMainThread("specialStatus", specialStatus)
             if (specialStatus) {
-                var continueDownload = true
+                val isMobileData = isMobileData(context)
                 var downloadStatus = false
                 var existingPdfFilePath = ""
                 val dataDirectory = context.filesDir.absolutePath + "/data/"
+
                 if (File(dataDirectory + "special/special0.pdf").exists()) {
                     val existingPdfFile = File(dataDirectory + "special/special0.pdf")
                     val lastModifiedDateTime = LocalDateTime.ofInstant(
@@ -308,18 +332,19 @@ class SchedulesFragment : Fragment() {
 
                     if (lastModifiedDateTime > currentDateTime.minusHours(1)) {
                         existingPdfFilePath = existingPdfFile.absolutePath // TODO: use old files instead of downloading new
-                        continueDownload = false
                     } else {
                         Log.d("[fileCheck]", "deleting existing pdf file")
                         existingPdfFile.delete()
-                        continueDownload = true
                     }
                 } else {
                     Log.d("[fileCheck]", "no existing pdf files found")
                 }
-                if (viewModel.automaticDownloads && continueDownload) {
+
+                if (isMobileData && viewModel.automaticDownloads) {
+                    Log.d("[isMobileDataCheck]", "true && true")
                     downloadStatus = downloadSpecial()
-                } else {
+                } else if (isMobileData && !viewModel.automaticDownloads) {
+                    Log.d("[isMobileDataCheck]", "true && false")
                     withContext (Main) {
                         configureBottomSheet(view, true)
                         val specialSchedulesTextView =
@@ -330,7 +355,12 @@ class SchedulesFragment : Fragment() {
                         specialAboutShimmerFrameLayout.hideShimmer()
                         specialShimmerFrameLayout.visibility = View.GONE
                     }
+
+                } else if (!isMobileData) {
+                    Log.d("[isMobileDataCheck]", "false && null")
+                    downloadStatus = downloadSpecial()
                 }
+
                 if (downloadStatus || (existingPdfFilePath != "")) {
                     val convertStatus = convertSpecial()
                     if (convertStatus) {
@@ -364,6 +394,7 @@ class SchedulesFragment : Fragment() {
                         }
                     }
                 }
+
             } else {
                 configureBottomSheetOnMainThread(view, false, specialShimmerFrameLayout)
             }
@@ -588,6 +619,31 @@ class SchedulesFragment : Fragment() {
             else -> false
         }
     }
+
+    private fun isMobileData(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        if (capabilities != null) {
+            val hasCellular = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+            val hasWiFi = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+            val hasEthernet = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+
+            return if (hasCellular && !hasWiFi) {
+                Log.i("[isMobileData]", "true")
+                true
+            } else if (hasCellular && !hasEthernet) {
+                Log.i("[isMobileData]", "true")
+                true
+            } else {
+                Log.i("[isMobileData]", "false")
+                false
+            }
+        }
+        return false
+    }
+
 
     private suspend fun updateListViewBackgroundTask(
         source: Int, destination: Int,
