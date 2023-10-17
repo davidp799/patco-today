@@ -27,7 +27,7 @@ Current features of Patco Today include the following:
 - Up-to-date transit schedules at runtime.
 - Automatic updates for special schedules.
 - Caching of files for offline viewing.
-- Support for android 5.1 or higher.
+- Support for android 8.0 or higher.
 - An ad-free experience.
 - Application theming:
 	* Light, Dark, and System Modes
@@ -36,8 +36,6 @@ Current features of Patco Today include the following:
 
 Coming Soon:
 - Ability to change date for schedule viewing.
-- Seamless implementaiton of special schedules.
-- Ability to toggle automatic commuter mode.
 - Late arrival notifications.
 
 ## Screenshots
@@ -52,7 +50,7 @@ Coming Soon:
 
 ## Permissions
 
-On Android versions following Android 5.1, Patco Today requires the following permissions:
+On Android versions following Android 8.0, Patco Today requires the following permissions:
 - Full Network Access.
 - View Network Connections.
 
