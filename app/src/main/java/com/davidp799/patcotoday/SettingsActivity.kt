@@ -60,8 +60,10 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
                     DynamicColors.applyToActivitiesIfAvailable(application)
                 }
             }
+            "download_on_mobile_data" -> {
+            }
         }
-        this.recreate()
+        recreate()
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
