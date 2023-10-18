@@ -85,6 +85,8 @@ class SchedulesFragment : Fragment() {
         viewModel.toIndex = viewModel
             .stationOptions.indexOf(viewModel.toString)
 
+        // TODO: prevent users from selecting same from and to station
+
         val fromTextView =
             root.findViewById<AutoCompleteTextView>(R.id.fromTextView)
         val toTextView =
