@@ -250,7 +250,9 @@ class SchedulesFragment : Fragment() {
                 viewModel.stationOptions
             )
             fromTextView.setText(viewModel.stationOptions[viewModel.fromIndex])
+            fromTextView.dismissDropDown()
             toTextView.setText(viewModel.stationOptions[viewModel.toIndex])
+            toTextView.dismissDropDown()
             sharedPreferencesEditor.putString("last_source", viewModel.fromString)
             sharedPreferencesEditor.putString("last_dest", viewModel.toString)
             sharedPreferencesEditor.apply()
