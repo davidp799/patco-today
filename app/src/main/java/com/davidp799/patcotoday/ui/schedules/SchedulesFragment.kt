@@ -335,19 +335,22 @@ class SchedulesFragment : Fragment() {
                     val currentDateTime = LocalDateTime.now()
 
                     if (lastModifiedDateTime > currentDateTime.minusHours(1)) {
-                        existingPdfFilePath = existingPdfFile.absolutePath // TODO: use old files instead of downloading new
+                        existingPdfFilePath = existingPdfFile.absolutePath
+                        downloadStatus = true
                     } else {
                         Log.d("[fileCheck]", "deleting existing pdf file")
                         existingPdfFile.delete()
+                        existingPdfFilePath = ""
                     }
                 } else {
                     Log.d("[fileCheck]", "no existing pdf files found")
+                    existingPdfFilePath = ""
                 }
 
-                if (isMobileData && viewModel.automaticDownloads) {
+                if (isMobileData && viewModel.automaticDownloads && !downloadStatus) {
                     Log.d("[isMobileDataCheck]", "true && true")
                     downloadStatus = downloadSpecial()
-                } else if (isMobileData && !viewModel.automaticDownloads) {
+                } else if (isMobileData && !viewModel.automaticDownloads && !downloadStatus) {
                     Log.d("[isMobileDataCheck]", "true && false")
                     withContext (Main) {
                         configureBottomSheet(view, true)
@@ -360,7 +363,7 @@ class SchedulesFragment : Fragment() {
                         specialShimmerFrameLayout.visibility = View.GONE
                     }
 
-                } else if (!isMobileData) {
+                } else if (!isMobileData && !downloadStatus) {
                     Log.d("[isMobileDataCheck]", "false && null")
                     downloadStatus = downloadSpecial()
                 }
@@ -440,52 +443,49 @@ class SchedulesFragment : Fragment() {
         var output: OutputStream? = null
         var connection: HttpURLConnection? = null
         try {
-            for (i in 0 until viewModel.specialURLs.size) {
-                var filePath= viewModel.directory + "special/" + "special" + i
-                try {
-                    val url = URL(viewModel.specialURLs[i])
-                    filePath += if (url.toString().contains(".jpg")) {
-                        ".jpg"
-                    } else {
-                        ".pdf"
-                    }
-                    connection = url.openConnection() as HttpURLConnection
-                    connection.connect()
-                    if (connection.responseCode != HttpURLConnection.HTTP_OK) {
-                        Log.d(
-                            "[downloadPDF]",
-                            "Server ResponseCode="
-                                    + connection.responseCode.toString()
-                                    + " ResponseMessage="
-                                    + connection.responseMessage
-                        )
-                    }
-                    input = connection.inputStream
-                    Log.d("[downloadPDF] ", "file download successful")
-                    val newFile = File(filePath)
-                    newFile.parentFile!!.mkdirs()
-                    newFile.createNewFile()
-                    newFile.setLastModified(System.currentTimeMillis())
-                    output = FileOutputStream(filePath)
-                    val data = ByteArray(4096)
-                    var count: Int
-                    while (input.read(data).also { count = it } != -1) {
-                        output.write(data, 0, count)
-                    }
-                    viewModel.downloaded = true
-                    val newPdfFile = File(filePath)
-                    newPdfFile.setLastModified(System.currentTimeMillis())
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    try {
-                        output?.close()
-                        input?.close()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-                    connection?.disconnect()
+            val currentMillis = System.currentTimeMillis()
+            var filePath= viewModel.directory + "special/special0"
+            try {
+                val url = URL(viewModel.specialURLs[0])
+                filePath += if (url.toString().contains(".jpg")) {
+                    ".jpg"
+                } else {".pdf"}
+                connection = url.openConnection() as HttpURLConnection
+                connection.connect()
+                if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                    Log.d(
+                        "[downloadPDF]",
+                        "Server ResponseCode="
+                                + connection.responseCode.toString()
+                                + " ResponseMessage="
+                                + connection.responseMessage
+                    )
                 }
+                input = connection.inputStream
+                Log.d("[downloadPDF] ", "file download successful")
+                val newFile = File(filePath)
+                newFile.parentFile!!.mkdirs()
+                newFile.createNewFile()
+                newFile.setLastModified(currentMillis)
+                output = FileOutputStream(filePath)
+                val data = ByteArray(4096)
+                var count: Int
+                while (input.read(data).also { count = it } != -1) {
+                    output.write(data, 0, count)
+                }
+                viewModel.downloaded = true
+                val newPdfFile = File(filePath)
+                newPdfFile.setLastModified(currentMillis)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                try {
+                    output?.close()
+                    input?.close()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+                connection?.disconnect()
             }
             output?.close()
             input?.close()
