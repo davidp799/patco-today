@@ -321,7 +321,7 @@ class SchedulesFragment : Fragment() {
             if (specialStatus) {
                 val isMobileData = isMobileData(context)
                 var downloadStatus = false
-                var existingPdfFilePath = ""
+                val existingPdfFilePath: String
                 val dataDirectory = context.filesDir.absolutePath + "/data/"
 
                 if (File(dataDirectory + "special/special0.pdf").exists()) {
@@ -537,9 +537,7 @@ class SchedulesFragment : Fragment() {
                 viewModel.specialWestBound, viewModel.specialEastBound
             )
             val travelTime = viewModel.schedules.getTravelTime(source, destination)
-            val routeId = viewModel.schedules.getRouteID(
-                viewModel.schedules.tripId, source, destination
-            )
+            val routeId = viewModel.schedules.getRouteID(source, destination)
             // retrieve list of base data
             var position = 0
             val arrivalsArrayList =
@@ -681,8 +679,7 @@ class SchedulesFragment : Fragment() {
     private fun getArrivalsBackgroundTask(sourceId: Int, destinationId: Int): ArrayList<Arrival> {
         return try {
             val travelTime = viewModel.schedules.getTravelTime(sourceId, destinationId)
-            val tripId = viewModel.schedules.tripId
-            val routeId = viewModel.schedules.getRouteID(tripId, sourceId, destinationId)
+            val routeId = viewModel.schedules.getRouteID(sourceId, destinationId)
             val schedulesList =
                 viewModel.schedules.getSchedulesList(this.context, routeId, viewModel.fromIndex)
             return viewModel.schedules.getFormatArrival(schedulesList, travelTime)
