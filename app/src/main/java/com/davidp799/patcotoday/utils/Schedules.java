@@ -18,19 +18,20 @@ import java.util.Locale;
  *  based on provided source and destination stations and day of week. */
 public class Schedules {
     private final List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 24, 26, 27, 28);
+
     // Codes representing weekday or weekend status; Used to determine service_id
     private final int dayOfWeekNumber = LocalDate.now().getDayOfWeek().getValue();
 
-    /** Function which returns the length in minutes between source station and destination station.
+    /** Returns the length in minutes between source station and destination station.
      * @return integer value of distance in minutes */
     public int getTravelTime(int source_id, int destination_id) {
         return Math.abs(timeBetween.get(source_id) - timeBetween.get(destination_id));
     }
-    /** Function which returns the routeID which represents the direction
-     *  of the desired train (Eastbound / Westbound).
-     * @return integer route code (1 = Westbound, 2 = Eastbound) */
+
+    /** Returns the travel schedule of the train.
+     * @return string trip id (weekdays-, saturdays-, sundays-) */
     public String getTripId() {
-        if (dayOfWeekNumber >= 1 && dayOfWeekNumber <= 5) { // weekdays, concatenate first half as weekdays
+        if (dayOfWeekNumber >= 1 && dayOfWeekNumber <= 5) { // weekdays
             return "weekdays-";
         } else if (dayOfWeekNumber == 6) { // saturdays
             return "saturdays-";
@@ -38,8 +39,7 @@ public class Schedules {
             return "sundays-";
         }
     }
-    /** Function which returns the routeID which represents the direction
-     *  of the desired train (Eastbound / Westbound).
+    /** Returns the direction of the train.
      * @return integer route code (1 = Westbound, 2 = Eastbound) */
     public String getRouteID(String trip_id, int source_id, int destination_id) {
         if (destination_id > source_id) {
@@ -49,20 +49,18 @@ public class Schedules {
         }
     }
 
-    /** Function which reads the stop_times.txt data file to determine the
-     *  trip_id based on the given route_id and service_id.
-     * @return ArrayList of strings */
+    /** Returns the arrival times for the source station using the route_id and source_id.
+     * @return ArrayList of strings containing arrival times for the source station */
     public ArrayList<String> getSchedulesList(Context context, String route_id, int source_id) {
         AssetManager am = context.getAssets();
         ArrayList<String> result = new ArrayList<>();
         BufferedReader reader;
-        InputStream databaseStream = null;
+        InputStream databaseStream;
         try {
             databaseStream = am.open(route_id);
             reader = new BufferedReader(new InputStreamReader(databaseStream));
             String line = reader.readLine();
             while ( line != null ) {
-                List<String> c;
                 ArrayList<String> newC = new ArrayList<>();
                 String[] split = line.split(",", 128);
                 for (String oldString : split) {
@@ -89,8 +87,7 @@ public class Schedules {
         }
         return result;
     }
-    /** Function which formats list of trip by removing duplicate arrivals,
-     *  setting arrivals to 12 hour format, and appending travel times as Arrival objects.
+    /** Removes duplicates, converts to 12 hour format, and appends times as Arrival objects.
      *  @param schedules unformatted list of arrival times
      *  @param travelTime minutes between source and destination station
      *  @return ArrayList of Arrival objects */
@@ -101,7 +98,6 @@ public class Schedules {
             String currentTime = schedules.get(i);
             SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm", Locale.US);
             try {
-                Date current24HourDt = _24HourSDF.parse(currentTime);
                 if (i < schedules.size()-1 && i > 0) {
                     String nextTime = schedules.get(i+1);
                     if (currentTime.equals("99:99")) {
