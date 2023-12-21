@@ -41,73 +41,73 @@ public class Schedules {
     }
     /** Returns the direction of the train.
      * @return integer route code (1 = Westbound, 2 = Eastbound) */
-    public String getRouteID(String trip_id, int source_id, int destination_id) {
+    public String getRouteID(int source_id, int destination_id) {
         if (destination_id > source_id) {
-            return trip_id + "west.csv";
+            return getTripId() + "west.csv";
         } else {
-            return trip_id + "east.csv";
+            return getTripId() + "east.csv";
         }
     }
 
     /** Returns the arrival times for the source station using the route_id and source_id.
      * @return ArrayList of strings containing arrival times for the source station */
-    public ArrayList<String> getSchedulesList(Context context, String route_id, int source_id) {
-        AssetManager am = context.getAssets();
-        ArrayList<String> result = new ArrayList<>();
+    public ArrayList<Trip> getSchedulesList(
+            Context context, String route_id, int source_id, int destination_id
+    ) {
+        ArrayList<Trip> schedulesList = new ArrayList<>(); // final result
+        AssetManager assetManager = context.getAssets();
         BufferedReader reader;
         InputStream databaseStream;
         try {
-            databaseStream = am.open(route_id);
+            databaseStream = assetManager.open(route_id);
             reader = new BufferedReader(new InputStreamReader(databaseStream));
-            String line = reader.readLine();
-            while ( line != null ) {
-                ArrayList<String> newC = new ArrayList<>();
-                String[] split = line.split(",", 128);
-                for (String oldString : split) {
-                    if (oldString.contains("A")) {
-                        String newString = oldString.replace("A", "");
-                        newC.add(newString);
-                    } else if (oldString.contains("P") && !oldString.contains("12:")) {
-                        String newString = oldString.replace("P", "");
-                        String[] newParts = newString.split(":");
-                        int newHour = Integer.parseInt(newParts[0]) + 12;
-                        newString = newHour + ":" + newParts[1];
-                        newC.add(newString);
-                    } else if (oldString.contains("P") && oldString.contains("12:")) {
-                        String newString = oldString.replace("P", "");
-                        newC.add(newString);
-                    }
+            String currentLine = reader.readLine();
+            while ( currentLine != null ) {
+                Trip formattedTrip = new Trip("", false, false);
+                String[] unformattedTrips = currentLine.split(",", 128);
+                String unformattedTrip = unformattedTrips[source_id];
+                // Set arrival time for trip
+                if (unformattedTrip.contains("A")) {
+                    String newString = unformattedTrip.replace("A", "");
+                    formattedTrip.setArrivalTime(newString);
+                } else if (unformattedTrip.contains("P") && !unformattedTrip.contains("12:")) {
+                    String newString = unformattedTrip.replace("P", "");
+                    String[] newParts = newString.split(":");
+                    int newHour = Integer.parseInt(newParts[0]) + 12;
+                    newString = newHour + ":" + newParts[1];
+                    formattedTrip.setArrivalTime(newString);
+                } else if (unformattedTrip.contains("P") && unformattedTrip.contains("12:")) {
+                    String newString = unformattedTrip.replace("P", "");
+                    formattedTrip.setArrivalTime(newString);
                 }
-                result.add(newC.get(source_id));
-                line = reader.readLine();
+                // Set source and destination station status for trip
+                if (unformattedTrips[source_id].contains("CLOSED")) {
+                    formattedTrip.setSourceClosed(true);
+                }
+                if (unformattedTrips[destination_id].contains("CLOSED")) {
+                    formattedTrip.setDestinationClosed(true);
+                }
+                schedulesList.add(formattedTrip);
+                currentLine = reader.readLine();
             }
             reader.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return result;
+        return schedulesList;
     }
     /** Removes duplicates, converts to 12 hour format, and appends times as Arrival objects.
      *  @param schedules unformatted list of arrival times
      *  @param travelTime minutes between source and destination station
      *  @return ArrayList of Arrival objects */
-    public ArrayList<Arrival> getFormatArrival(ArrayList<String> schedules, int travelTime) {
+    public ArrayList<Arrival> getFormatArrival(ArrayList<Trip> schedules, int travelTime) {
         final long MILLISECONDS = 60000; //milliseconds
         ArrayList<Arrival> arrivals = new ArrayList<>();
         for (int i=0; i<schedules.size(); i++) {
-            String currentTime = schedules.get(i);
             SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm", Locale.US);
             try {
-                if (i < schedules.size()-1 && i > 0) {
-                    String nextTime = schedules.get(i+1);
-                    if (currentTime.equals("99:99")) {
-                        schedules.set(i, schedules.get(i-1));
-                    } else if (nextTime.equals("99:99")) {
-                        schedules.set(i+1, schedules.get(i));
-                    }
-                }
                 // convert to dateTime object, format as 24hr time
-                String _24HourTime = schedules.get(i);
+                String _24HourTime = schedules.get(i).getArrivalTime();
                 SimpleDateFormat _12HourSDF = new SimpleDateFormat("h:mm a", Locale.US);
                 Date _24HourDt = _24HourSDF.parse(_24HourTime);
                 // compute trip finish time from train arrival time
@@ -115,6 +115,12 @@ public class Schedules {
                 Date arrivedDt = new Date(_24HourDt.getTime() + (travelTime * MILLISECONDS));
                 // append formatted arrival times as Arrival objects
                 Arrival thisArrival = new Arrival(_12HourSDF.format(_24HourDt), _12HourSDF.format(arrivedDt));
+                if (schedules.get(i).getSourceClosed()) {
+                    thisArrival.setArrivalTime("CLOSED");
+                }
+                if (schedules.get(i).getDestinationClosed()) {
+                    thisArrival.setTravelTime("CLOSED");
+                }
                 arrivals.add(i, thisArrival);
             } catch (Exception e) {
                 e.printStackTrace();
