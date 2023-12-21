@@ -2,7 +2,7 @@ package com.davidp799.patcotoday.utils;
 
 /** Object containing arrival time and travel time for each scheduled arrival.*/
 
-public class Arrival{
+public class Arrival {
     private String arrivalTime;
     private String travelTime;
     public Arrival(String arrivalTime, String travelTime) {
