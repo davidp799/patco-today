@@ -29,6 +29,7 @@ import com.davidp799.patcotoday.utils.ConvertPDF
 import com.davidp799.patcotoday.utils.GetSpecial
 import com.davidp799.patcotoday.utils.JpgToPdf
 import com.davidp799.patcotoday.utils.ParsePDF
+import com.davidp799.patcotoday.utils.Trip
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.transition.MaterialFadeThrough
@@ -321,7 +322,7 @@ class SchedulesFragment : Fragment() {
             if (specialStatus) {
                 val isMobileData = isMobileData(context)
                 var downloadStatus = false
-                var existingPdfFilePath = ""
+                val existingPdfFilePath: String
                 val dataDirectory = context.filesDir.absolutePath + "/data/"
 
                 if (File(dataDirectory + "special/special0.pdf").exists()) {
@@ -371,7 +372,7 @@ class SchedulesFragment : Fragment() {
                 if (downloadStatus || (existingPdfFilePath != "")) {
                     val convertStatus = convertSpecial()
                     if (convertStatus) {
-                        val parseStatus = parseSpecial()
+                        val parseStatus = parseSpecial(viewModel.fromIndex, viewModel.toIndex)
                         if (parseStatus) {
                             val specialArrivalsArrayList =
                                 getSpecialArrivalsBackground(source, destination)
@@ -516,12 +517,12 @@ class SchedulesFragment : Fragment() {
         }
     }
 
-    private fun parseSpecial(): Boolean {
+    private fun parseSpecial(source: Int, destination: Int): Boolean {
         return try {
             for (i in 0 until viewModel.runnableConvertedStrings.size) {
                 val parsePDF =
                     ParsePDF(viewModel.runnableConvertedStrings[i])
-                viewModel.parsedArrivals.addAll(parsePDF.arrivalLines)
+                viewModel.parsedArrivals.addAll(parsePDF.getArrivalLines(source, destination))
             }
             viewModel.specialWestBound.addAll(viewModel.parsedArrivals[0])
             viewModel.specialEastBound.addAll(viewModel.parsedArrivals[1])
@@ -533,12 +534,10 @@ class SchedulesFragment : Fragment() {
     }
     private fun getSpecialArrivalsBackground(source: Int, destination: Int): ArrayList<Arrival> {
         return try {
+            val travelTime = viewModel.schedules.getTravelTime(source, destination)
+            val routeId = viewModel.schedules.getRouteID(source, destination)
             val specialArrivals = arrayListOf(
                 viewModel.specialWestBound, viewModel.specialEastBound
-            )
-            val travelTime = viewModel.schedules.getTravelTime(source, destination)
-            val routeId = viewModel.schedules.getRouteID(
-                viewModel.schedules.tripId, source, destination
             )
             // retrieve list of base data
             var position = 0
@@ -548,7 +547,7 @@ class SchedulesFragment : Fragment() {
                 } else {
                     specialArrivals[1]
                 }
-            val temp = ArrayList<String>()
+            val temp = ArrayList<Trip>()
             try { // check for null
                 for (i in arrivalsArrayList.indices) {
                     if (position == 13) {
@@ -681,10 +680,9 @@ class SchedulesFragment : Fragment() {
     private fun getArrivalsBackgroundTask(sourceId: Int, destinationId: Int): ArrayList<Arrival> {
         return try {
             val travelTime = viewModel.schedules.getTravelTime(sourceId, destinationId)
-            val tripId = viewModel.schedules.tripId
-            val routeId = viewModel.schedules.getRouteID(tripId, sourceId, destinationId)
+            val routeId = viewModel.schedules.getRouteID(sourceId, destinationId)
             val schedulesList =
-                viewModel.schedules.getSchedulesList(this.context, routeId, viewModel.fromIndex)
+                viewModel.schedules.getSchedulesList(this.context, routeId, sourceId, destinationId)
             return viewModel.schedules.getFormatArrival(schedulesList, travelTime)
         } catch (e: Error) {
             e.printStackTrace()

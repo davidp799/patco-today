@@ -3,6 +3,7 @@ package com.davidp799.patcotoday.ui.schedules
 import androidx.lifecycle.ViewModel
 import com.davidp799.patcotoday.utils.Arrival
 import com.davidp799.patcotoday.utils.Schedules
+import com.davidp799.patcotoday.utils.Trip
 import kotlin.collections.ArrayList
 
 class SchedulesViewModel : ViewModel() {
@@ -27,14 +28,14 @@ class SchedulesViewModel : ViewModel() {
     var schedulesArrayList = ArrayList<Arrival>()
 
     // Background Lists
-    var specialEastBound = ArrayList<String>()
-    var specialWestBound = ArrayList<String>()
+    var specialEastBound = ArrayList<Trip>()
+    var specialWestBound = ArrayList<Trip>()
     var specialText = ArrayList<String>()
     var specialURLs = ArrayList<String>()
     var specialTexts = ArrayList<String>()
     var specialFromToTimes = ArrayList<String>()
     var runnableConvertedStrings = ArrayList<String>()
-    var parsedArrivals = ArrayList<ArrayList<String>>()
+    var parsedArrivals = ArrayList<ArrayList<Trip>>()
     var specialSchedulesArrayList = ArrayList<Arrival>()
 
     // List objects
