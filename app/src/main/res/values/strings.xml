@@ -82,6 +82,11 @@
     <string name="close_to_schedule">Trains are operating on or close to schedule.</string>
     <string name="download_on_mobile_data">Download schedules using cellular data</string>
     <string name="download_on_mobile_data_summary">Automatically download special schedules when WiFi is not available</string>
+    // changelog
+    <string name="changelog_full_title">Recent Changes</string>
+    <string name="changelog_title">What\'s New</string>
+    <string name="changelog_ok_button">Great!</string>
+    <string name="changelog_show_full">More…</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
