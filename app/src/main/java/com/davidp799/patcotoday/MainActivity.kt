@@ -1,5 +1,7 @@
 package com.davidp799.patcotoday
 
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -13,6 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelLazy
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -88,19 +91,38 @@ class MainActivity : AppCompatActivity() {
         val doesNotExist = -1
         val currentVersionCode = BuildConfig.VERSION_CODE
         sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
+        val sharedPreferencesEditor = sharedPreferences.edit()
         val savedVersionCode = sharedPreferences.getInt(prefVersionKeyCode, doesNotExist)
+
         if (currentVersionCode == savedVersionCode) {
             return
         } else if (savedVersionCode == doesNotExist) {
-            // TODO: this is a new install (make tasks for new install)
+            ChangeLogDialogFragment().show(
+                this.supportFragmentManager, ChangeLogDialogFragment.TAG
+            )
+            sharedPreferencesEditor.putInt(prefVersionKeyCode, currentVersionCode).apply()
             return
         } else if (currentVersionCode > savedVersionCode) {
-            // TODO: this is an upgrade (MAKE TASKS FOR UPGRADE)
+            ChangeLogDialogFragment().show(
+                this.supportFragmentManager, ChangeLogDialogFragment.TAG
+            )
             return
         }
-        // update shared prefs with current version code
         sharedPreferences.edit().putInt(prefVersionKeyCode, currentVersionCode).apply()
     }
+
+    class ChangeLogDialogFragment : DialogFragment() {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
+            AlertDialog.Builder(requireContext())
+                .setTitle(R.string.changelog_title)
+                .setMessage(R.string.changelog_message)
+                .setPositiveButton(getString(R.string.changelog_ok_button)) { _,_ -> }
+                .create()
+        companion object {
+            const val TAG = "ChangeLogDialog"
+        }
+    }
+
     private suspend fun runBackgroundTasks() {
         print("[backgroundTasksRequest] = Active\n")
         cleanUpFiles()
