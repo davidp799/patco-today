@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-// TODO: update gtfs.zip gathering to include modified calendar.txt (with 1-6 lines it works)
 /** Class which analyzes PATCO Transit GTFS data to provide a list of upcoming arrivals
  *  based on provided source and destination stations and day of week. */
 public class Schedules {
@@ -106,20 +105,25 @@ public class Schedules {
         for (int i=0; i<schedules.size(); i++) {
             SimpleDateFormat _24HourSDF = new SimpleDateFormat("HH:mm", Locale.US);
             try {
-                // convert to dateTime object, format as 24hr time
-                String _24HourTime = schedules.get(i).getArrivalTime();
                 SimpleDateFormat _12HourSDF = new SimpleDateFormat("h:mm a", Locale.US);
-                Date _24HourDt = _24HourSDF.parse(_24HourTime);
-                // compute trip finish time from train arrival time
-                assert _24HourDt != null;
-                Date arrivedDt = new Date(_24HourDt.getTime() + (travelTime * MILLISECONDS));
-                // append formatted arrival times as Arrival objects
-                Arrival thisArrival = new Arrival(_12HourSDF.format(_24HourDt), _12HourSDF.format(arrivedDt));
-                if (schedules.get(i).getSourceClosed()) {
+                Arrival thisArrival = new Arrival("00:00", "00:00");
+                Trip thisTrip = schedules.get(i);
+                if (thisTrip.getSourceClosed() && thisTrip.getDestinationClosed()) {
                     thisArrival.setArrivalTime("CLOSED");
-                }
-                if (schedules.get(i).getDestinationClosed()) {
                     thisArrival.setTravelTime("CLOSED");
+                } else if (thisTrip.getSourceClosed()) {
+                    thisArrival.setArrivalTime("CLOSED");
+                    thisArrival.setTravelTime("CLOSED");
+                } else if (thisTrip.getDestinationClosed()) {
+                    Date _24HourDt = _24HourSDF.parse(thisTrip.getArrivalTime());
+                    assert _24HourDt != null;
+                    thisArrival.setArrivalTime(_12HourSDF.format(_24HourDt));
+                    thisArrival.setTravelTime("CLOSED");
+                } else {
+                    Date _24HourDtArrival = _24HourSDF.parse(thisTrip.getArrivalTime());
+                    assert _24HourDtArrival != null;
+                    Date _24HourDtTravel = new Date(_24HourDtArrival.getTime() + (travelTime * MILLISECONDS));
+                    thisArrival = new Arrival(_12HourSDF.format(_24HourDtArrival), _12HourSDF.format(_24HourDtTravel));
                 }
                 arrivals.add(i, thisArrival);
             } catch (Exception e) {
