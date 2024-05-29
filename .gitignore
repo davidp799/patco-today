@@ -19,3 +19,6 @@ local.properties
 .idea/.name
 .idea/compiler.xml
 .idea/gradle.xml
+/.idea/appInsightsSettings.xml
+/.idea/migrations.xml
+/.idea/inspectionProfiles/Project_Default.xml
