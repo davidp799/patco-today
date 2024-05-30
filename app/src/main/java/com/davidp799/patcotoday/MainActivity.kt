@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAppLayout(fitsSystemWindows: Boolean, actionBarId: Int, windowColor: Int) {
-        WindowCompat.setDecorFitsSystemWindows(window, fitsSystemWindows)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setSupportActionBar(findViewById<MaterialToolbar>(actionBarId))
         window.statusBarColor = ContextCompat.getColor(this, windowColor)
         window.navigationBarColor = ContextCompat.getColor(this, windowColor)
@@ -182,28 +182,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    /* Function to check internet connection */
     private fun checkInternet(context: Context): Boolean {
-        val connectivityManager = context
-            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork ?: return false
-        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val activeNetworkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
         return when {
-            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            activeNetworkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            activeNetworkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
             else -> false
         }
     }
-    private fun cleanUpFiles(){
+    /* Function to clean up files */
+    private fun cleanUpFiles() {
         Log.d("[cleanUpFiles]", "started...")
-        val dataDirectory = this.filesDir.absolutePath + "/data/"
-        File(dataDirectory + "special/").walk().forEach {
-            val specialPdfFile = File(dataDirectory + "special/" + it)
-            val lastModified = Date(specialPdfFile.lastModified())
-            if (lastModified < Date() ) {
-                it.delete()
-            }
-        }
+        val dataDirectory = File(filesDir, "data/special/")
+        dataDirectory.listFiles()?.filter { it.lastModified() < Date().time }?.forEach { it.delete() }
     }
+    /* Function to update files */
     private fun updateFiles(): Boolean {
         Log.d("[updateFiles]", "started...")
         val dataDirectory = this.filesDir.absolutePath + "/data/"
@@ -217,21 +213,21 @@ class MainActivity : AppCompatActivity() {
             val latestRelease = Date("09/02/2023")
             if (lastModified < latestRelease) {
                 updatedCount++
-                print("[updateFiles] State: OUT OF DATE\n")
+                Log.d("[updateFiles]", "Files not up to date!")
             } else {
-                print("[updateFiles] State: UP TO DATE\n")
+                Log.d("[updateFiles]", "Files up to date...")
                 return true
             }
+            // Check if all files exist
             var notFound = 0
-            for (fileName in dataFiles) { // Check if all files exist
-                println(fileName)
+            for (fileName in dataFiles) {
                 val tempFile = File(dataDirectory + fileName)
                 if (!tempFile.exists()) notFound++
             }
             notFound += updatedCount
             notFound <= 0
         } catch (e: Exception) {
-            println("[updateFiles] Error: Files not up to date!")
+            Log.e("[updateFiles]", "Files not up to date!")
             false
         }
     }
