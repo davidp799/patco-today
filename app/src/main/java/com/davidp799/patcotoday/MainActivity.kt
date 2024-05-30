@@ -34,10 +34,6 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 class MainActivity : AppCompatActivity() {
-    private val dataFiles = listOf("agency.txt", "calendar.txt", "calendar_dates.txt",
-        "fare_attributes.txt", "fare_rules.txt", "feed_info.txt", "frequencies.txt",
-        "routes.txt", "shapes.txt", "stop_times.txt", "stops.txt", "transfers.txt", "trips.txt"
-    )
     private val viewModel: MainViewModel by ViewModelLazy(
         MainViewModel::class, {viewModelStore }, { defaultViewModelProviderFactory }
     )
@@ -50,22 +46,27 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setAppLayout(false, R.id.topAppBar, R.color.transparent)
+        setNavView(setOf( R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info ))
         CoroutineScope(Dispatchers.IO).launch {
             checkIfFirstRun()
             runBackgroundTasks()
         }
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    }
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        setSupportActionBar(findViewById<MaterialToolbar>(R.id.topAppBar))
-        window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
+    private fun setAppLayout(fitsSystemWindows: Boolean, actionBarId: Int, windowColor: Int) {
+        WindowCompat.setDecorFitsSystemWindows(window, fitsSystemWindows)
+        setSupportActionBar(findViewById<MaterialToolbar>(actionBarId))
+        window.statusBarColor = ContextCompat.getColor(this, windowColor)
+        window.navigationBarColor = ContextCompat.getColor(this, windowColor)
+    }
+
+    private fun setNavView(configurationSet: Set<Int>) {
         val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
-        val appBarConfiguration = AppBarConfiguration(
-            setOf( R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info )
-        )
+        val appBarConfiguration = AppBarConfiguration(configurationSet)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
@@ -94,21 +95,14 @@ class MainActivity : AppCompatActivity() {
         val sharedPreferencesEditor = sharedPreferences.edit()
         val savedVersionCode = sharedPreferences.getInt(prefVersionKeyCode, doesNotExist)
 
-        if (currentVersionCode == savedVersionCode) {
-            return
-        } else if (savedVersionCode == doesNotExist) {
-            ChangeLogDialogFragment().show(
-                this.supportFragmentManager, ChangeLogDialogFragment.TAG
+        if ((currentVersionCode > savedVersionCode) || (currentVersionCode.equals(doesNotExist))) {
+            Log.d(
+                "[checkIfFirstRun]",
+                "true: current = $currentVersionCode && saved = $savedVersionCode"
             )
+            ChangeLogDialogFragment().show(this.supportFragmentManager, ChangeLogDialogFragment.TAG)
             sharedPreferencesEditor.putInt(prefVersionKeyCode, currentVersionCode).apply()
-            return
-        } else if (currentVersionCode > savedVersionCode) {
-            ChangeLogDialogFragment().show(
-                this.supportFragmentManager, ChangeLogDialogFragment.TAG
-            )
-            return
         }
-        sharedPreferences.edit().putInt(prefVersionKeyCode, currentVersionCode).apply()
     }
 
     class ChangeLogDialogFragment : DialogFragment() {
@@ -124,7 +118,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun runBackgroundTasks() {
-        print("[backgroundTasksRequest] = Active\n")
+        Log.d("[runBackgroundTasks]", "started...")
         cleanUpFiles()
         val internetAvailable = checkInternet(this) // wait until job is done
         setStatusOnMainThread("internetAvailable", internetAvailable)
@@ -199,6 +193,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun cleanUpFiles(){
+        Log.d("[cleanUpFiles]", "started...")
         val dataDirectory = this.filesDir.absolutePath + "/data/"
         File(dataDirectory + "special/").walk().forEach {
             val specialPdfFile = File(dataDirectory + "special/" + it)
@@ -209,7 +204,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun updateFiles(): Boolean {
+        Log.d("[updateFiles]", "started...")
         val dataDirectory = this.filesDir.absolutePath + "/data/"
+        val dataFiles = resources.getStringArray(R.array.data_files).toList()
+
         return try {
             // check if new version released
             var updatedCount = 0
@@ -225,6 +223,7 @@ class MainActivity : AppCompatActivity() {
             }
             var notFound = 0
             for (fileName in dataFiles) { // Check if all files exist
+                println(fileName)
                 val tempFile = File(dataDirectory + fileName)
                 if (!tempFile.exists()) notFound++
             }
