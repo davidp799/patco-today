@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelLazy
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setAppLayout(false, R.id.topAppBar, R.color.transparent)
         setNavView(setOf( R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info ))
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             checkIfFirstRun()
             runBackgroundTasks()
         }
