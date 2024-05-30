@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAppLayout(fitsSystemWindows: Boolean, actionBarId: Int, windowColor: Int) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, fitsSystemWindows)
         setSupportActionBar(findViewById<MaterialToolbar>(actionBarId))
         window.statusBarColor = ContextCompat.getColor(this, windowColor)
         window.navigationBarColor = ContextCompat.getColor(this, windowColor)
