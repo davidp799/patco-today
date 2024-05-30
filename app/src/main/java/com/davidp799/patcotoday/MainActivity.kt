@@ -56,14 +56,14 @@ class MainActivity : AppCompatActivity() {
             runBackgroundTasks()
         }
     }
-
+    /* Function to set app layout */
     private fun setAppLayout(fitsSystemWindows: Boolean, actionBarId: Int, windowColor: Int) {
         WindowCompat.setDecorFitsSystemWindows(window, fitsSystemWindows)
         setSupportActionBar(findViewById<MaterialToolbar>(actionBarId))
         window.statusBarColor = ContextCompat.getColor(this, windowColor)
         window.navigationBarColor = ContextCompat.getColor(this, windowColor)
     }
-
+    /* Function to set navigation view */
     private fun setNavView(configurationSet: Set<Int>) {
         val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
@@ -71,13 +71,13 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
-
+    /* Function to set menu */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_settings, menu)
         return true
     }
-
+    /* Function to handle menu items */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.settings) {
             val intent = Intent(this, SettingsActivity::class.java)
@@ -86,8 +86,7 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-    /* Function to check if first run or new version */
+    /* Function to check if first run */
     private fun checkIfFirstRun() {
         val prefVersionKeyCode = "version_code"
         val doesNotExist = -1
@@ -105,7 +104,7 @@ class MainActivity : AppCompatActivity() {
             sharedPreferencesEditor.putInt(prefVersionKeyCode, currentVersionCode).apply()
         }
     }
-
+    /* Function to show changelog dialog */
     class ChangeLogDialogFragment : DialogFragment() {
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
             AlertDialog.Builder(requireContext())
@@ -117,7 +116,7 @@ class MainActivity : AppCompatActivity() {
             const val TAG = "ChangeLogDialog"
         }
     }
-
+    /* Function to run background tasks */
     private suspend fun runBackgroundTasks() {
         Log.d("[runBackgroundTasks]", "started...")
         cleanUpFiles()
@@ -135,6 +134,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    /* Function to set status on main thread */
     private suspend fun setStatusOnMainThread(key: String, value: Boolean) {
         withContext(Main) {
             when (key) {
@@ -278,6 +278,7 @@ class MainActivity : AppCompatActivity() {
             connection?.disconnect()
         }
     }
+    /* Function to extract zip file */
     private fun extractZip(): Boolean {
         val dataDirectory = this.filesDir.absolutePath + "/data/"
         val inputStream: InputStream
