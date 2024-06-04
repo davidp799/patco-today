@@ -25,11 +25,15 @@ import androidx.navigation.ui.setupWithNavController
 import com.davidp799.patcotoday.databinding.ActivityMainBinding
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.play.core.review.ReviewException
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.google.android.play.core.review.model.ReviewErrorCode
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -49,19 +53,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setAppLayout(false, R.id.topAppBar, R.color.transparent)
+        setAppLayout()
         setNavView(setOf( R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info ))
         lifecycleScope.launch(Dispatchers.IO) {
             checkIfFirstRun()
+            requestReview()
             runBackgroundTasks()
         }
     }
     /* Function to set app layout */
-    private fun setAppLayout(fitsSystemWindows: Boolean, actionBarId: Int, windowColor: Int) {
-        WindowCompat.setDecorFitsSystemWindows(window, fitsSystemWindows)
-        setSupportActionBar(findViewById<MaterialToolbar>(actionBarId))
-        window.statusBarColor = ContextCompat.getColor(this, windowColor)
-        window.navigationBarColor = ContextCompat.getColor(this, windowColor)
+    private fun setAppLayout() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.topAppBar))
+        window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
     }
     /* Function to set navigation view */
     private fun setNavView(configurationSet: Set<Int>) {
@@ -88,14 +93,14 @@ class MainActivity : AppCompatActivity() {
     }
     /* Function to check if first run */
     private fun checkIfFirstRun() {
+        Log.d("[checkIfFirstRun]", "started...")
         val prefVersionKeyCode = "version_code"
-        val doesNotExist = -1
         val currentVersionCode = BuildConfig.VERSION_CODE
         sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
         val sharedPreferencesEditor = sharedPreferences.edit()
-        val savedVersionCode = sharedPreferences.getInt(prefVersionKeyCode, doesNotExist)
+        val savedVersionCode = sharedPreferences.getInt(prefVersionKeyCode, -1)
 
-        if ((currentVersionCode > savedVersionCode) || (currentVersionCode.equals(doesNotExist))) {
+        if ((currentVersionCode > savedVersionCode) || (savedVersionCode.equals(-1))) {
             Log.d(
                 "[checkIfFirstRun]",
                 "true: current = $currentVersionCode && saved = $savedVersionCode"
@@ -116,6 +121,37 @@ class MainActivity : AppCompatActivity() {
             const val TAG = "ChangeLogDialog"
         }
     }
+    /* Function to request an app review */
+    private fun requestReview() {
+        Log.d("[requestReview]", "started...")
+        val prefVisitNumber = "visit_number"
+        sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
+        val visitNumber = sharedPreferences.getInt(prefVisitNumber, 0)
+        val sharedPreferencesEditor = sharedPreferences.edit()
+
+        if (visitNumber % 10 == 0) {
+            val reviewManager = ReviewManagerFactory.create(this)
+            val requestReviewFlow = reviewManager.requestReviewFlow()
+            requestReviewFlow.addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val reviewInfo = it.result
+                    val reviewFlow = reviewManager.launchReviewFlow(this, reviewInfo)
+                    reviewFlow.addOnCompleteListener {
+                        sharedPreferencesEditor.putInt(prefVisitNumber, visitNumber + 1).apply()
+                    }
+                } else {
+                    @ReviewErrorCode val reviewErrorCode = (it.exception as? ReviewException)?.errorCode
+                    Log.e(
+                        "[requestReview]",
+                        "reviewErrorCode = $reviewErrorCode"
+                    )
+                }
+            }
+        } else {
+            sharedPreferencesEditor.putInt(prefVisitNumber, visitNumber + 1).apply()
+        }
+    }
+
     /* Function to run background tasks */
     private suspend fun runBackgroundTasks() {
         Log.d("[runBackgroundTasks]", "started...")
@@ -210,7 +246,9 @@ class MainActivity : AppCompatActivity() {
             var updatedCount = 0
             val zipFile = File(dataDirectory + gtfsFileName)
             val lastModified = Date(zipFile.lastModified())
-            val latestRelease = Date("09/02/2023")
+            val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.US)
+            val latestRelease = dateFormat.parse("11/25/2023")
+
             if (lastModified < latestRelease) {
                 updatedCount++
                 Log.d("[updateFiles]", "Files not up to date!")
