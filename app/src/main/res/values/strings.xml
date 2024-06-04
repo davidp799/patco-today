@@ -9,6 +9,7 @@
     <string name="special_schedules">Special Schedules Available</string>
     <string name="special_schedule_header">Special Schedule(s):</string>
     <string name="special_schedule_about">Checking for special schedules . . .</string>
+    <string name="special_schedule_about_prefix">Special Schedules: %1$s</string>
     <string name="special_schedule_download">View Schedule</string>
     <string name="special_schedule_link" />
     <string name="menu_refresh">Refresh</string>

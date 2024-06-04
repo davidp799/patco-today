@@ -599,7 +599,7 @@ class SchedulesFragment : Fragment() {
             } catch (e: Exception) {
                 viewModel.specialTexts[0]
             }
-            specialAbout.text = specialAboutValue
+            specialAbout.text = getString(R.string.special_schedule_about_prefix, specialAboutValue)
             specialViewButton.setOnClickListener {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(viewModel.specialURLs[0])))
             }
