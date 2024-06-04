@@ -25,6 +25,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.davidp799.patcotoday.databinding.ActivityMainBinding
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.play.core.review.ReviewException
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.google.android.play.core.review.model.ReviewErrorCode
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import java.io.*
@@ -53,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         setNavView(setOf( R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info ))
         lifecycleScope.launch(Dispatchers.IO) {
             checkIfFirstRun()
+            requestReview()
             runBackgroundTasks()
         }
     }
@@ -88,14 +92,14 @@ class MainActivity : AppCompatActivity() {
     }
     /* Function to check if first run */
     private fun checkIfFirstRun() {
+        Log.d("[checkIfFirstRun]", "started...")
         val prefVersionKeyCode = "version_code"
-        val doesNotExist = -1
         val currentVersionCode = BuildConfig.VERSION_CODE
         sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
         val sharedPreferencesEditor = sharedPreferences.edit()
-        val savedVersionCode = sharedPreferences.getInt(prefVersionKeyCode, doesNotExist)
+        val savedVersionCode = sharedPreferences.getInt(prefVersionKeyCode, -1)
 
-        if ((currentVersionCode > savedVersionCode) || (currentVersionCode.equals(doesNotExist))) {
+        if ((currentVersionCode > savedVersionCode) || (savedVersionCode.equals(-1))) {
             Log.d(
                 "[checkIfFirstRun]",
                 "true: current = $currentVersionCode && saved = $savedVersionCode"
@@ -116,6 +120,37 @@ class MainActivity : AppCompatActivity() {
             const val TAG = "ChangeLogDialog"
         }
     }
+    /* Function to request an app review */
+    private fun requestReview() {
+        Log.d("[requestReview]", "started...")
+        val prefVisitNumber = "visit_number"
+        sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
+        val visitNumber = sharedPreferences.getInt(prefVisitNumber, 0)
+        val sharedPreferencesEditor = sharedPreferences.edit()
+
+        if (visitNumber % 10 == 0) {
+            val reviewManager = ReviewManagerFactory.create(this)
+            val requestReviewFlow = reviewManager.requestReviewFlow()
+            requestReviewFlow.addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val reviewInfo = it.result
+                    val reviewFlow = reviewManager.launchReviewFlow(this, reviewInfo)
+                    reviewFlow.addOnCompleteListener {
+                        sharedPreferencesEditor.putInt(prefVisitNumber, visitNumber + 1).apply()
+                    }
+                } else {
+                    @ReviewErrorCode val reviewErrorCode = (it.exception as? ReviewException)?.errorCode
+                    Log.e(
+                        "[requestReview]",
+                        "reviewErrorCode = $reviewErrorCode"
+                    )
+                }
+            }
+        } else {
+            sharedPreferencesEditor.putInt(prefVisitNumber, visitNumber + 1).apply()
+        }
+    }
+
     /* Function to run background tasks */
     private suspend fun runBackgroundTasks() {
         Log.d("[runBackgroundTasks]", "started...")
