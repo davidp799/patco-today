@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setAppLayout(false, R.id.topAppBar, R.color.transparent)
+        setAppLayout()
         setNavView(setOf( R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info ))
         lifecycleScope.launch(Dispatchers.IO) {
             checkIfFirstRun()
@@ -61,11 +61,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
     /* Function to set app layout */
-    private fun setAppLayout(fitsSystemWindows: Boolean, actionBarId: Int, windowColor: Int) {
-        WindowCompat.setDecorFitsSystemWindows(window, fitsSystemWindows)
-        setSupportActionBar(findViewById<MaterialToolbar>(actionBarId))
-        window.statusBarColor = ContextCompat.getColor(this, windowColor)
-        window.navigationBarColor = ContextCompat.getColor(this, windowColor)
+    private fun setAppLayout() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        setSupportActionBar(findViewById<MaterialToolbar>(R.id.topAppBar))
+        window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
     }
     /* Function to set navigation view */
     private fun setNavView(configurationSet: Set<Int>) {
@@ -245,7 +245,7 @@ class MainActivity : AppCompatActivity() {
             var updatedCount = 0
             val zipFile = File(dataDirectory + gtfsFileName)
             val lastModified = Date(zipFile.lastModified())
-            val latestRelease = Date("09/02/2023")
+            val latestRelease = Date("11/25/2023")
             if (lastModified < latestRelease) {
                 updatedCount++
                 Log.d("[updateFiles]", "Files not up to date!")
