@@ -33,6 +33,7 @@ import kotlinx.coroutines.Dispatchers.Main
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -245,7 +246,9 @@ class MainActivity : AppCompatActivity() {
             var updatedCount = 0
             val zipFile = File(dataDirectory + gtfsFileName)
             val lastModified = Date(zipFile.lastModified())
-            val latestRelease = Date("11/25/2023")
+            val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.US)
+            val latestRelease = dateFormat.parse("11/25/2023")
+
             if (lastModified < latestRelease) {
                 updatedCount++
                 Log.d("[updateFiles]", "Files not up to date!")
