@@ -8,20 +8,33 @@ import android.view.View
 import android.widget.ImageView
 import com.davidp799.patcotoday.R
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 
 class MapListAdapter(private val mContext: Context, resource: Int, private val mObjects: Array<String>): ArrayAdapter<String>(mContext, resource, mObjects) {
+    class ViewHolder(view: View) {
+        val image: ImageView = view.findViewById<View>(R.id.item_image) as ImageView
+        val entry: TextView = view.findViewById<View>(R.id.item_text) as TextView
+    }
+
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val inflater = LayoutInflater.from(mContext)
-        val row: View = inflater.inflate(R.layout.map_adapter_view_layout, parent, false)
-        val image: ImageView = row.findViewById<View>(R.id.item_image) as ImageView
-        val entry: TextView = row.findViewById<View>(R.id.item_text) as TextView
-        entry.text = mObjects[position]
-        if (position == 0) {
-            image.setImageResource(R.drawable.ic_timeline_start_tt)
-        } else if (position == mObjects.size-1) {
-            image.setImageResource(R.drawable.ic_timeline_end_tt)
+        val view: View
+        val viewHolder: ViewHolder
+
+        if (convertView == null) {
+            val inflater = LayoutInflater.from(mContext)
+            view = inflater.inflate(R.layout.map_adapter_view_layout, parent, false)
+            viewHolder = ViewHolder(view)
+            view.tag = viewHolder
+        } else {
+            view = convertView
+            viewHolder = view.tag as ViewHolder
         }
-        return row
+
+        viewHolder.entry.text = mObjects[position]
+        if (position == 0) {
+            viewHolder.image.setImageResource(R.drawable.ic_timeline_start_tt)
+        } else if (position == mObjects.size-1) {
+            viewHolder.image.setImageResource(R.drawable.ic_timeline_end_tt)
+        }
+        return view
     }
 }
