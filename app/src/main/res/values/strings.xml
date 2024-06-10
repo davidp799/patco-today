@@ -32,7 +32,16 @@
         <item>15–16th &amp; Locust</item>
     </string-array>
 
-<!-- Settings Preferences-->
+<!-- Map Details Page -->
+    <string name="map_details_subDescription">For directions only. Not a mailing address.</string>
+    <string name="map_details_station_amenities">Station Amenities</string>
+    <string name="map_details_schedule_information">Schedule Information</string>
+    <string name="map_details_fares">Fares &amp; travel times between stations</string>
+    <string name="map_details_gated_parking">Gated Parking: </string>
+    <string name="map_details_meters">Meters: </string>
+    <string name="map_details_within_walking_distance">Within Walking Distance: </string>
+
+    <!-- Settings Preferences-->
     <string name="title_activity_settings">SettingsActivity</string>
     <!-- Dynamic Colors -->
     <string name="pref_dynamic">Use Dynamic Colors</string>
@@ -88,6 +97,19 @@
         \n1. Improvements to app performance\n\n2. Fixed a crash occurring when checking for special schedules
     </string>
     <string name="changelog_ok_button">Great!</string>
+    <string name="elevator_image_content_description">image of an elevator</string>
+    <string name="escalator_content_description">image of an escalator</string>
+    <string name="parking_content_description">image of a parking sign</string>
+    <string name="taxi_content_description">image of a taxi cab</string>
+    <string name="bike_racks_content_description">image of bike racks</string>
+    <string name="elevator">Elevator</string>
+    <string name="escalator">Escalator</string>
+    <string name="parking">Parking</string>
+    <string name="taxi">Taxi</string>
+    <string name="bike_racks">Bike Racks</string>
+    <string name="default_title">Default title...</string>
+    <string name="default_description">Default description...</string>
+
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>
