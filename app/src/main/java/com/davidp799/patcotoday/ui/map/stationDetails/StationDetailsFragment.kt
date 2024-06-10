@@ -97,12 +97,13 @@ class StationDetailsFragment : Fragment() {
 
         val stationHoursLinearLayout = view.findViewById<LinearLayout>(R.id.stationHoursLinearLayout)
         val stationHoursTextViewBody = view.findViewById<TextView>(R.id.stationHoursTextViewBody)
-        val stationHours = stationDetails.get("hours") as String
+        var stationHours = stationDetails.get("hours") as String
         if (stationHours.isNotEmpty()) {
             stationHoursLinearLayout.visibility = View.VISIBLE
             stationHoursTextViewBody.text = stationHours
         } else {
-            stationHoursLinearLayout.visibility = View.GONE
+            stationHours = "Station is open 24/7."
+            stationHoursTextViewBody.text = stationHours
         }
 
         val faresLinearLayout = view.findViewById<LinearLayout>(R.id.faresLinearLayout)
