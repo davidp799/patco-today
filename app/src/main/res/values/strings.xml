@@ -34,9 +34,9 @@
 
 <!-- Map Details Page -->
     <string name="map_details_subDescription">For directions only. Not a mailing address.</string>
-    <string name="map_details_station_amenities">Station Amenities</string>
-    <string name="map_details_schedule_information">Schedule Information</string>
-    <string name="map_details_fares">Fares &amp; travel times between stations</string>
+    <string name="map_details_station_amenities">Station Amenities:</string>
+    <string name="map_details_schedule_information">Schedule Information:</string>
+    <string name="map_details_fares">Fares &amp; Travel Times Between Stations:</string>
     <string name="map_details_gated_parking">Gated Parking: </string>
     <string name="map_details_meters">Meters: </string>
     <string name="map_details_within_walking_distance">Within Walking Distance: </string>
@@ -109,6 +109,7 @@
     <string name="bike_racks">Bike Racks</string>
     <string name="default_title">Default title...</string>
     <string name="default_description">Default description...</string>
+    <string name="map_details_station_hours">Station Hours:</string>
 
 
     <string-array name="pref_themeOptions_entries">

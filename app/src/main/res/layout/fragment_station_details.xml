@@ -188,30 +188,30 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/scheduleInformationLinearLayout"
+            android:id="@+id/stationHoursLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="24dp"
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/stationAmenitiesLinearLayout">
             <TextView
-                android:id="@+id/scheduleInformationTextViewTitle"
+                android:id="@+id/stationHoursTextViewTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/map_details_schedule_information"
+                android:text="@string/map_details_station_hours"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/stationAmenitiesLinearLayout" />
+                app:layout_constraintTop_toBottomOf="@id/stationHoursLinearLayout" />
             <TextView
-                android:id="@+id/scheduleInformationTextViewBody"
+                android:id="@+id/stationHoursTextViewBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceBody2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/scheduleInformationTextViewTitle" />
+                app:layout_constraintTop_toBottomOf="@id/stationHoursTextViewTitle" />
         </LinearLayout>
 
         <LinearLayout
@@ -220,7 +220,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="24dp"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@id/scheduleInformationLinearLayout">
+            app:layout_constraintTop_toBottomOf="@id/stationHoursLinearLayout">
             <TextView
                 android:id="@+id/faresTextViewTitle"
                 android:layout_width="wrap_content"

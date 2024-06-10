@@ -95,9 +95,15 @@ class StationDetailsFragment : Fragment() {
             parkingLinearLayout.visibility = View.GONE
         }
 
-        val scheduleInformationLinearLayout = view.findViewById<LinearLayout>(R.id.scheduleInformationLinearLayout)
-        val scheduleInformationTextViewBody = view.findViewById<TextView>(R.id.scheduleInformationTextViewBody)
-        scheduleInformationTextViewBody.text = "Not yet implemented..."
+        val stationHoursLinearLayout = view.findViewById<LinearLayout>(R.id.stationHoursLinearLayout)
+        val stationHoursTextViewBody = view.findViewById<TextView>(R.id.stationHoursTextViewBody)
+        val stationHours = stationDetails.get("hours") as String
+        if (stationHours.isNotEmpty()) {
+            stationHoursLinearLayout.visibility = View.VISIBLE
+            stationHoursTextViewBody.text = stationHours
+        } else {
+            stationHoursLinearLayout.visibility = View.GONE
+        }
 
         val faresLinearLayout = view.findViewById<LinearLayout>(R.id.faresLinearLayout)
         val faresTextViewBody = view.findViewById<TextView>(R.id.faresTextViewBody)
