@@ -97,7 +97,7 @@ class StationDetailsFragment : Fragment() {
 
         val stationHoursLinearLayout = view.findViewById<LinearLayout>(R.id.stationHoursLinearLayout)
         val stationHoursTextViewBody = view.findViewById<TextView>(R.id.stationHoursTextViewBody)
-        var stationHours = stationDetails.get("hours") as String
+        var stationHours = stationDetails["hours"] as String
         if (stationHours.isNotEmpty()) {
             stationHoursLinearLayout.visibility = View.VISIBLE
             stationHoursTextViewBody.text = stationHours
@@ -112,7 +112,7 @@ class StationDetailsFragment : Fragment() {
 
         val gatedParkingLinearLayout = view.findViewById<LinearLayout>(R.id.gatedParkingLinearLayout)
         val gatedParkingTextViewBody = view.findViewById<TextView>(R.id.gatedParkingTextViewBody)
-        val gatedParking = stationDetails.get("gatedParking") as String
+        val gatedParking = stationDetails["gatedParking"] as String
         if (gatedParking.isNotEmpty()) {
             gatedParkingLinearLayout.visibility = View.VISIBLE
             gatedParkingTextViewBody.text = gatedParking
@@ -122,7 +122,7 @@ class StationDetailsFragment : Fragment() {
 
         val walkingDistanceLinearLayout = view.findViewById<LinearLayout>(R.id.walkingDistanceLinearLayout)
         val walkingDistanceTextViewBody = view.findViewById<TextView>(R.id.walkingDistanceTextViewBody)
-        val walkingDistance = stationDetails.get("walkingDistance") as String
+        val walkingDistance = stationDetails["walkingDistance"] as String
         if (walkingDistance.isNotEmpty()) {
             walkingDistanceLinearLayout.visibility = View.VISIBLE
             walkingDistanceTextViewBody.text = walkingDistance
