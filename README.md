@@ -8,7 +8,7 @@ Patco Today is a free, open-source transit app for Android. Primarily utilizing 
 Patco Today is (soon to be) available on the Google Play Store and F-Droid.
 
 <p align="left">
-	<a href="https://play.google.com/store/apps/NOT_YET">
+	<a href="https://play.google.com/store/apps/details?id=com.davidp799.patcotoday">
 	    <img alt="Get it on Google Play"
 		height="80"
 		src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" />
