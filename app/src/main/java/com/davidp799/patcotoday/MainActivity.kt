@@ -60,6 +60,12 @@ class MainActivity : AppCompatActivity() {
             requestReview()
             runBackgroundTasks()
         }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment_activity_main)
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
     /* Function to set app layout */
     private fun setAppLayout() {
@@ -75,6 +81,28 @@ class MainActivity : AppCompatActivity() {
         val appBarConfiguration = AppBarConfiguration(configurationSet)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        navView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_schedules -> {
+                    navController.navigate(R.id.navigation_schedules)
+                    true
+                }
+                R.id.navigation_map -> {
+                    if (navController.currentDestination?.id == R.id.navigation_station_details) {
+                        navController.navigateUp() // Go up/back if already on this destination
+                    } else {
+                        navController.navigate(R.id.navigation_map) // Navigate to destination
+                    }
+                    true
+                }
+                R.id.navigation_info -> {
+                    navController.navigate(R.id.navigation_info)
+                    true
+                }
+                // Handle other destinations similarly
+                else -> false
+            }
+        }
     }
     /* Function to set menu */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
