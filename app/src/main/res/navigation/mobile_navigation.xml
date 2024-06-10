@@ -15,7 +15,21 @@
         android:id="@+id/navigation_map"
         android:name="com.davidp799.patcotoday.ui.map.MapFragment"
         android:label="@string/title_map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_map" >
+        <action
+            android:id="@+id/action_navigation_map_to_navigation_station_details"
+            app:destination="@id/navigation_station_details" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_station_details"
+        android:name="com.davidp799.patcotoday.ui.map.stationDetails.StationDetailsFragment"
+        android:label="@string/title_map"
+        tools:layout="@layout/fragment_map">
+        <argument
+            android:name="stationName"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_info"
