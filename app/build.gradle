@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 android {
@@ -12,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId "com.davidp799.patcotoday"
-        minSdk 26
+        minSdk 28
         targetSdk 34
         versionCode 12
         versionName "1.2.0"
