@@ -107,10 +107,43 @@
     <string name="parking">Parking</string>
     <string name="taxi">Taxi</string>
     <string name="bike_racks">Bike Racks</string>
-    <string name="default_title">Default title...</string>
-    <string name="default_description">Default description...</string>
+    <string name="default_title">Default title…</string>
+    <string name="default_description">Default description…</string>
     <string name="map_details_station_hours">Station Hours:</string>
-
+    <string name="sample_text">Avenue of the Arts Kimmel Center Academy of Music Merriam Theater Wilma Theaters University of the Arts Rittenhouse Square</string>
+    <string name="fares_from">From:</string>
+    <string name="fares_from_lindenwold">Lindenwold, Ashland &amp; Woodcrest</string>
+    <string name="fares_from_haddonfield">Haddonfield, Westmont &amp; Collingswood</string>
+    <string name="fares_from_ferry_avenue">Ferry Avenue (Camden)</string>
+    <string name="fares_from_any_nj">Any New Jersey station (except between Broadway and City Hall)</string>
+    <string name="fares_from_broadway">Broadway (Camden)</string>
+    <string name="fares_from_broadway_city_hall">Broadway &amp; City Hall (Camden)</string>
+    <string name="fares_any_philadelphia">Any Philadelphia Station</string>
+    <string name="fares_to">"To: "</string>
+    <string name="fares_to_philadelphia">"Philadelphia"</string>
+    <string name="fares_to_any_nj">Any New Jersey Station</string>
+    <string name="fares_to_city_hall">City Hall (Camden)</string>
+    <string name="fares_one_way">One-Way:</string>
+    <string name="fares_one_way_lindenwold_to_phila">$3.00</string>
+    <string name="fares_one_way_haddonfield_to_phila">$2.60</string>
+    <string name="fares_one_way_ferry_avenue">$2.25</string>
+    <string name="fares_one_way_any_nj">$1.60</string>
+    <string name="fares_one_way_broadway_west">$1.40</string>
+    <string name="fares_round_trip">Round-Trip:</string>
+    <string name="fares_round_trip_lindenwold_to_phila">$6.00</string>
+    <string name="fares_round_trip_haddonfield_to_phila">$5.20</string>
+    <string name="fares_round_trip_ferry_avenue">$4.50</string>
+    <string name="fares_round_trip_any_nj">$3.20</string>
+    <string name="fares_round_trip_broadway_west">$2.80</string>
+    <string name="fares_this_station">This Station</string>
+    <string name="fares_child_fares_body">Children four (4) and under ride free when accompanied by a fare-paying adult.</string>
+    <string name="fares_child_fares_title">Child Fares</string>
+    <string name="fares_options_body">Fare gates accept FREEDOM Cards, SHARE Cards and paper tickets.</string>
+    <string name="fares_options_title">Fare Payment Options</string>
+    <string name="fares_reduced_body">A Reduced Fare Program (RFP) is available to senior citizens, people with disabilities, and Medicare card holders. The program allows eligible individuals to travel between any two PATCO stations during off-peak hours for $0.70, regardless of distance traveled. The reduced fare is set as half the lowest full fare. For program information, please visit PATCO\'s Website.</string>
+    <string name="fares_reduced_title">Reduced Fare Program</string>
+    <string name="fares_passes_body">Weekend Monthly Passes offer unlimited travel between Friday and Sunday nights for $18/month.</string>
+    <string name="fares_passes_title"><![CDATA[Weekend &amp; Monthly Pass]]></string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>

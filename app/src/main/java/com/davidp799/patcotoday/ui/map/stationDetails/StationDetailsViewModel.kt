@@ -10,8 +10,8 @@ class StationDetailsViewModel : ViewModel() {
             "amenities" to mapOf(
                 "elevator" to "Elevator",
                 "escalator" to "Escalator",
-                "bikeRacks" to "Bike Racks",
-                "taxiService" to "Taxi Service",
+                "bikeRacks" to "Bike\nRacks",
+                "taxiService" to "Taxi\nService",
                 "parking" to "Parking"
             ),
             "hours" to "",
@@ -23,8 +23,8 @@ class StationDetailsViewModel : ViewModel() {
             "description" to "2 Burnt Mill Road, Voorhees, NJ",
             "amenities" to mapOf(
                 "escalator" to "Escalator",
-                "bikeRacks" to "Bike Racks",
-                "taxiService" to "Taxi Service",
+                "bikeRacks" to "Bike\nRacks",
+                "taxiService" to "Taxi\nService",
                 "parking" to "Parking"
             ),
             "hours" to "",
@@ -35,10 +35,10 @@ class StationDetailsViewModel : ViewModel() {
             "title" to "Woodcrest Station",
             "description" to "200 Tindale Avenue, Cherry Hill, NJ 08003",
             "amenities" to mapOf(
-                "elevator" to "Elevator Westbound",
-                "escalator" to "Escalator Westbound",
-                "bikeRacks" to "Bike Racks",
-                "taxiService" to "Taxi Service",
+                "elevator" to "Elevator\nWestbound",
+                "escalator" to "Escalator\nWestbound",
+                "bikeRacks" to "Bike\nRacks",
+                "taxiService" to "Taxi\nService",
                 "parking" to "Parking"
             ),
             "hours" to "",
@@ -51,8 +51,8 @@ class StationDetailsViewModel : ViewModel() {
             "amenities" to mapOf(
                 "elevator" to "Elevator",
                 "escalator" to "Escalator",
-                "bikeRacks" to "Bike Racks",
-                "taxiService" to "Taxi Service",
+                "bikeRacks" to "Bike\nRacks",
+                "taxiService" to "Taxi\nService",
                 "parking" to "Parking"
             ),
             "hours" to "",
@@ -63,9 +63,9 @@ class StationDetailsViewModel : ViewModel() {
             "title" to "Westmont Station",
             "description" to "100 Stoy Avenue, Haddon Township, NJ",
             "amenities" to mapOf(
-                "escalator" to "Up Escalator",
-                "bikeRacks" to "Bike Racks",
-                "taxiService" to "Taxi Service",
+                "escalator" to "Up\nEscalator",
+                "bikeRacks" to "Bike\nRacks",
+                "taxiService" to "Taxi\nService",
                 "parking" to "Parking"
             ),
             "hours" to "",
@@ -76,9 +76,9 @@ class StationDetailsViewModel : ViewModel() {
             "title" to "Collingswood Station",
             "description" to "100 Lees Avenue, Collingswood, NJ",
             "amenities" to mapOf(
-                "escalator" to "Up Escalator",
-                "bikeRacks" to "Bike Racks",
-                "taxiService" to "Taxi Service",
+                "escalator" to "Up\nEscalator",
+                "bikeRacks" to "Bike\nRacks",
+                "taxiService" to "Taxi\nService",
                 "parking" to "Parking"
             ),
             "hours" to "",
@@ -94,8 +94,8 @@ class StationDetailsViewModel : ViewModel() {
             "amenities" to mapOf(
                 "elevator" to "Elevator",
                 "escalator" to "Escalator",
-                "bikeRacks" to "Bike Racks",
-                "taxiService" to "Taxi Service",
+                "bikeRacks" to "Bike\nRacks",
+                "taxiService" to "Taxi\nService",
                 "parking" to "Parking"
             ),
             "hours" to "",
@@ -109,9 +109,9 @@ class StationDetailsViewModel : ViewModel() {
             "description" to "100 South Broadway, Camden, NJ 08103",
             "amenities" to mapOf(
                 "elevator" to "Elevator",
-                "escalator" to "Up Escalator",
-                "bikeRacks" to "Bike Racks at W. Headhouse",
-                "taxiService" to "Taxi Service"
+                "escalator" to "Up\nEscalator",
+                "bikeRacks" to "Bike\nRacks at W. Headhouse",
+                "taxiService" to "Taxi\nService"
             ),
             "hours" to "",
             "gatedParking" to "",
@@ -125,7 +125,7 @@ class StationDetailsViewModel : ViewModel() {
             "description" to "Market Street and North 5th Street, Camden NJ",
             "amenities" to mapOf(
                 "elevator" to "Elevator",
-                "bikeRacks" to "Bike Racks"
+                "bikeRacks" to "Bike\nRacks"
             ),
             "hours" to "Station is open daily from 5 a.m. to midnight.",
             "gatedParking" to "",
@@ -141,7 +141,7 @@ class StationDetailsViewModel : ViewModel() {
             "amenities" to mapOf(
                 "elevator" to "Elevator",
                 "escalator" to "Escalator",
-                "bikeRacks" to "Bike Racks"
+                "bikeRacks" to "Bike\nRacks"
             ),
             "hours" to "",
             "gatedParking" to "",
@@ -158,7 +158,7 @@ class StationDetailsViewModel : ViewModel() {
             "amenities" to mapOf(
                 "elevator" to "Elevator",
                 "escalator" to "Escalator",
-                "bikeRacks" to "Bike Racks"
+                "bikeRacks" to "Bike\nRacks"
             ),
             "hours" to "Station is open daily from 4:15 a.m. to 12:07 a.m.",
             "gatedParking" to "",
@@ -172,8 +172,8 @@ class StationDetailsViewModel : ViewModel() {
             "title" to "12/13th & Locust Street Station",
             "description" to "12th & Locust Street, Philadelphia, PA",
             "amenities" to mapOf(
-                "escalator" to "Up Escalator",
-                "bikeRacks" to "Bike Racks"
+                "escalator" to "Up\nEscalator",
+                "bikeRacks" to "Bike\nRacks"
             ),
             "hours" to "",
             "gatedParking" to "",
@@ -186,8 +186,8 @@ class StationDetailsViewModel : ViewModel() {
             "description" to "15th & Locust Street, Philadelphia, PA",
             "amenities" to mapOf(
                 "elevator" to "Elevator",
-                "escalator" to "Up Escalator",
-                "bikeRacks" to "Bike Racks"
+                "escalator" to "Up\nEscalator",
+                "bikeRacks" to "Bike\nRacks"
             ),
             "hours" to "",
             "gatedParking" to "",

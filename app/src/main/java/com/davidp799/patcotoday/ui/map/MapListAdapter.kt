@@ -17,17 +17,10 @@ class MapListAdapter(private val mContext: Context, resource: Int, private val m
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view: View
-        val viewHolder: ViewHolder
-
-        if (convertView == null) {
-            val inflater = LayoutInflater.from(mContext)
-            view = inflater.inflate(R.layout.map_adapter_view_layout, parent, false)
-            viewHolder = ViewHolder(view)
-            view.tag = viewHolder
-        } else {
-            view = convertView
-            viewHolder = view.tag as ViewHolder
-        }
+        val inflater = LayoutInflater.from(mContext)
+        view = inflater.inflate(R.layout.map_adapter_view_layout, parent, false)
+        val viewHolder = ViewHolder(view)
+        view.tag = viewHolder
 
         viewHolder.entry.text = mObjects[position]
         if (position == 0) {

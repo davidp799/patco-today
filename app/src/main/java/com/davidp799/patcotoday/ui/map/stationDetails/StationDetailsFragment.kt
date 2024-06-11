@@ -106,10 +106,6 @@ class StationDetailsFragment : Fragment() {
             stationHoursTextViewBody.text = stationHours
         }
 
-        val faresLinearLayout = view.findViewById<LinearLayout>(R.id.faresLinearLayout)
-        val faresTextViewBody = view.findViewById<TextView>(R.id.faresTextViewBody)
-        faresTextViewBody.text = "Not yet implemented..."
-
         val gatedParkingLinearLayout = view.findViewById<LinearLayout>(R.id.gatedParkingLinearLayout)
         val gatedParkingTextViewBody = view.findViewById<TextView>(R.id.gatedParkingTextViewBody)
         val gatedParking = stationDetails["gatedParking"] as String

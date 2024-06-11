@@ -39,6 +39,7 @@
             android:layout_height="wrap_content"
             android:text="@string/map_details_subDescription"
             android:textAppearance="?attr/textAppearanceBody2"
+            android:textStyle="italic"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/descriptionTextView" />
@@ -59,7 +60,7 @@
             android:id="@+id/stationAmenitiesLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@id/stationAmenitiesTextView">
 
             <LinearLayout
@@ -208,6 +209,7 @@
                 android:id="@+id/stationHoursTextViewBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:lineHeight="24dp"
                 android:textAppearance="?attr/textAppearanceBody2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -221,6 +223,7 @@
             android:paddingTop="24dp"
             android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@id/stationHoursLinearLayout">
+
             <TextView
                 android:id="@+id/faresTextViewTitle"
                 android:layout_width="wrap_content"
@@ -231,14 +234,97 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
+
+            <include layout="@layout/station_details_table_layout" />
+
             <TextView
-                android:id="@+id/faresTextViewBody"
+                android:id="@+id/faresTextViewChildFaresTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceBody2"
+                android:paddingTop="16dp"
+                android:text="@string/fares_child_fares_title"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/faresTextViewTitle" />
+                app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
+
+            <TextView
+                android:id="@+id/faresTextViewChildFaresBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fares_child_fares_body"
+                android:textAppearance="?attr/textAppearanceBody1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
+
+            <TextView
+                android:id="@+id/faresTextViewPassesTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/fares_passes_title"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
+
+            <TextView
+                android:id="@+id/faresTextViewPassesBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fares_passes_body"
+                android:textAppearance="?attr/textAppearanceBody1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
+
+            <TextView
+                android:id="@+id/faresTextViewReducedTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/fares_reduced_title"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
+
+            <TextView
+                android:id="@+id/faresTextViewReducedBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fares_reduced_body"
+                android:textAppearance="?attr/textAppearanceBody1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
+
+            <TextView
+                android:id="@+id/faresTextViewOptionsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="16dp"
+                android:text="@string/fares_options_title"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
+
+            <TextView
+                android:id="@+id/faresTextViewOptionsBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fares_options_body"
+                android:textAppearance="?attr/textAppearanceBody1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -262,6 +348,7 @@
                 android:id="@+id/gatedParkingTextViewBody"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:lineHeight="24dp"
                 android:textAppearance="?attr/textAppearanceBody2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -289,7 +376,9 @@
                 android:id="@+id/walkingDistanceTextViewBody"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:lineHeight="24dp"
                 android:textAppearance="?attr/textAppearanceBody2"
+                android:text="@string/sample_text"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/walkingDistanceLinearLayout" />
