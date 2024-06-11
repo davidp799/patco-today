@@ -35,8 +35,8 @@ class StationDetailsViewModel : ViewModel() {
             "title" to "Woodcrest Station",
             "description" to "200 Tindale Avenue, Cherry Hill, NJ 08003",
             "amenities" to mapOf(
-                "elevator" to "Elevator Westbound",
-                "escalator" to "Escalator Westbound",
+                "elevator" to "Elevator WB",
+                "escalator" to "Escalator WB",
                 "bikeRacks" to "Bike Racks",
                 "taxiService" to "Taxi Service",
                 "parking" to "Parking"
