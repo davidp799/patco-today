@@ -17,28 +17,44 @@
                 android:id="@+id/tableFromTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:paddingTop="4dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="4dp"
                 android:textStyle="bold"
                 android:text="@string/fares_from">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:paddingTop="4dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="4dp"
                 android:textStyle="bold"
                 android:text="@string/fares_to">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:paddingTop="4dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="4dp"
                 android:textStyle="bold"
                 android:text="@string/fares_one_way">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:paddingTop="4dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="4dp"
                 android:textStyle="bold"
                 android:text="@string/fares_round_trip">
             </TextView>
@@ -52,25 +68,29 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_from_lindenwold">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_to_philadelphia">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_one_way_lindenwold_to_phila">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_round_trip_lindenwold_to_phila">
             </TextView>
         </TableRow>
@@ -83,25 +103,29 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_from_haddonfield">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_to_philadelphia">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_one_way_haddonfield_to_phila">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_round_trip_haddonfield_to_phila">
             </TextView>
         </TableRow>
@@ -114,25 +138,29 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_from_ferry_avenue">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_to_philadelphia">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_one_way_ferry_avenue">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_round_trip_ferry_avenue">
             </TextView>
         </TableRow>
@@ -145,25 +173,29 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_from_any_nj">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_to_any_nj">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_one_way_any_nj">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_round_trip_any_nj">
             </TextView>
         </TableRow>
@@ -176,25 +208,29 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_from_broadway">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_to_city_hall">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_one_way_broadway_west">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_round_trip_broadway_west">
             </TextView>
         </TableRow>
@@ -207,25 +243,28 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_from_broadway_city_hall">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_to_philadelphia">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
                 android:text="@string/fares_one_way_broadway_west">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_round_trip_broadway_west">
             </TextView>
         </TableRow>
@@ -238,25 +277,29 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_any_philadelphia">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.28"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_any_philadelphia">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_one_way_broadway_west">
             </TextView>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.22"
+                android:layout_weight="0.25"
+                android:padding="4dp"
                 android:text="@string/fares_round_trip_broadway_west">
             </TextView>
         </TableRow>
