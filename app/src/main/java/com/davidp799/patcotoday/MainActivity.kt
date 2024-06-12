@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -25,6 +26,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.davidp799.patcotoday.databinding.ActivityMainBinding
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
@@ -84,22 +86,31 @@ class MainActivity : AppCompatActivity() {
         navView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_schedules -> {
-                    navController.navigate(R.id.navigation_schedules)
+                    if (navController.currentDestination?.id == R.id.navigation_schedules) {
+                        val bottomSheetLayout
+                                = findViewById<LinearLayout>(R.id.bottom_sheet_layout)
+                        val bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+                                = BottomSheetBehavior.from(bottomSheetLayout)
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    } else {
+                        navController.navigate(R.id.navigation_schedules)
+                    }
                     true
                 }
                 R.id.navigation_map -> {
-                    if (navController.currentDestination?.id == R.id.navigation_station_details) {
-                        navController.navigateUp() // Go up/back if already on this destination
-                    } else {
-                        navController.navigate(R.id.navigation_map) // Navigate to destination
+                    if (navController.currentDestination?.id != R.id.navigation_map) {
+                        navController.navigate(R.id.navigation_map)
+                    } else if (navController.currentDestination?.id == R.id.navigation_station_details) {
+                        navController.navigateUp() // Go back to map page
                     }
                     true
                 }
                 R.id.navigation_info -> {
-                    navController.navigate(R.id.navigation_info)
+                    if (navController.currentDestination?.id != R.id.navigation_info) {
+                        navController.navigate(R.id.navigation_info)
+                    }
                     true
                 }
-                // Handle other destinations similarly
                 else -> false
             }
         }
