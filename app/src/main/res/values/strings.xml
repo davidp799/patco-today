@@ -97,6 +97,8 @@
         \n1. Improvements to app performance\n\n2. Fixed a crash occurring when checking for special schedules
     </string>
     <string name="changelog_ok_button">Great!</string>
+
+    <!--StationDetailsFragment-->
     <string name="elevator_image_content_description">image of an elevator</string>
     <string name="escalator_content_description">image of an escalator</string>
     <string name="parking_content_description">image of a parking sign</string>
