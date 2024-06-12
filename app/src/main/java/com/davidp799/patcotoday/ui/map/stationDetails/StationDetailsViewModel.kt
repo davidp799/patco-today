@@ -121,7 +121,7 @@ class StationDetailsViewModel : ViewModel() {
                     "RiverLINE to Trenton"
         ),
         "City Hall" to mapOf(
-            "title" to "City Hall",
+            "title" to "City Hall Station",
             "description" to "Market Street and North 5th Street, Camden NJ",
             "amenities" to mapOf(
                 "elevator" to "Elevator",
