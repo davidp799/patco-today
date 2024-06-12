@@ -82,10 +82,10 @@
 
             </com.facebook.shimmer.ShimmerFrameLayout>
 
-            <ListView
-                android:id="@+id/specialArrivalsListView"
+            <com.davidp799.patcotoday.ui.BottomSheetListView
+                android:id="@+id/specialArrivalsBottomSheetListView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"/>
 
         </LinearLayout>
 
