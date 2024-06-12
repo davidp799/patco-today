@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelLazy
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding
+import com.davidp799.patcotoday.ui.BottomSheetListView
 import com.davidp799.patcotoday.utils.Arrival
 import com.davidp799.patcotoday.utils.ConvertPDF
 import com.davidp799.patcotoday.utils.GetSpecial
@@ -380,8 +381,8 @@ class SchedulesFragment : Fragment() {
                                 viewModel.specialSchedulesArrayList.clear()
                                 viewModel.specialSchedulesArrayList.addAll(specialArrivalsArrayList)
                                 configureBottomSheet(view, true)
-                                val specialSchedulesListView =
-                                    view.findViewById<ListView>(R.id.specialArrivalsListView)
+                                val specialSchedulesBottomSheetListView =
+                                    view.findViewById<BottomSheetListView>(R.id.specialArrivalsBottomSheetListView)
                                 val specialSchedulesTextView =
                                     view.findViewById<TextView>(R.id.specialScheduleAbout)
                                 if (viewModel.specialText.size > 0) {
@@ -394,7 +395,7 @@ class SchedulesFragment : Fragment() {
                                         viewModel.specialSchedulesArrayList,
                                         0
                                     )
-                                specialSchedulesListView.adapter = specialArrayAdapter
+                                specialSchedulesBottomSheetListView.adapter = specialArrayAdapter
                                 specialArrayAdapter.notifyDataSetChanged()
                                 specialAboutShimmerFrameLayout.hideShimmer()
                                 specialShimmerFrameLayout.visibility = View.GONE
