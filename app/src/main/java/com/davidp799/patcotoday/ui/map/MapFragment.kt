@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -44,8 +45,9 @@ class MapFragment : Fragment() {
         stationMap.adapter = stationMapGeneralAdapter
         stationMap.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
+                val activeItem = mapViewModel.stationList[position]
                 val action = MapFragmentDirections
-                    .actionNavigationMapToNavigationStationDetails(mapViewModel.stationList[position])
+                    .actionNavigationMapToNavigationStationDetails(activeItem)
                 navController.navigate(action)
             }
         return root
