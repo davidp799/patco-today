@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.databinding.FragmentStationDetailsBinding
-import com.google.android.material.transition.MaterialSharedAxis
+import com.google.android.material.transition.MaterialFadeThrough
 
 class StationDetailsFragment : Fragment() {
     private var _binding: FragmentStationDetailsBinding? = null
@@ -28,22 +28,17 @@ class StationDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val stationName = arguments?.getString("stationName")
-        println("stationId: $stationName")
-
         val stationDetailsViewModel =
             ViewModelProvider(this)[StationDetailsViewModel::class.java]
         _binding = FragmentStationDetailsBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Y, true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Y, false)
-
         setLayout(root, stationDetailsViewModel.stationDetailsList[stationName])
 
+        enterTransition = MaterialFadeThrough()
+        exitTransition = MaterialFadeThrough()
+
         return root
-
     }
-
     private fun setLayout(view: View, stationDetails: Map<String, Any>?) {
         val titleTextView = view.findViewById<TextView>(R.id.titleTextView)
         titleTextView.text = stationDetails?.get("title").toString()
@@ -149,5 +144,4 @@ class StationDetailsFragment : Fragment() {
             walkingDistanceLinearLayout.visibility = View.GONE
         }
     }
-
 }
