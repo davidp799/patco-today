@@ -1,13 +1,17 @@
 package com.davidp799.patcotoday.ui.map.stationDetails
 
-import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.davidp799.patcotoday.R
@@ -40,13 +44,32 @@ class StationDetailsFragment : Fragment() {
 
     }
 
-    @SuppressLint("SetTextI18n")
     private fun setLayout(view: View, stationDetails: Map<String, Any>?) {
         val titleTextView = view.findViewById<TextView>(R.id.titleTextView)
         titleTextView.text = stationDetails?.get("title").toString()
 
         val descriptionTextView = view.findViewById<TextView>(R.id.descriptionTextView)
         descriptionTextView.text = stationDetails?.get("description").toString()
+
+        descriptionTextView.setOnClickListener {
+            val gmmIntentUri = Uri.parse("geo:0,0?q=${Uri.encode(descriptionTextView.text.toString())}")
+            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+            mapIntent.setPackage("com.google.android.apps.maps")
+            val packageManager = requireContext().packageManager
+            if (mapIntent.resolveActivity(packageManager) != null) {
+                startActivity(mapIntent)
+            } else {
+                val clip = ClipData.newPlainText("station address", descriptionTextView.text.toString())
+                getSystemService(requireContext(), ClipboardManager::class.java)?.setPrimaryClip(
+                    clip
+                )
+                Toast.makeText(
+                    requireContext(),
+                    "Address copied to clipboard",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
 
         val elevatorLinearLayout = view.findViewById<LinearLayout>(R.id.elevatorLinearLayout)
         val escalatorLinearLayout = view.findViewById<LinearLayout>(R.id.escalatorLinearLayout)
