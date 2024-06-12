@@ -147,6 +147,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="table_odd_background">#59F8F8F8</color>
     <color name="table_even_background">#59070707</color>
+    <color name="table_text">#FFFFFFFF</color>
     <!-- Shimmer Placeholder Colors -->
     <color name="shimmer_placeholder">#dddddd</color>
 </resources>
