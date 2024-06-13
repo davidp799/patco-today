@@ -55,7 +55,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-
 class SchedulesFragment : Fragment() {
     private var _binding: FragmentSchedulesBinding? = null
     private val binding get() = _binding!!
