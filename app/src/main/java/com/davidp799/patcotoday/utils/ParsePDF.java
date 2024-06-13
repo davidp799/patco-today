@@ -19,7 +19,7 @@ public class ParsePDF {
         for (String pdfLine : pdfLines) {
             String newString = pdfLine;
             String[] badRegexValues = {"\\s", "à", "A", "P"};
-            String[] replacementValues = {"", "CLOSED", "A,", "P,"};
+            String[] replacementValues = {"", "CLOSED,", "A,", "P,"};
             for (int i=0; i<badRegexValues.length; i++) {
                 newString = newString.replaceAll(badRegexValues[i], replacementValues[i]);
             }
