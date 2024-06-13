@@ -149,8 +149,7 @@ class StationDetailsViewModel : ViewModel() {
                     "Gallery Shopping\n" +
                     "PA Convention Center\n" +
                     "SEPTA's Market East Station\n" +
-                    "SEPTA's Market Frankford Line to University City\n" +
-                    "[MORE]"
+                    "SEPTA's Market Frankford Line to University City"
         ),
         "9/10th & Locust" to mapOf(
             "title" to "9/10th & Locust Street Station",
@@ -165,8 +164,7 @@ class StationDetailsViewModel : ViewModel() {
             "walkingDistance" to "Jefferson Hospital\n" +
                     "Pennsylvania Hospital\n" +
                     "Wills Eye Hospitals\n" +
-                    "Walnut Street Theater\n" +
-                    "[MORE]"
+                    "Walnut Street Theater"
         ),
         "12/13th & Locust" to mapOf(
             "title" to "12/13th & Locust Street Station",
@@ -178,8 +176,7 @@ class StationDetailsViewModel : ViewModel() {
             "hours" to "",
             "gatedParking" to "",
             "walkingDistance" to "Forrest Theater\n" +
-                    "SEPTA's Broad Street Line (to travel to stadiums)\n" +
-                    "[MORE]"
+                    "SEPTA's Broad Street Line (to travel to stadiums)"
         ),
         "15/16th & Locust" to mapOf(
             "title" to "15/16th & Locust Street Station",
