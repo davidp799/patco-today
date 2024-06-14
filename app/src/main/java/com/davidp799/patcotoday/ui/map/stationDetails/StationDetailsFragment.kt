@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
@@ -123,6 +124,61 @@ class StationDetailsFragment : Fragment() {
             stationHours = "Station is open 24/7."
             stationHoursTextViewBody.text = stationHours
         }
+
+//        Fares section
+        var newJerseyOneWayFare = "n/a"
+        var newJerseyRoundTripFare = "n/a"
+        var philadelphiaOneWayFare = "n/a"
+        var philadelphiaRoundTripFare = "n/a"
+        val stationTitle = stationDetails["title"].toString()
+        if (stationTitle.contains("Broadway Station")) {
+            val broadwayToCityHallRow = view.findViewById<TableRow>(R.id.broadwayToCityHallRow)
+            broadwayToCityHallRow.visibility = View.VISIBLE
+        } else {
+            val broadwayToCityHallRow = view.findViewById<TableRow>(R.id.broadwayToCityHallRow)
+            broadwayToCityHallRow.visibility = View.GONE
+        }
+
+        if (stationTitle in arrayOf("Lindenwold Station", "Ashland Station", "Woodcrest Station")) {
+            newJerseyOneWayFare = "$1.60"
+            newJerseyRoundTripFare = "$3.20"
+            philadelphiaOneWayFare = "$3.00"
+            philadelphiaRoundTripFare = "$6.00"
+        } else if (stationTitle in arrayOf("Haddonfield Station", "Westmont Station", "Collingswood Station")) {
+            newJerseyOneWayFare = "$1.60"
+            newJerseyRoundTripFare = "$3.20"
+            philadelphiaOneWayFare = "$3.00"
+            philadelphiaRoundTripFare = "$6.00"
+        } else if (stationTitle in arrayOf("Ferry Avenue Station")) {
+            newJerseyOneWayFare = "$1.60"
+            newJerseyRoundTripFare = "$3.20"
+            philadelphiaOneWayFare = "$2.00"
+            philadelphiaRoundTripFare = "$4.00"
+        } else if (stationTitle in arrayOf("Broadway Station (Walter Rand Transportation Center)", "City Hall Station")) {
+            newJerseyOneWayFare = "$1.60"
+            newJerseyRoundTripFare = "$3.20"
+            philadelphiaOneWayFare = "$1.40"
+            philadelphiaRoundTripFare = "$2.80"
+        } else { // philadelphia to any
+            newJerseyOneWayFare = "$3.00"
+            newJerseyRoundTripFare = "$6.00"
+            philadelphiaOneWayFare = "$1.40"
+            philadelphiaRoundTripFare = "$2.80"
+        }
+
+        val thisStationToPhiladelphiaTextView = view.findViewById<TextView>(R.id.thisStationToPhiladelphia)
+        thisStationToPhiladelphiaTextView.text = stationTitle
+        val thisStationToPhiladelphiaOneWay = view.findViewById<TextView>(R.id.thisStationToPhiladelphiaOneWay)
+        thisStationToPhiladelphiaOneWay.text = philadelphiaOneWayFare
+        val thisStationToPhiladelphiaRoundTrip = view.findViewById<TextView>(R.id.thisStationToPhiladelphiaRoundTrip)
+        thisStationToPhiladelphiaRoundTrip.text = philadelphiaRoundTripFare
+
+        val thisStationToNewJerseyTextView = view.findViewById<TextView>(R.id.thisStationToNewJersey)
+        thisStationToNewJerseyTextView.text = stationTitle
+        val thisStationToNewJerseyOneWay = view.findViewById<TextView>(R.id.thisStationToNewJerseyOneWay)
+        thisStationToNewJerseyOneWay.text = newJerseyOneWayFare
+        val thisStationToNewJerseyRoundTrip = view.findViewById<TextView>(R.id.thisStationToNewJerseyRoundTrip)
+        thisStationToNewJerseyRoundTrip.text = newJerseyRoundTripFare
 
         val gatedParkingLinearLayout = view.findViewById<LinearLayout>(R.id.gatedParkingLinearLayout)
         val gatedParkingTextViewBody = view.findViewById<TextView>(R.id.gatedParkingTextViewBody)

@@ -105,7 +105,7 @@ class StationDetailsViewModel : ViewModel() {
                     "Historic Harleigh Cemetery"
         ),
         "Broadway" to mapOf(
-            "title" to "Broadway Station (Walter Rand Transportation Center)",
+            "title" to "Broadway Station \n(Walter Rand Transportation Center)",
             "description" to "100 South Broadway, Camden, NJ 08103",
             "amenities" to mapOf(
                 "elevator" to "Elevator",
@@ -194,8 +194,7 @@ class StationDetailsViewModel : ViewModel() {
                     "Merriam Theater\n" +
                     "Wilma Theaters\n" +
                     "University of the Arts\n" +
-                    "Rittenhouse Square\n" +
-                    "[MORE]"
+                    "Rittenhouse Square"
         )
     )
     val stationDetailsList = _stationDetailsList
