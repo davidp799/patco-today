@@ -36,8 +36,6 @@ class StationDetailsFragment : Fragment() {
         setLayout(root, stationDetailsViewModel.stationDetailsList[stationName])
 
         enterTransition = MaterialFadeThrough()
-        exitTransition = MaterialFadeThrough()
-
         return root
     }
     private fun setLayout(view: View, stationDetails: Map<String, Any>?) {

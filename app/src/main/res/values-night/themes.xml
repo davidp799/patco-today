@@ -51,7 +51,16 @@
         <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
+        <!-- New Material 3 Switch. -->
+        <item name="preferenceTheme">@style/ThemeOverlay.App.Preference</item>
+    </style>
 
+    <style name="ThemeOverlay.App.Preference" parent="PreferenceThemeOverlay">
+        <item name="switchPreferenceCompatStyle">@style/PreferenceMaterialSwitch</item>
+    </style>
+
+    <style name="PreferenceMaterialSwitch" parent="@style/Preference.SwitchPreferenceCompat.Material">
+        <item name="widgetLayout">@layout/preference_switch</item>
     </style>
 
     <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
