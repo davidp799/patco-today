@@ -404,10 +404,10 @@ class SchedulesFragment : Fragment() {
                 }
 
             } else {
-                configureBottomSheetOnMainThread(view, false, specialShimmerFrameLayout)
+                configureBottomSheetOnMainThread(view, false, specialAboutShimmerFrameLayout, specialShimmerFrameLayout)
             }
         } else {
-            configureBottomSheetOnMainThread(view, false, specialShimmerFrameLayout)
+            configureBottomSheetOnMainThread(view, false, specialAboutShimmerFrameLayout, specialShimmerFrameLayout)
         }
     }
     private fun checkSpecial(): Boolean {
@@ -568,10 +568,11 @@ class SchedulesFragment : Fragment() {
         }
     }
     private suspend fun configureBottomSheetOnMainThread(
-        view: View, specialStatus: Boolean, specialShimmerFrameLayout: ShimmerFrameLayout
+        view: View, specialStatus: Boolean, specialAboutShimmerFrameLayout: ShimmerFrameLayout, specialShimmerFrameLayout: ShimmerFrameLayout
     ) {
         withContext (Main) {
             configureBottomSheet(view, specialStatus)
+            specialAboutShimmerFrameLayout.hideShimmer()
             specialShimmerFrameLayout.visibility = View.GONE
         }
     }
