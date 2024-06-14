@@ -1,6 +1,7 @@
 package com.davidp799.patcotoday
 
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +11,7 @@ import androidx.core.view.WindowCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.color.DynamicColors
 import kotlin.random.Random
@@ -79,6 +81,11 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.preferences, rootKey)
+
+            val dynamicColorsPref = findPreference<SwitchPreferenceCompat>("dynamic_colors")
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                dynamicColorsPref?.isVisible = false
+            }
         } // set as xml.preferences
 
         override fun onPreferenceTreeClick(preference: Preference): Boolean {
