@@ -47,7 +47,7 @@
     <string name="pref_dynamic">Use Dynamic Colors</string>
     <string name="pref_dynamic_key">dynamic_colors</string>
     <string name="pref_dynamic_def_value">false</string>
-    <string name="pref_dynamic_summary">Apply Material You dynamic colors if available</string>
+    <string name="pref_dynamic_summary">Apply Material You dynamic colors</string>
     <!-- Theme -->
     <string name="pref_theme">Choose Theme</string>
     <string name="pref_theme_key">device_theme</string>
