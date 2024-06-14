@@ -582,6 +582,7 @@ class SchedulesFragment : Fragment() {
             = view.findViewById<LinearLayout>(R.id.bottom_sheet_layout)
         val bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
             = BottomSheetBehavior.from(bottomSheetLayout)
+        bottomSheetLayout.visibility = View.VISIBLE
         if (!specialStatus || !viewModel.internet || !viewModel.special) {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             val specialAbout: TextView = view.findViewById(R.id.specialScheduleAbout)
