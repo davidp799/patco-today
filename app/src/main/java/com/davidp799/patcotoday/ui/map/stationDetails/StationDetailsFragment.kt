@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
@@ -65,51 +66,51 @@ class StationDetailsFragment : Fragment() {
             }
         }
 
-        val elevatorLinearLayout = view.findViewById<LinearLayout>(R.id.elevatorLinearLayout)
-        val escalatorLinearLayout = view.findViewById<LinearLayout>(R.id.escalatorLinearLayout)
-        val bikeRacksLinearLayout = view.findViewById<LinearLayout>(R.id.bikeRacksLinearLayout)
-        val taxiLinearLayout = view.findViewById<LinearLayout>(R.id.taxiLinearLayout)
-        val parkingLinearLayout = view.findViewById<LinearLayout>(R.id.parkingLinearLayout)
+        val elevatorContainer = view.findViewById<RelativeLayout>(R.id.elevatorContainer)
+        val escalatorContainer = view.findViewById<RelativeLayout>(R.id.escalatorContainer)
+        val bikeRacksContainer = view.findViewById<RelativeLayout>(R.id.bikeRacksContainer)
+        val taxiContainer = view.findViewById<RelativeLayout>(R.id.taxiContainer)
+        val parkingContainer = view.findViewById<RelativeLayout>(R.id.parkingContainer)
 
         val amenities = stationDetails?.get("amenities") as Map<*, *>
         if (amenities.contains("elevator")) {
-            elevatorLinearLayout.visibility = View.VISIBLE
-            val elevatorTextView = elevatorLinearLayout.findViewById<TextView>(R.id.elevatorTextView)
+            elevatorContainer.visibility = View.VISIBLE
+            val elevatorTextView = elevatorContainer.findViewById<TextView>(R.id.elevatorTextView)
             elevatorTextView.text = amenities["elevator"].toString()
         } else {
-            elevatorLinearLayout.visibility = View.GONE
+            elevatorContainer.visibility = View.GONE
         }
 
         if (amenities.contains("escalator")) {
-            escalatorLinearLayout.visibility = View.VISIBLE
-            val escalatorTextView = escalatorLinearLayout.findViewById<TextView>(R.id.escalatorTextView)
+            escalatorContainer.visibility = View.VISIBLE
+            val escalatorTextView = escalatorContainer.findViewById<TextView>(R.id.escalatorTextView)
             escalatorTextView.text = amenities["escalator"].toString()
         } else {
-            escalatorLinearLayout.visibility = View.GONE
+            escalatorContainer.visibility = View.GONE
         }
 
         if (amenities.contains("bikeRacks")) {
-            bikeRacksLinearLayout.visibility = View.VISIBLE
-            val bikeRacksTextView = bikeRacksLinearLayout.findViewById<TextView>(R.id.bikeRacksTextView)
+            bikeRacksContainer.visibility = View.VISIBLE
+            val bikeRacksTextView = bikeRacksContainer.findViewById<TextView>(R.id.bikeRacksTextView)
             bikeRacksTextView.text = amenities["bikeRacks"].toString()
         } else {
-            bikeRacksLinearLayout.visibility = View.GONE
+            bikeRacksContainer.visibility = View.GONE
         }
 
         if (amenities.contains("taxiService")) {
-            taxiLinearLayout.visibility = View.VISIBLE
-            val taxiTextView = taxiLinearLayout.findViewById<TextView>(R.id.taxiTextView)
+            taxiContainer.visibility = View.VISIBLE
+            val taxiTextView = taxiContainer.findViewById<TextView>(R.id.taxiTextView)
             taxiTextView.text = amenities["taxiService"].toString()
         } else {
-            taxiLinearLayout.visibility = View.GONE
+            taxiContainer.visibility = View.GONE
         }
 
         if (amenities.contains("parking")) {
-            parkingLinearLayout.visibility = View.VISIBLE
-            val parkingTextView = parkingLinearLayout.findViewById<TextView>(R.id.parkingTextView)
+            parkingContainer.visibility = View.VISIBLE
+            val parkingTextView = parkingContainer.findViewById<TextView>(R.id.parkingTextView)
             parkingTextView.text = amenities["parking"].toString()
         } else {
-            parkingLinearLayout.visibility = View.GONE
+            parkingContainer.visibility = View.GONE
         }
 
         val stationHoursLinearLayout = view.findViewById<LinearLayout>(R.id.stationHoursLinearLayout)
@@ -124,10 +125,10 @@ class StationDetailsFragment : Fragment() {
         }
 
 //        Fares section
-        var newJerseyOneWayFare = "n/a"
-        var newJerseyRoundTripFare = "n/a"
-        var philadelphiaOneWayFare = "n/a"
-        var philadelphiaRoundTripFare = "n/a"
+        var newJerseyOneWayFare: String
+        var newJerseyRoundTripFare: String
+        var philadelphiaOneWayFare: String
+        var philadelphiaRoundTripFare: String
         val stationTitle = stationDetails["title"].toString()
         if (stationTitle.contains("Broadway Station")) {
             val broadwayToCityHallRow = view.findViewById<TableRow>(R.id.broadwayToCityHallRow)
@@ -137,31 +138,37 @@ class StationDetailsFragment : Fragment() {
             broadwayToCityHallRow.visibility = View.GONE
         }
 
-        if (stationTitle in arrayOf("Lindenwold Station", "Ashland Station", "Woodcrest Station")) {
-            newJerseyOneWayFare = "$1.60"
-            newJerseyRoundTripFare = "$3.20"
-            philadelphiaOneWayFare = "$3.00"
-            philadelphiaRoundTripFare = "$6.00"
-        } else if (stationTitle in arrayOf("Haddonfield Station", "Westmont Station", "Collingswood Station")) {
-            newJerseyOneWayFare = "$1.60"
-            newJerseyRoundTripFare = "$3.20"
-            philadelphiaOneWayFare = "$3.00"
-            philadelphiaRoundTripFare = "$6.00"
-        } else if (stationTitle in arrayOf("Ferry Avenue Station")) {
-            newJerseyOneWayFare = "$1.60"
-            newJerseyRoundTripFare = "$3.20"
-            philadelphiaOneWayFare = "$2.00"
-            philadelphiaRoundTripFare = "$4.00"
-        } else if (stationTitle in arrayOf("Broadway Station (Walter Rand Transportation Center)", "City Hall Station")) {
-            newJerseyOneWayFare = "$1.60"
-            newJerseyRoundTripFare = "$3.20"
-            philadelphiaOneWayFare = "$1.40"
-            philadelphiaRoundTripFare = "$2.80"
-        } else { // philadelphia to any
-            newJerseyOneWayFare = "$3.00"
-            newJerseyRoundTripFare = "$6.00"
-            philadelphiaOneWayFare = "$1.40"
-            philadelphiaRoundTripFare = "$2.80"
+        when (stationTitle) {
+            in arrayOf("Lindenwold Station", "Ashland Station", "Woodcrest Station") -> {
+                newJerseyOneWayFare = "$1.60"
+                newJerseyRoundTripFare = "$3.20"
+                philadelphiaOneWayFare = "$3.00"
+                philadelphiaRoundTripFare = "$6.00"
+            }
+            in arrayOf("Haddonfield Station", "Westmont Station", "Collingswood Station") -> {
+                newJerseyOneWayFare = "$1.60"
+                newJerseyRoundTripFare = "$3.20"
+                philadelphiaOneWayFare = "$3.00"
+                philadelphiaRoundTripFare = "$6.00"
+            }
+            "Ferry Avenue Station" -> {
+                newJerseyOneWayFare = "$1.60"
+                newJerseyRoundTripFare = "$3.20"
+                philadelphiaOneWayFare = "$2.25"
+                philadelphiaRoundTripFare = "$4.50"
+            }
+            "Broadway Station (Walter Rand Transportation Center)", "City Hall Station" -> {
+                newJerseyOneWayFare = "$1.60"
+                newJerseyRoundTripFare = "$3.20"
+                philadelphiaOneWayFare = "$1.40"
+                philadelphiaRoundTripFare = "$2.80"
+            }
+            else -> { // philadelphia to any
+                newJerseyOneWayFare = "$3.00"
+                newJerseyRoundTripFare = "$6.00"
+                philadelphiaOneWayFare = "$1.40"
+                philadelphiaRoundTripFare = "$2.80"
+            }
         }
 
         val thisStationToPhiladelphiaTextView = view.findViewById<TextView>(R.id.thisStationToPhiladelphia)

@@ -143,9 +143,9 @@
     <string name="fares_options_title">Fare Payment Options</string>
     <string name="fares_reduced_body">A Reduced Fare Program (RFP) is available to senior citizens, people with disabilities, and Medicare card holders. Eligible individuals may travel between any two PATCO stations during off-peak hours for $0.70, regardless of distance traveled. The reduced fare is set as half the lowest full fare. For program information, please visit PATCO\'s Website.</string>
     <string name="fares_reduced_title">Reduced Fare Program</string>
-    <string name="fares_passes_body">Weekend Monthly Passes offer unlimited travel between Friday and Sunday nights for $18/month.</string>
-    <string name="fares_passes_title">Weekend &amp; Monthly Pass</string>
     <string name="fares_from_this_station">This Station</string>
+    <string name="default_sub_title">Default subtitle…</string>
+    <string name="fares_learn_more">Learn more.</string>
 
     <string-array name="pref_themeOptions_entries">
         <item>Light</item>

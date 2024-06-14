@@ -25,7 +25,7 @@
         android:id="@+id/navigation_station_details"
         android:name="com.davidp799.patcotoday.ui.map.stationDetails.StationDetailsFragment"
         android:label="@string/title_map"
-        tools:layout="@layout/fragment_map">
+        tools:layout="@layout/fragment_station_details">
         <argument
             android:name="stationName"
             app:argType="string" />
@@ -35,5 +35,20 @@
         android:id="@+id/navigation_info"
         android:name="com.davidp799.patcotoday.ui.info.InfoFragment"
         android:label="@string/title_info"
-        tools:layout="@layout/fragment_info" />
+        tools:layout="@layout/fragment_info">
+        <action
+            android:id="@+id/action_navigation_info_to_navigation_info_details"
+            app:destination="@id/navigation_info_details" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_info_details"
+        android:name="com.davidp799.patcotoday.ui.info.infoDetails.InfoDetailsFragment"
+        android:label="@string/title_info"
+        tools:layout="@layout/fragment_info_details">
+        <argument
+            android:name="itemSelected"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

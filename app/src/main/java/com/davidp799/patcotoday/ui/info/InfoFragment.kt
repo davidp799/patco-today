@@ -5,18 +5,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
-import android.widget.ImageButton
 import android.widget.ListView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.davidp799.patcotoday.R
-import com.davidp799.patcotoday.SettingsActivity
 import com.davidp799.patcotoday.databinding.FragmentInfoBinding
 import com.davidp799.patcotoday.utils.EnableNestedScrolling
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.internal.CollapsingTextHelper
 import com.google.android.material.transition.MaterialFadeThrough
 
 class InfoFragment : Fragment() {
@@ -34,6 +29,7 @@ class InfoFragment : Fragment() {
         val infoViewModel =
             ViewModelProvider(this)[InfoViewModel::class.java]
         _binding = FragmentInfoBinding.inflate(inflater, container, false)
+        val navController = findNavController()
         val root: View = binding.root
         enterTransition = MaterialFadeThrough()
 
@@ -48,10 +44,18 @@ class InfoFragment : Fragment() {
         infoListView.adapter = infoGeneralAdapter
         infoListView.isTransitionGroup = true
         infoListView.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
+
+            AdapterView.OnItemClickListener { _, _, position, _ ->
                 try {
-                    val openLinksIntent = Intent(Intent.ACTION_VIEW, Uri.parse(infoViewModel.infoLinks[position]))
-                    requireContext().startActivity(openLinksIntent)
+                    val activeItem = infoViewModel.infoItems[position]
+                    if (activeItem == "Fares") {
+                        val action = InfoFragmentDirections
+                            .actionNavigationInfoToNavigationInfoDetails(activeItem)
+                        navController.navigate(action)
+                    } else {
+                        val openLinksIntent = Intent(Intent.ACTION_VIEW, Uri.parse(infoViewModel.infoLinks[position]))
+                        requireContext().startActivity(openLinksIntent)
+                    }
                 } catch (e: Error) {
                     e.printStackTrace()
                 }

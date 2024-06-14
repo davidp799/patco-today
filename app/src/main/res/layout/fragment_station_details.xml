@@ -68,141 +68,86 @@
                 android:orientation="horizontal"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <LinearLayout
-                    android:id="@+id/elevatorLinearLayout"
+                <RelativeLayout
+                    android:id="@+id/elevatorContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:padding="8dp"
                     app:layout_constraintTop_toBottomOf="@id/stationAmenitiesLinearLayout">
-
-                    <ImageView
-                        android:id="@+id/elevatorImageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:contentDescription="@string/elevator_image_content_description"
-                        app:srcCompat="@drawable/ic_elevator" />
-
                     <TextView
                         android:id="@+id/elevatorTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/elevator"
                         android:textAppearance="?attr/textAppearanceBody2"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/elevatorImageView" />
+                        android:layout_centerHorizontal="true"
+                        app:drawableTopCompat="@drawable/ic_elevator" />
+                </RelativeLayout>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/escalatorLinearLayout"
+                <RelativeLayout
+                    android:id="@+id/escalatorContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:padding="8dp"
-                    android:text="@string/escalator"
                     app:layout_constraintTop_toBottomOf="@id/stationAmenitiesLinearLayout">
-
-                    <ImageView
-                        android:id="@+id/escalatorImageView"
-                        android:contentDescription="@string/escalator_content_description"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        app:srcCompat="@drawable/ic_escalator"/>
                     <TextView
                         android:id="@+id/escalatorTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/escalator"
                         android:textAppearance="?attr/textAppearanceBody2"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/escalatorImageView" />
+                        android:layout_centerHorizontal="true"
+                        app:drawableTopCompat="@drawable/ic_escalator" />
+                </RelativeLayout>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/bikeRacksLinearLayout"
+                <RelativeLayout
+                    android:id="@+id/bikeRacksContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:padding="8dp"
                     app:layout_constraintTop_toBottomOf="@id/stationAmenitiesLinearLayout">
-
-                    <ImageView
-                        android:id="@+id/bikeRacksImageView"
-                        android:contentDescription="@string/bike_racks_content_description"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        app:srcCompat="@drawable/ic_bike"/>
                     <TextView
                         android:id="@+id/bikeRacksTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/bike_racks"
                         android:textAppearance="?attr/textAppearanceBody2"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/bikeRacksImageView" />
+                        android:layout_centerHorizontal="true"
+                        app:drawableTopCompat="@drawable/ic_bike" />
+                </RelativeLayout>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/taxiLinearLayout"
+                <RelativeLayout
+                    android:id="@+id/taxiContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:padding="8dp"
                     app:layout_constraintTop_toBottomOf="@id/stationAmenitiesLinearLayout">
-                    <ImageView
-                        android:id="@+id/taxiImageView"
-                        android:contentDescription="@string/taxi_content_description"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        app:srcCompat="@drawable/ic_taxi"/>
                     <TextView
                         android:id="@+id/taxiTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/taxi"
                         android:textAppearance="?attr/textAppearanceBody2"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/taxiImageView" />
-                </LinearLayout>
+                        android:layout_centerHorizontal="true"
+                        app:drawableTopCompat="@drawable/ic_taxi" />
+                </RelativeLayout>
 
-                <LinearLayout
-                    android:id="@+id/parkingLinearLayout"
+                <RelativeLayout
+                    android:id="@+id/parkingContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:padding="8dp"
                     app:layout_constraintTop_toBottomOf="@id/stationAmenitiesLinearLayout">
-                    <ImageView
-                        android:id="@+id/parkingImageView"
-                        android:contentDescription="@string/parking_content_description"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        app:srcCompat="@drawable/ic_parking"/>
                     <TextView
                         android:id="@+id/parkingTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/parking"
                         android:textAppearance="?attr/textAppearanceBody2"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/parkingImageView" />
-                </LinearLayout>
-
+                        android:layout_centerHorizontal="true"
+                        app:drawableTopCompat="@drawable/ic_parking" />
+                </RelativeLayout>
             </LinearLayout>
-
         </HorizontalScrollView>
 
         <LinearLayout
@@ -271,28 +216,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/fares_child_fares_body"
-                android:textAppearance="?attr/textAppearanceBody1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
-
-            <TextView
-                android:id="@+id/faresTextViewPassesTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:text="@string/fares_passes_title"
-                android:textAppearance="?attr/textAppearanceSubtitle1"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
-
-            <TextView
-                android:id="@+id/faresTextViewPassesBody"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/fares_passes_body"
                 android:textAppearance="?attr/textAppearanceBody1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

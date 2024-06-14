@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -90,6 +91,7 @@ class MainActivity : AppCompatActivity() {
                                 = findViewById<LinearLayout>(R.id.bottom_sheet_layout)
                         val bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
                                 = BottomSheetBehavior.from(bottomSheetLayout)
+                        bottomSheetLayout.visibility = View.VISIBLE
                         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                     } else {
                         navController.navigate(R.id.navigation_schedules)
