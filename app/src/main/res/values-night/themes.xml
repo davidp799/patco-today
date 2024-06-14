@@ -49,7 +49,8 @@
         <item name="colorSurfaceContainerHighest">@color/md_theme_surfaceContainerHighest</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+        <!-- Dialog Corner Radius. -->
+        <item name="android:dialogCornerRadius">16dp</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <!-- New Material 3 Switch. -->
         <item name="preferenceTheme">@style/ThemeOverlay.App.Preference</item>

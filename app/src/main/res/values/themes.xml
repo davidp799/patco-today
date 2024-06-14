@@ -48,22 +48,19 @@
         <item name="colorSurfaceContainerHigh">@color/md_theme_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_surfaceContainerHighest</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
-        <item name="android:windowLightStatusBar" >true</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <!-- Dialog Corner Radius. -->
+        <item name="android:dialogCornerRadius">16dp</item>
         <!-- New Material 3 Switch. -->
         <item name="preferenceTheme">@style/ThemeOverlay.App.Preference</item>
     </style>
-
     <style name="ThemeOverlay.App.Preference" parent="PreferenceThemeOverlay">
         <item name="switchPreferenceCompatStyle">@style/PreferenceMaterialSwitch</item>
     </style>
-
     <style name="PreferenceMaterialSwitch" parent="@style/Preference.SwitchPreferenceCompat.Material">
         <item name="widgetLayout">@layout/preference_switch</item>
     </style>
-
     <style name="Theme.PatcoToday.AppBarOverlay" parent="ThemeOverlay.Material3.ActionBar" />
-
     <style name="Theme.PatcoToday.PopupOverlay" parent="ThemeOverlay.Material3.Light" />
-
 </resources>
