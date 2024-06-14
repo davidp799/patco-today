@@ -62,7 +62,6 @@ class MainActivity : AppCompatActivity() {
             requestReview()
             runBackgroundTasks()
         }
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun onSupportNavigateUp(): Boolean {
