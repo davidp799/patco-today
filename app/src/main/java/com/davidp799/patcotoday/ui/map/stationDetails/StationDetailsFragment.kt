@@ -148,8 +148,8 @@ class StationDetailsFragment : Fragment() {
             in arrayOf("Haddonfield Station", "Westmont Station", "Collingswood Station") -> {
                 newJerseyOneWayFare = "$1.60"
                 newJerseyRoundTripFare = "$3.20"
-                philadelphiaOneWayFare = "$3.00"
-                philadelphiaRoundTripFare = "$6.00"
+                philadelphiaOneWayFare = "$2.60"
+                philadelphiaRoundTripFare = "$5.20"
             }
             "Ferry Avenue Station" -> {
                 newJerseyOneWayFare = "$1.60"
@@ -193,6 +193,16 @@ class StationDetailsFragment : Fragment() {
             gatedParkingTextViewBody.text = gatedParking
         } else {
             gatedParkingLinearLayout.visibility = View.GONE
+        }
+
+        val metersLinearLayout = view.findViewById<LinearLayout>(R.id.metersLinearLayout)
+        val metersTextViewBody = view.findViewById<TextView>(R.id.metersTextViewBody)
+        val meters = stationDetails["meters"] as String
+        if (meters.isNotEmpty()) {
+            metersLinearLayout.visibility = View.VISIBLE
+            metersTextViewBody.text = meters
+        } else {
+            metersLinearLayout.visibility = View.GONE
         }
 
         val walkingDistanceLinearLayout = view.findViewById<LinearLayout>(R.id.walkingDistanceLinearLayout)

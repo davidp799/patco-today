@@ -16,6 +16,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "",
             "gatedParking" to "$1 from 5 am to 10 am (pay with FREEDOM card only). Free after 10 am.",
+            "meters" to "",
             "walkingDistance" to "UMDNJ-School of Osteopathic Medicine\nKennedy University Hospital"
         ),
         "Ashland" to mapOf(
@@ -29,6 +30,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "",
             "gatedParking" to "$1 from 5 am to 10 am (pay with FREEDOM card only). Free after 10 am.",
+            "meters" to "25¢ for 2 hours. (Use Quarters Only)",
             "walkingDistance" to "Voorhees Town Center"
         ),
         "Woodcrest" to mapOf(
@@ -43,6 +45,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "",
             "gatedParking" to "$1 from 5 am to 10 am (pay with FREEDOM card only). Free after 10 am.",
+            "meters" to "25¢ for 2 hours. (Use Quarters Only)",
             "walkingDistance" to ""
         ),
         "Haddonfield" to mapOf(
@@ -57,6 +60,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "",
             "gatedParking" to "$1 from 5 am to 10 am (pay with FREEDOM card only). Free after 10 am.",
+            "meters" to "25¢ for 2 hours. (Use Quarters Only)",
             "walkingDistance" to "Shopping & Fine Dining\nHistoric Indian King Tavern\nHadrosaurus Foulkii Dinosaur"
         ),
         "Westmont" to mapOf(
@@ -70,6 +74,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "",
             "gatedParking" to "$1 from 5 am to 10 am (pay with FREEDOM card only). Free after 10 am.",
+            "meters" to "25¢ for 2 hours. (Use Quarters Only)",
             "walkingDistance" to "Shopping & Fine Dining along Haddon Avenue"
         ),
         "Collingswood" to mapOf(
@@ -82,7 +87,8 @@ class StationDetailsViewModel : ViewModel() {
                 "parking" to "Parking"
             ),
             "hours" to "",
-            "gatedParking" to "",
+            "gatedParking" to "$1 from 5 am to 10 am (pay with FREEDOM card only). Free after 10 am.",
+            "meters" to "",
             "walkingDistance" to "Shopping\n" +
                     "Dining\n" +
                     "Farmer's Market (seasonal - Saturday a.m.)\n" +
@@ -100,6 +106,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "",
             "gatedParking" to "$1 from 5 am to 10 am (pay with FREEDOM card only). Free after 10 am.",
+            "meters" to "",
             "walkingDistance" to "Lady of Lourdes Hospital\n" +
                     "Camden Historical Society\n" +
                     "Historic Harleigh Cemetery"
@@ -115,6 +122,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "",
             "gatedParking" to "",
+            "meters" to "",
             "walkingDistance" to "Cooper Hospital\n" +
                     "Walt Whitman House\n" +
                     "Freedom Mortgage Pavilion\n" +
@@ -129,6 +137,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "Station is open daily from 5 a.m. to midnight.",
             "gatedParking" to "",
+            "meters" to "",
             "walkingDistance" to "Rutgers-Camden, Camden County College\n" +
                     "Rowan University\n" +
                     "Campbell's Field (RiverSharks baseball)\n" +
@@ -145,6 +154,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "",
             "gatedParking" to "",
+            "meters" to "",
             "walkingDistance" to "Historic District\n" +
                     "Gallery Shopping\n" +
                     "PA Convention Center\n" +
@@ -161,6 +171,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "Station is open daily from 4:15 a.m. to 12:07 a.m.",
             "gatedParking" to "",
+            "meters" to "",
             "walkingDistance" to "Jefferson Hospital\n" +
                     "Pennsylvania Hospital\n" +
                     "Wills Eye Hospitals\n" +
@@ -175,6 +186,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "",
             "gatedParking" to "",
+            "meters" to "",
             "walkingDistance" to "Forrest Theater\n" +
                     "SEPTA's Broad Street Line (to travel to stadiums)"
         ),
@@ -188,6 +200,7 @@ class StationDetailsViewModel : ViewModel() {
             ),
             "hours" to "",
             "gatedParking" to "",
+            "meters" to "",
             "walkingDistance" to "Avenue of the Arts\n" +
                     "Kimmel Center\n" +
                     "Academy of Music\n" +
