@@ -378,7 +378,11 @@ class SchedulesFragment : Fragment() {
                                 getSpecialArrivalsBackground(source, destination)
                             withContext (Main) {
                                 viewModel.specialSchedulesArrayList.clear()
+                                Log.d("specials", "(clear): viewModel.specialSchedulesArrayList.size = ${viewModel.specialSchedulesArrayList.size}")
+                                Log.d("specials", "(clear): val specialArrivalsArrayList.size = ${specialArrivalsArrayList.size}")
+
                                 viewModel.specialSchedulesArrayList.addAll(specialArrivalsArrayList)
+                                Log.d("specials", "(addAll): viewModel.specialSchedulesArrayList.size = ${viewModel.specialSchedulesArrayList.size}")
                                 configureBottomSheet(view, true)
                                 val specialSchedulesBottomSheetListView =
                                     view.findViewById<BottomSheetListView>(R.id.specialArrivalsBottomSheetListView)
@@ -519,6 +523,8 @@ class SchedulesFragment : Fragment() {
 
     private fun parseSpecial(source: Int, destination: Int): Boolean {
         return try {
+            viewModel.specialWestBound.clear()
+            viewModel.specialEastBound.clear()
             for (i in 0 until viewModel.runnableConvertedStrings.size) {
                 val parsePDF =
                     ParsePDF(viewModel.runnableConvertedStrings[i])
@@ -539,6 +545,7 @@ class SchedulesFragment : Fragment() {
             val specialArrivals = arrayListOf(
                 viewModel.specialWestBound, viewModel.specialEastBound
             )
+            Log.d("specials, getSpecialArrivalsBackground", "viewModel.specialWestBound, viewModel.specialEastBound sizes = ${viewModel.specialWestBound.size}, ${viewModel.specialEastBound.size}")
             // retrieve list of base data
             var position = 0
             val arrivalsArrayList =
