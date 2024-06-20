@@ -294,7 +294,9 @@ class SchedulesFragment : Fragment() {
         for (i in 0 until arrivalsArrayList.size) {
             val arrivalTime = arrivalsArrayList[i].arrivalTime.toString()
             try {
-                if (!timeFormat.parse(timeFormatDate)!!.after(timeFormat.parse(arrivalTime))) {
+                if (arrivalTime == "CLOSED") {
+                    Log.d("scrollToNext", "CLOSED, skipping to next")
+                } else if (!timeFormat.parse(timeFormatDate)!!.after(timeFormat.parse(arrivalTime))) {
                     break
                 }
                 scrollIndex = i + 1
@@ -521,6 +523,7 @@ class SchedulesFragment : Fragment() {
         return try {
             viewModel.specialWestBound.clear()
             viewModel.specialEastBound.clear()
+            viewModel.parsedArrivals.clear()
             for (i in 0 until viewModel.runnableConvertedStrings.size) {
                 val parsePDF =
                     ParsePDF(viewModel.runnableConvertedStrings[i])

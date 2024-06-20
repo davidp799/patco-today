@@ -2,6 +2,8 @@ package com.davidp799.patcotoday.utils;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,6 +14,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /** Class which analyzes PATCO Transit GTFS data to provide a list of upcoming arrivals
  *  based on provided source and destination stations and day of week. */
@@ -120,10 +123,15 @@ public class Schedules {
                     thisArrival.setArrivalTime(_12HourSDF.format(_24HourDt));
                     thisArrival.setTravelTime("CLOSED");
                 } else {
-                    Date _24HourDtArrival = _24HourSDF.parse(thisTrip.getArrivalTime());
-                    assert _24HourDtArrival != null;
-                    Date _24HourDtTravel = new Date(_24HourDtArrival.getTime() + (travelTime * MILLISECONDS));
-                    thisArrival = new Arrival(_12HourSDF.format(_24HourDtArrival), _12HourSDF.format(_24HourDtTravel));
+                    if (Objects.equals(thisTrip.getArrivalTime(), "")) {
+                        thisArrival.setArrivalTime("CLOSED");
+                        thisArrival.setTravelTime("CLOSED");
+                    } else {
+                        Date _24HourDtArrival = _24HourSDF.parse(thisTrip.getArrivalTime());
+                        assert _24HourDtArrival != null;
+                        Date _24HourDtTravel = new Date(_24HourDtArrival.getTime() + (travelTime * MILLISECONDS));
+                        thisArrival = new Arrival(_12HourSDF.format(_24HourDtArrival), _12HourSDF.format(_24HourDtTravel));
+                    }
                 }
                 arrivals.add(i, thisArrival);
             } catch (Exception e) {
