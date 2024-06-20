@@ -19,7 +19,7 @@ class BottomSheetListView(context: Context?, p_attrs: AttributeSet?) :
         return super.onTouchEvent(ev)
     }
 
-    fun canScrollVertically(view: AbsListView?): Boolean {
+    private fun canScrollVertically(view: AbsListView?): Boolean {
         var canScroll = false
 
         if (view != null && view.childCount > 0) {
