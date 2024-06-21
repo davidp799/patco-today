@@ -59,7 +59,7 @@
     <string name="pref_title_feedback">Send App Feedback</string>
     <string name="pref_summary_feedback">Email developer</string>
     <string name="pref_title_version">Application Version</string>
-    <string name="pref_summary_version">1.2.0</string>
+    <string name="pref_summary_version">1.2.1</string>
     <string name="pref_title_licenses">Open Source Licenses</string>
     <string name="pref_summary_licenses">View the GNU General Public License</string>
     <string name="pref_title_updates">Check for Updates</string>
@@ -94,7 +94,7 @@
     <string name="download_on_mobile_data_summary">Automatically download special schedules when WiFi is not available</string>
     <string name="changelog_title">What\'s New</string>
     <string name="changelog_message">
-        \n1. Improvements to the look and feel of the app\n\n2. Station details are now shown in-app within the Station Map section\n\n3. Fixed a bug where the special schedules sheet would close when scrolling through arrivals\n\n4. Fixed a bug where eastbound special schedules would appear incorrectly\n\n5. General performance improvements</string>
+        \n1. Fixed a bug where special schedules were not being cleared when reversing directions.</string>
     <string name="changelog_ok_button">Great!</string>
 
     <!--StationDetailsFragment-->
