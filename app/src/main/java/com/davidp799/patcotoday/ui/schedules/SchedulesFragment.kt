@@ -21,7 +21,7 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelLazy
+import androidx.fragment.app.viewModels
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding
 import com.davidp799.patcotoday.ui.BottomSheetListView
@@ -56,13 +56,22 @@ import java.util.Locale
 import java.util.TimeZone
 
 class SchedulesFragment : Fragment() {
+    // View Binding & Data Store
     private var _binding: FragmentSchedulesBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: SchedulesViewModel by ViewModelLazy(
-        SchedulesViewModel::class, {viewModelStore }, { defaultViewModelProviderFactory }
-    )
-    private lateinit var sharedPreferences: SharedPreferences
+    // ViewModel
+    private val viewModel: SchedulesViewModel by viewModels()
+    // Shared Preferences
     private val preferencesName = "com.davidp799.patcotoday_preferences"
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferencesEditor: SharedPreferences.Editor
+    // UI Elements
+    private lateinit var arrivalsListView: ListView
+    private lateinit var arrivalsShimmerFrameLayout: ShimmerFrameLayout
+    private lateinit var specialAboutShimmerFrameLayout: ShimmerFrameLayout
+    private lateinit var specialShimmerFrameLayout: ShimmerFrameLayout
+    private lateinit var specialViewButton: Button
+    private lateinit var stationsArrayAdapter: ArrayAdapter<String>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,160 +79,53 @@ class SchedulesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSchedulesBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        enterTransition = MaterialFadeThrough()
         sharedPreferences =
             requireActivity().getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
-        val sharedPreferencesEditor = sharedPreferences.edit()
+        sharedPreferencesEditor = sharedPreferences.edit()
 
-        viewModel.automaticDownloads = sharedPreferences
-            .getBoolean("download_on_mobile_data", true)
-        viewModel.fromString = sharedPreferences
-            .getString("last_source", "Lindenwold").toString()
-        viewModel.toString = sharedPreferences
-            .getString("last_dest", "15-16th & Locust").toString()
-        viewModel.fromIndex = viewModel
-            .stationOptions.indexOf(viewModel.fromString)
-        viewModel.toIndex = viewModel
-            .stationOptions.indexOf(viewModel.toString)
-
-        // TODO: prevent users from selecting same from and to station
-
-        val fromTextView =
-            root.findViewById<AutoCompleteTextView>(R.id.fromTextView)
-        val toTextView =
-            root.findViewById<AutoCompleteTextView>(R.id.toTextView)
-        var stationsArrayAdapter =
-            ArrayAdapter(requireContext(), R.layout.dropdown_item, viewModel.stationOptions)
-        val reverseStationsButton =
-            root.findViewById<ImageButton>(R.id.reverseStationsButton)
-        val arrivalsListView =
-            root.findViewById<ListView>(R.id.arrivalsListView)
-        val arrivalsShimmerFrameLayout: ShimmerFrameLayout =
-            root.findViewById(R.id.arrivalsShimmerFrameLayout)
-        val specialAboutShimmerFrameLayout: ShimmerFrameLayout =
-            root.findViewById(R.id.specialAboutShimmerFrameLayout)
-        val specialShimmerFrameLayout: ShimmerFrameLayout =
-            root.findViewById(R.id.specialShimmerFrameLayout)
-        val specialViewButton: Button =
-            root.findViewById(R.id.specialScheduleViewButton)
-
-        fromTextView.setText(viewModel.fromString)
-        fromTextView.setAdapter(stationsArrayAdapter)
-        toTextView.setText(viewModel.toString)
-        toTextView.setAdapter(stationsArrayAdapter)
-        specialViewButton.isEnabled = false
-
-        enterTransition = MaterialFadeThrough()
+        val root: View = binding.root
+        initLayoutElements(root)
 
         CoroutineScope(Dispatchers.IO).launch {
-            checkInternetBackgroundTask(
-                requireContext()
-            )
-            updateListViewBackgroundTask(
-                viewModel.fromIndex,
-                viewModel.toIndex,
-                arrivalsListView,
-                arrivalsShimmerFrameLayout
-            )
-            checkSpecialBackgroundTask(
-                requireContext(),
-                viewModel.fromIndex,
-                viewModel.toIndex,
-                specialAboutShimmerFrameLayout,
-                specialShimmerFrameLayout,
-                root
-            )
+            checkInternetBackgroundTask(requireContext())
+            updateListViewBackgroundTask(viewModel.fromIndex, viewModel.toIndex)
+            checkSpecialBackgroundTask(requireContext(), root)
         }
 
-        fromTextView.onItemClickListener =
-            AdapterView.OnItemClickListener { _, _, position, _ ->
-                viewModel.fromIndex = position
-                viewModel.fromString = viewModel.stationOptions[viewModel.fromIndex]
-                sharedPreferencesEditor.putString("last_source", viewModel.fromString).apply()
-                arrivalsShimmerFrameLayout.visibility = View.VISIBLE
-                CoroutineScope(Dispatchers.IO).launch {
-                    updateListViewBackgroundTask(
-                        viewModel.fromIndex, viewModel.toIndex,
-                        arrivalsListView, arrivalsShimmerFrameLayout
-                    )
-                }
-                arrivalsListView.adapter =
-                    SchedulesListAdapter(
-                        context,
-                        R.layout.adapter_view_layout,
-                        viewModel.schedulesArrayList,
-                        0
-                    )
-                specialShimmerFrameLayout.visibility = View.VISIBLE
-                CoroutineScope(Dispatchers.IO).launch {
-                    checkSpecialBackgroundTask(
-                        requireContext(),
-                        viewModel.fromIndex,
-                        viewModel.toIndex,
-                        specialAboutShimmerFrameLayout,
-                        specialShimmerFrameLayout,
-                        root
-                    )
-                }
-            }
+        // TODO: prevent users from selecting same from and to station
+        stationsArrayAdapter =
+            ArrayAdapter(requireContext(), R.layout.dropdown_item, viewModel.stationOptions)
 
-        toTextView.onItemClickListener =
-            AdapterView.OnItemClickListener { _, _, position, _ ->
-                viewModel.toIndex = position
-                viewModel.toString = viewModel.stationOptions[viewModel.toIndex]
-                sharedPreferencesEditor.putString("last_dest", viewModel.toString).apply()
-                arrivalsShimmerFrameLayout.visibility = View.VISIBLE
-                CoroutineScope(Dispatchers.IO).launch {
-                    updateListViewBackgroundTask(
-                        viewModel.fromIndex, viewModel.toIndex,
-                        arrivalsListView, arrivalsShimmerFrameLayout
-                    )
-                }
-                arrivalsListView.adapter =
-                    SchedulesListAdapter(
-                        context,
-                        R.layout.adapter_view_layout,
-                        viewModel.schedulesArrayList,
-                        0
-                    )
-                specialAboutShimmerFrameLayout.visibility = View.VISIBLE
-                specialShimmerFrameLayout.visibility = View.VISIBLE
-                CoroutineScope(Dispatchers.IO).launch {
-                    checkSpecialBackgroundTask(
-                        requireContext(),
-                        viewModel.fromIndex,
-                        viewModel.toIndex,
-                        specialAboutShimmerFrameLayout,
-                        specialShimmerFrameLayout,
-                        root
-                    )
-                }
-            }
+        val fromTextView = initStationSelectorTextView(root, R.id.fromTextView, false)
+        val toTextView = initStationSelectorTextView(root, R.id.toTextView, true)
 
+        // reverse stations
+        val reverseStationsButton =
+            root.findViewById<ImageButton>(R.id.reverseStationsButton)
         reverseStationsButton.setOnClickListener {
-            if (viewModel.isReversed) {
-                reverseStationsButton.animate().setDuration(180).rotationBy(-180f).start()
-                viewModel.isReversed = false
-            } else {
-                reverseStationsButton.animate().setDuration(180).rotationBy(180f).start()
-                viewModel.isReversed = true
-            }
-            val tempIndex = viewModel.fromIndex
-            val tempString = viewModel.fromString
+            // Show loading animations
+            arrivalsShimmerFrameLayout.visibility = View.VISIBLE
+            specialAboutShimmerFrameLayout.visibility = View.VISIBLE
+            specialShimmerFrameLayout.visibility = View.VISIBLE
+            // Rotate reverse icon
+            val degrees = if (viewModel.isReversed) -180f else 180f
+            reverseStationsButton.animate().setDuration(180).rotationBy(degrees).start()
+            viewModel.isReversed = !viewModel.isReversed
+            // Store 'from' values temporarily and swap with 'to' values
+            val initialFromIndex = viewModel.fromIndex
+            val initialFromString = viewModel.fromString
             viewModel.fromIndex = viewModel.toIndex
             viewModel.fromString = viewModel.toString
+            viewModel.toIndex = initialFromIndex
+            viewModel.toString = initialFromString
+            // Save new values to shared preferences
             sharedPreferencesEditor.putString("last_source", viewModel.fromString)
-            viewModel.toIndex = tempIndex
-            viewModel.toString = tempString
             sharedPreferencesEditor.putString("last_dest", viewModel.toString)
             sharedPreferencesEditor.apply()
 
-            arrivalsShimmerFrameLayout.visibility = View.VISIBLE
             CoroutineScope(Dispatchers.IO).launch {
-                updateListViewBackgroundTask(
-                    viewModel.fromIndex, viewModel.toIndex,
-                    arrivalsListView, arrivalsShimmerFrameLayout
-                )
+                updateListViewBackgroundTask(viewModel.fromIndex, viewModel.toIndex)
             }
             arrivalsListView.adapter =
                 SchedulesListAdapter(
@@ -232,17 +134,8 @@ class SchedulesFragment : Fragment() {
                     viewModel.schedulesArrayList,
                     0
                 )
-            specialAboutShimmerFrameLayout.visibility = View.VISIBLE
-            specialShimmerFrameLayout.visibility = View.VISIBLE
             CoroutineScope(Dispatchers.IO).launch {
-                checkSpecialBackgroundTask(
-                    requireContext(),
-                    viewModel.fromIndex,
-                    viewModel.toIndex,
-                    specialAboutShimmerFrameLayout,
-                    specialShimmerFrameLayout,
-                    root
-                )
+                checkSpecialBackgroundTask(requireContext(), root)
             }
 
             stationsArrayAdapter = ArrayAdapter(
@@ -262,7 +155,6 @@ class SchedulesFragment : Fragment() {
         }
         return root
     }
-
     override fun onResume() {
         super.onResume()
         val root: View = binding.root
@@ -280,10 +172,70 @@ class SchedulesFragment : Fragment() {
         toTextView.setText(viewModel.toString)
         toTextView.setAdapter(stationsArrayAdapter)
     }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+    private fun initStationSelectorTextView(view: View, resourceId: Int, resourceType: Boolean): AutoCompleteTextView {
+        val textView = view.findViewById<AutoCompleteTextView>(resourceId)
+        textView.setText(if (resourceType) viewModel.toString else viewModel.fromString)
+        textView.setAdapter(stationsArrayAdapter)
+        textView.onItemClickListener =
+            AdapterView.OnItemClickListener { _, _, position, _ ->
+                // Show loading animations
+                arrivalsShimmerFrameLayout.visibility = View.VISIBLE
+                specialShimmerFrameLayout.visibility = View.VISIBLE
+                // Update ViewModel and SharedPreferences based on resourceType
+                if (resourceType) {
+                    viewModel.toIndex = position
+                    viewModel.toString = viewModel.stationOptions[viewModel.toIndex]
+                    sharedPreferencesEditor.putString("last_dest", viewModel.toString).apply()
+                } else {
+                    viewModel.fromIndex = position
+                    viewModel.fromString = viewModel.stationOptions[viewModel.fromIndex]
+                    sharedPreferencesEditor.putString("last_source", viewModel.fromString).apply()
+                }
+                // Update listView and special schedules status in background
+                CoroutineScope(Dispatchers.IO).launch {
+                    updateListViewBackgroundTask(viewModel.fromIndex, viewModel.toIndex)
+                    checkSpecialBackgroundTask(requireContext(), view)
+                }
+                // Update listView adapter
+                arrivalsListView.adapter =
+                    SchedulesListAdapter(
+                        context,
+                        R.layout.adapter_view_layout,
+                        viewModel.schedulesArrayList,
+                        0
+                    )
+            }
+        return textView
+    }
+    private fun initLayoutElements(view: View) {
+        // set viewModel values from shared preferences
+        viewModel.automaticDownloads = sharedPreferences
+            .getBoolean("download_on_mobile_data", true)
+        viewModel.fromString = sharedPreferences
+            .getString("last_source", "Lindenwold").toString()
+        viewModel.toString = sharedPreferences
+            .getString("last_dest", "15-16th & Locust").toString()
+        viewModel.fromIndex = viewModel
+            .stationOptions.indexOf(viewModel.fromString)
+        viewModel.toIndex = viewModel
+            .stationOptions.indexOf(viewModel.toString)
+        // initialize layout elements
+        arrivalsListView =
+            view.findViewById(R.id.arrivalsListView)
+        arrivalsShimmerFrameLayout =
+            view.findViewById(R.id.arrivalsShimmerFrameLayout)
+        specialAboutShimmerFrameLayout =
+            view.findViewById(R.id.specialAboutShimmerFrameLayout)
+        specialShimmerFrameLayout =
+            view.findViewById(R.id.specialShimmerFrameLayout)
+        specialViewButton =
+            view.findViewById(R.id.specialScheduleViewButton)
+        specialViewButton.isEnabled = false
+
     }
 
     private fun scrollToNext(arrivalsArrayList: ArrayList<Arrival>): Int {
@@ -309,10 +261,6 @@ class SchedulesFragment : Fragment() {
 
     private suspend fun checkSpecialBackgroundTask(
         context: Context,
-        source: Int,
-        destination: Int,
-        specialAboutShimmerFrameLayout: ShimmerFrameLayout,
-        specialShimmerFrameLayout: ShimmerFrameLayout,
         view: View
     ) {
         logThread("checkSpecialBackgroundTask")
@@ -377,7 +325,7 @@ class SchedulesFragment : Fragment() {
                         val parseStatus = parseSpecial(viewModel.fromIndex, viewModel.toIndex)
                         if (parseStatus) {
                             val specialArrivalsArrayList =
-                                getSpecialArrivalsBackground(source, destination)
+                                getSpecialArrivalsBackground(viewModel.fromIndex, viewModel.toIndex)
                             withContext (Main) {
                                 viewModel.specialSchedulesArrayList.clear()
                                 viewModel.specialSchedulesArrayList.addAll(specialArrivalsArrayList)
@@ -655,10 +603,7 @@ class SchedulesFragment : Fragment() {
     }
 
 
-    private suspend fun updateListViewBackgroundTask(
-        source: Int, destination: Int,
-        listView: ListView, arrivalsShimmerFrameLayout: ShimmerFrameLayout
-    ) {
+    private suspend fun updateListViewBackgroundTask(source: Int, destination: Int) {
         logThread("updateListViewBackgroundTask")
         val arrivalsArrayList = getArrivalsBackgroundTask(source, destination)
         val scrollIndex = scrollToNext(arrivalsArrayList)
@@ -673,9 +618,9 @@ class SchedulesFragment : Fragment() {
                         viewModel.schedulesArrayList,
                         scrollIndex
                     )
-                listView.adapter = schedulesAdapter
+                arrivalsListView.adapter = schedulesAdapter
                 schedulesAdapter.notifyDataSetChanged()
-                listView.smoothScrollToPositionFromTop(scrollIndex, 0, 120)
+                arrivalsListView.smoothScrollToPositionFromTop(scrollIndex, 0, 120)
                 // TODO: set current arrival listview text as bold
                 arrivalsShimmerFrameLayout.visibility = View.GONE
             }

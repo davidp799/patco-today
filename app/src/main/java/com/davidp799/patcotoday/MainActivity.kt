@@ -14,11 +14,11 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelLazy
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -42,12 +42,14 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 class MainActivity : AppCompatActivity() {
-    private val viewModel: MainViewModel by ViewModelLazy(
-        MainViewModel::class, {viewModelStore }, { defaultViewModelProviderFactory }
-    )
+    // View Binding & Data Store
     private lateinit var binding: ActivityMainBinding
-    private lateinit var sharedPreferences: SharedPreferences
+    // ViewModel
+    private val viewModel: MainViewModel by viewModels()
+    // Shared Preferences
     private val preferencesName = "com.davidp799.patcotoday_preferences"
+    private lateinit var sharedPreferences: SharedPreferences
+    // Schedule Handling
     private val urlString
         = "https://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip"
     private val gtfsFileName = "gtfs.zip"
@@ -64,19 +66,19 @@ class MainActivity : AppCompatActivity() {
             runBackgroundTasks()
         }
     }
-
+    // Handle back button
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
-    /* Function to set app layout */
+    // Set App Layout
     private fun setAppLayout() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.topAppBar))
         window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
         window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
     }
-    /* Function to set navigation view */
+    // Set Navigation View
     private fun setNavView(configurationSet: Set<Int>) {
         val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
@@ -116,13 +118,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    /* Function to set menu */
+    // Set Settings Menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_settings, menu)
         return true
     }
-    /* Function to handle menu items */
+    // Handle Settings Menu action
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.settings) {
             val intent = Intent(this, SettingsActivity::class.java)
@@ -131,7 +133,7 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-    /* Function to check if first run */
+    // Check if first run
     private fun checkIfFirstRun() {
         Log.d("[checkIfFirstRun]", "started...")
         val prefVersionKeyCode = "version_code"
@@ -149,7 +151,7 @@ class MainActivity : AppCompatActivity() {
             sharedPreferencesEditor.putInt(prefVersionKeyCode, currentVersionCode).apply()
         }
     }
-    /* Function to show changelog dialog */
+    // Show changelog dialog
     class ChangeLogDialogFragment : DialogFragment() {
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
             AlertDialog.Builder(requireContext())
@@ -161,7 +163,7 @@ class MainActivity : AppCompatActivity() {
             const val TAG = "ChangeLogDialog"
         }
     }
-    /* Function to request an app review */
+    // Request Google Play Store app review
     private fun requestReview() {
         Log.d("[requestReview]", "started...")
         val prefVisitNumber = "visit_number"
@@ -191,8 +193,7 @@ class MainActivity : AppCompatActivity() {
             sharedPreferencesEditor.putInt(prefVisitNumber, visitNumber + 1).apply()
         }
     }
-
-    /* Function to run background tasks */
+    // Run background tasks
     private suspend fun runBackgroundTasks() {
         Log.d("[runBackgroundTasks]", "started...")
         cleanUpFiles()
@@ -210,7 +211,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    /* Function to set status on main thread */
+    // Set status on main thread for background tasks
     private suspend fun setStatusOnMainThread(key: String, value: Boolean) {
         withContext(Main) {
             when (key) {
@@ -258,7 +259,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    /* Function to check internet connection */
+    // Check internet connection availability
     private fun checkInternet(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork ?: return false
@@ -269,13 +270,13 @@ class MainActivity : AppCompatActivity() {
             else -> false
         }
     }
-    /* Function to clean up files */
+    // Clean up old files
     private fun cleanUpFiles() {
         Log.d("[cleanUpFiles]", "started...")
         val dataDirectory = File(filesDir, "data/special/")
         dataDirectory.listFiles()?.filter { it.lastModified() < Date().time }?.forEach { it.delete() }
     }
-    /* Function to update files */
+    // Update data files
     private fun updateFiles(): Boolean {
         Log.d("[updateFiles]", "started...")
         val dataDirectory = this.filesDir.absolutePath + "/data/"
@@ -309,6 +310,7 @@ class MainActivity : AppCompatActivity() {
             false
         }
     }
+    // Download GTFS zip file
     private fun downloadZip(): Boolean {
         val dataDirectory = this.filesDir.absolutePath + "/data/"
         var input: InputStream? = null
@@ -356,7 +358,7 @@ class MainActivity : AppCompatActivity() {
             connection?.disconnect()
         }
     }
-    /* Function to extract zip file */
+    // Extract zip file
     private fun extractZip(): Boolean {
         val dataDirectory = this.filesDir.absolutePath + "/data/"
         val inputStream: InputStream
