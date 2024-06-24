@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -32,26 +33,36 @@ class MapFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMapBinding.inflate(inflater, container, false)
-        val navController = findNavController()
         val root: View = binding.root
+        return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        postponeEnterTransition()
+        val navController = findNavController()
 
         // recyclerview items
-        val stationMap = root.findViewById<RecyclerView>(com.davidp799.patcotoday.R.id.stationMap)
+        val stationMap = view.findViewById<RecyclerView>(com.davidp799.patcotoday.R.id.stationMap)
         stationMap.layoutManager = LinearLayoutManager(requireContext()) // Or any other layout manager
         EnableNestedScrolling.enable(stationMap)
 
         val stationMapGeneralAdapter = MapListAdapter(
             viewModel.stationList
-        ) { stationName, view -> // Item click listener
+        ) { stationName, itemView -> // Item click listener
             val action = MapFragmentDirections
                 .actionNavigationMapToNavigationStationDetails(stationName)
             val extras = FragmentNavigatorExtras(
-                view to "station_${stationName}"
+                itemView to "station_${stationName}"
             )
             navController.navigate(action, extras)
         }
         stationMap.adapter = stationMapGeneralAdapter
-        return root
+
+        // Resume once layout is finished
+        (view.parent as? ViewGroup)?.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
     }
     override fun onDestroyView() {
         super.onDestroyView()

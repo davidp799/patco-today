@@ -1,6 +1,7 @@
 package com.davidp799.patcotoday.ui.info.infoDetails
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,16 +9,30 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.databinding.FragmentInfoDetailsBinding
-import com.google.android.material.transition.MaterialFadeThrough
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.transition.MaterialContainerTransform
 
 class InfoDetailsFragment : Fragment() {
 
     private var _binding: FragmentInfoDetailsBinding? = null
     private val binding get() = _binding!!
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        sharedElementEnterTransition = MaterialContainerTransform().apply {
+            duration = 400
+            scrimColor = Color.TRANSPARENT
+        }
+        sharedElementReturnTransition = MaterialContainerTransform().apply {
+            duration = 400
+            scrimColor = Color.TRANSPARENT
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,8 +84,14 @@ class InfoDetailsFragment : Fragment() {
                 ).show()
             }
         }
-
-        enterTransition = MaterialFadeThrough()
         return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val transitionName = "info_${arguments?.getString("itemSelected")}"
+        val infoDetailsContainer = view.findViewById<MaterialCardView>(R.id.info_details_container)
+        ViewCompat.setTransitionName(infoDetailsContainer, transitionName)
+
     }
 }

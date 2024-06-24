@@ -6,11 +6,12 @@ import android.view.View
 import android.widget.ImageView
 import com.davidp799.patcotoday.R
 import android.widget.TextView
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class InfoListAdapter(
     private val items: Array<String>,
-    private val onItemClick: (Int) -> Unit
+    private val onItemClick: (Int, View) -> Unit
 ) : RecyclerView.Adapter<InfoListAdapter.InfoViewHolder>() {
     class InfoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView = view.findViewById(R.id.item_image)
@@ -23,6 +24,8 @@ class InfoListAdapter(
     }
     override fun onBindViewHolder(holder: InfoViewHolder, position: Int) {
         holder.entry.text = items[position]
+        ViewCompat.setTransitionName(holder.itemView, "info_${items[position]}")
+
         when (position) {
             0 -> holder.image.setImageResource(R.drawable.ic_info_fares_tt)
             1 -> holder.image.setImageResource(R.drawable.ic_info_reload_tt)
@@ -35,7 +38,7 @@ class InfoListAdapter(
             8 -> holder.image.setImageResource(R.drawable.ic_info_faq_tt)
             9 -> holder.image.setImageResource(R.drawable.ic_info_safety_tt)
         }
-        holder.itemView.setOnClickListener { onItemClick(position) }
+        holder.itemView.setOnClickListener { onItemClick(position, holder.itemView) }
     }
     override fun getItemCount(): Int = items.size
 }
