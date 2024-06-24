@@ -37,7 +37,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.transition.MaterialFadeThrough
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -66,8 +65,6 @@ class SchedulesFragment : Fragment() {
     private val preferencesName = "com.davidp799.patcotoday_preferences"
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var sharedPreferencesEditor: SharedPreferences.Editor
-    // Background Tasks
-    private var backgroundJob: Job? = null
     // UI Elements
     private lateinit var arrivalsListView: ListView
     private lateinit var arrivalsShimmerFrameLayout: ShimmerFrameLayout
@@ -76,13 +73,16 @@ class SchedulesFragment : Fragment() {
     private lateinit var specialViewButton: Button
     private lateinit var stationsArrayAdapter: ArrayAdapter<String>
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enterTransition = MaterialFadeThrough()
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSchedulesBinding.inflate(inflater, container, false)
-        enterTransition = MaterialFadeThrough()
         sharedPreferences =
             requireActivity().getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
         sharedPreferencesEditor = sharedPreferences.edit()
@@ -90,7 +90,7 @@ class SchedulesFragment : Fragment() {
         val root: View = binding.root
         initLayoutElements(root)
 
-        backgroundJob = lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             checkInternetBackgroundTask(requireContext())
             updateListViewBackgroundTask(viewModel.fromIndex, viewModel.toIndex)
             checkSpecialBackgroundTask(requireContext(), root)

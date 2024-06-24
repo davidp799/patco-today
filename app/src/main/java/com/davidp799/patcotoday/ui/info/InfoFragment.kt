@@ -21,14 +21,17 @@ class InfoFragment : Fragment() {
     // ViewModel
     private val viewModel: InfoViewModel by viewModels()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enterTransition = MaterialFadeThrough()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentInfoBinding.inflate(inflater, container, false)
-        enterTransition = MaterialFadeThrough()
-
         val navController = findNavController()
         val root: View = binding.root
 

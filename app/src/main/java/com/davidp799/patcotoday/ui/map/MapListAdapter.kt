@@ -23,9 +23,9 @@ class MapListAdapter(
         return StationViewHolder(view)
     }
     override fun onBindViewHolder(holder: StationViewHolder, position: Int) {
-        val station = stations[position]
-        ViewCompat.setTransitionName(holder.itemView, "station_${station}")
-        holder.entry.text = station
+        val stationName = stations[position]
+        ViewCompat.setTransitionName(holder.itemView, "station_${stationName}")
+        holder.entry.text = stationName
 
         if (position == 0) {
             holder.image.setImageResource(R.drawable.ic_timeline_start_tt)
@@ -33,7 +33,7 @@ class MapListAdapter(
             holder.image.setImageResource(R.drawable.ic_timeline_end_tt)
         }
 
-        holder.itemView.setOnClickListener { onItemClick(station, holder.itemView) }
+        holder.itemView.setOnClickListener { onItemClick(stationName, holder.itemView) }
     }
     override fun getItemCount(): Int = stations.size
 }

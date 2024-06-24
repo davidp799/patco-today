@@ -22,14 +22,16 @@ class MapFragment : Fragment() {
     // ViewModel
     private val viewModel: MapViewModel by viewModels()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enterTransition = MaterialFadeThrough()
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMapBinding.inflate(inflater, container, false)
-        enterTransition = MaterialFadeThrough()
-
         val navController = findNavController()
         val root: View = binding.root
 
@@ -40,11 +42,11 @@ class MapFragment : Fragment() {
 
         val stationMapGeneralAdapter = MapListAdapter(
             viewModel.stationList
-        ) { station, view -> // Item click listener
+        ) { stationName, view -> // Item click listener
             val action = MapFragmentDirections
-                .actionNavigationMapToNavigationStationDetails(station)
+                .actionNavigationMapToNavigationStationDetails(stationName)
             val extras = FragmentNavigatorExtras(
-                view to "station_${station}"
+                view to "station_${stationName}"
             )
             navController.navigate(action, extras)
         }
