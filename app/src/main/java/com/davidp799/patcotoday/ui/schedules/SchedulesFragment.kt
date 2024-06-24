@@ -22,6 +22,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.databinding.FragmentSchedulesBinding
 import com.davidp799.patcotoday.ui.BottomSheetListView
@@ -34,9 +35,9 @@ import com.davidp799.patcotoday.utils.Trip
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.transition.MaterialFadeThrough
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -65,6 +66,8 @@ class SchedulesFragment : Fragment() {
     private val preferencesName = "com.davidp799.patcotoday_preferences"
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var sharedPreferencesEditor: SharedPreferences.Editor
+    // Background Tasks
+    private var backgroundJob: Job? = null
     // UI Elements
     private lateinit var arrivalsListView: ListView
     private lateinit var arrivalsShimmerFrameLayout: ShimmerFrameLayout
@@ -87,72 +90,18 @@ class SchedulesFragment : Fragment() {
         val root: View = binding.root
         initLayoutElements(root)
 
-        CoroutineScope(Dispatchers.IO).launch {
+        backgroundJob = lifecycleScope.launch(Dispatchers.IO) {
             checkInternetBackgroundTask(requireContext())
             updateListViewBackgroundTask(viewModel.fromIndex, viewModel.toIndex)
             checkSpecialBackgroundTask(requireContext(), root)
         }
 
-        // TODO: prevent users from selecting same from and to station
+        // Initialize station selector elements
         stationsArrayAdapter =
             ArrayAdapter(requireContext(), R.layout.dropdown_item, viewModel.stationOptions)
-
         val fromTextView = initStationSelectorTextView(root, R.id.fromTextView, false)
         val toTextView = initStationSelectorTextView(root, R.id.toTextView, true)
-
-        // reverse stations
-        val reverseStationsButton =
-            root.findViewById<ImageButton>(R.id.reverseStationsButton)
-        reverseStationsButton.setOnClickListener {
-            // Show loading animations
-            arrivalsShimmerFrameLayout.visibility = View.VISIBLE
-            specialAboutShimmerFrameLayout.visibility = View.VISIBLE
-            specialShimmerFrameLayout.visibility = View.VISIBLE
-            // Rotate reverse icon
-            val degrees = if (viewModel.isReversed) -180f else 180f
-            reverseStationsButton.animate().setDuration(180).rotationBy(degrees).start()
-            viewModel.isReversed = !viewModel.isReversed
-            // Store 'from' values temporarily and swap with 'to' values
-            val initialFromIndex = viewModel.fromIndex
-            val initialFromString = viewModel.fromString
-            viewModel.fromIndex = viewModel.toIndex
-            viewModel.fromString = viewModel.toString
-            viewModel.toIndex = initialFromIndex
-            viewModel.toString = initialFromString
-            // Save new values to shared preferences
-            sharedPreferencesEditor.putString("last_source", viewModel.fromString)
-            sharedPreferencesEditor.putString("last_dest", viewModel.toString)
-            sharedPreferencesEditor.apply()
-
-            CoroutineScope(Dispatchers.IO).launch {
-                updateListViewBackgroundTask(viewModel.fromIndex, viewModel.toIndex)
-            }
-            arrivalsListView.adapter =
-                SchedulesListAdapter(
-                    context,
-                    R.layout.adapter_view_layout,
-                    viewModel.schedulesArrayList,
-                    0
-                )
-            CoroutineScope(Dispatchers.IO).launch {
-                checkSpecialBackgroundTask(requireContext(), root)
-            }
-
-            stationsArrayAdapter = ArrayAdapter(
-                requireContext(),
-                R.layout.dropdown_item,
-                viewModel.stationOptions
-            )
-            fromTextView.setText(viewModel.stationOptions[viewModel.fromIndex])
-            fromTextView.dismissDropDown()
-            toTextView.setText(viewModel.stationOptions[viewModel.toIndex])
-            toTextView.dismissDropDown()
-            sharedPreferencesEditor.putString("last_source", viewModel.fromString)
-            sharedPreferencesEditor.putString("last_dest", viewModel.toString)
-            sharedPreferencesEditor.apply()
-            fromTextView.setAdapter(stationsArrayAdapter)
-            toTextView.setAdapter(stationsArrayAdapter)
-        }
+        initReverseStationsButton(root, fromTextView, toTextView)
         return root
     }
     override fun onResume() {
@@ -176,6 +125,61 @@ class SchedulesFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+    // Initialize Reverse Stations Button and listen for selection
+    private fun initReverseStationsButton(
+        view: View, fromTextView: AutoCompleteTextView, toTextView: AutoCompleteTextView
+    ) {
+        val button = view.findViewById<ImageButton>(R.id.reverseStationsButton)
+        button.setOnClickListener {
+            // Show loading animations
+            arrivalsShimmerFrameLayout.visibility = View.VISIBLE
+            specialAboutShimmerFrameLayout.visibility = View.VISIBLE
+            specialShimmerFrameLayout.visibility = View.VISIBLE
+            // Rotate reverse icon
+            button.rotation = 0f
+            val degrees = if (viewModel.isReversed) -180f else 180f
+            button.animate().setDuration(180).rotationBy(degrees).start()
+            viewModel.isReversed = !viewModel.isReversed
+            // Store 'from' values temporarily and swap with 'to' values
+            val initialFromIndex = viewModel.fromIndex
+            val initialFromString = viewModel.fromString
+            viewModel.fromIndex = viewModel.toIndex
+            viewModel.fromString = viewModel.toString
+            viewModel.toIndex = initialFromIndex
+            viewModel.toString = initialFromString
+            // Save new values to shared preferences
+            sharedPreferencesEditor.putString("last_source", viewModel.fromString)
+            sharedPreferencesEditor.putString("last_dest", viewModel.toString)
+            sharedPreferencesEditor.apply()
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                updateListViewBackgroundTask(viewModel.fromIndex, viewModel.toIndex)
+                checkSpecialBackgroundTask(requireContext(), view)
+            }
+            arrivalsListView.adapter =
+                SchedulesListAdapter(
+                    context,
+                    R.layout.adapter_view_layout,
+                    viewModel.schedulesArrayList,
+                    0
+                )
+            stationsArrayAdapter = ArrayAdapter(
+                requireContext(),
+                R.layout.dropdown_item,
+                viewModel.stationOptions
+            )
+            fromTextView.setText(viewModel.stationOptions[viewModel.fromIndex])
+            fromTextView.dismissDropDown()
+            toTextView.setText(viewModel.stationOptions[viewModel.toIndex])
+            toTextView.dismissDropDown()
+            sharedPreferencesEditor.putString("last_source", viewModel.fromString)
+            sharedPreferencesEditor.putString("last_dest", viewModel.toString)
+            sharedPreferencesEditor.apply()
+            fromTextView.setAdapter(stationsArrayAdapter)
+            toTextView.setAdapter(stationsArrayAdapter)
+        }
+    }
+    // Initialize Station Selector AutoCompleteTextViews and listen for selection
     private fun initStationSelectorTextView(view: View, resourceId: Int, resourceType: Boolean): AutoCompleteTextView {
         val textView = view.findViewById<AutoCompleteTextView>(resourceId)
         textView.setText(if (resourceType) viewModel.toString else viewModel.fromString)
@@ -196,7 +200,7 @@ class SchedulesFragment : Fragment() {
                     sharedPreferencesEditor.putString("last_source", viewModel.fromString).apply()
                 }
                 // Update listView and special schedules status in background
-                CoroutineScope(Dispatchers.IO).launch {
+                lifecycleScope.launch(Dispatchers.IO) {
                     updateListViewBackgroundTask(viewModel.fromIndex, viewModel.toIndex)
                     checkSpecialBackgroundTask(requireContext(), view)
                 }
@@ -211,6 +215,7 @@ class SchedulesFragment : Fragment() {
             }
         return textView
     }
+    // Initialize Layout Elements and set View Model values from Shared Preferences
     private fun initLayoutElements(view: View) {
         // set viewModel values from shared preferences
         viewModel.automaticDownloads = sharedPreferences
@@ -237,7 +242,7 @@ class SchedulesFragment : Fragment() {
         specialViewButton.isEnabled = false
 
     }
-
+    // Scroll to next arrival in ListView
     private fun scrollToNext(arrivalsArrayList: ArrayList<Arrival>): Int {
         val date = Date()
         val timeFormat = SimpleDateFormat("h:mm aa", Locale.US)
@@ -258,7 +263,7 @@ class SchedulesFragment : Fragment() {
         }
         return scrollIndex
     }
-
+    // Check for special schedules in the background
     private suspend fun checkSpecialBackgroundTask(
         context: Context,
         view: View
@@ -360,6 +365,7 @@ class SchedulesFragment : Fragment() {
             configureBottomSheetOnMainThread(view, false, specialAboutShimmerFrameLayout, specialShimmerFrameLayout)
         }
     }
+    // Logic function for checking for special schedules
     private fun checkSpecial(): Boolean {
         return try {
             val doc = Jsoup.connect("https://www.ridepatco.org/schedules/schedules.asp").get()
@@ -389,6 +395,7 @@ class SchedulesFragment : Fragment() {
             false
         }
     }
+    // Logic function for downloading special schedules
     private fun downloadSpecial(): Boolean {
         var input: InputStream? = null
         var output: OutputStream? = null
@@ -446,7 +453,7 @@ class SchedulesFragment : Fragment() {
             return false
         }
     }
-
+    // Logic function for converting special schedules
     private fun convertSpecial(): Boolean {
         return try {
             for (i in 0 until viewModel.specialURLs.size) {
@@ -466,7 +473,7 @@ class SchedulesFragment : Fragment() {
             false
         }
     }
-
+    // Logic function for parsing special schedules
     private fun parseSpecial(source: Int, destination: Int): Boolean {
         return try {
             viewModel.specialWestBound.clear()
@@ -485,6 +492,7 @@ class SchedulesFragment : Fragment() {
             false
         }
     }
+    // Get special arrivals in the background
     private fun getSpecialArrivalsBackground(source: Int, destination: Int): ArrayList<Arrival> {
         return try {
             val travelTime = viewModel.schedules.getTravelTime(source, destination)
@@ -520,6 +528,7 @@ class SchedulesFragment : Fragment() {
             ArrayList()
         }
     }
+    // Configure bottom sheet on main thread
     private suspend fun configureBottomSheetOnMainThread(
         view: View, specialStatus: Boolean, specialAboutShimmerFrameLayout: ShimmerFrameLayout, specialShimmerFrameLayout: ShimmerFrameLayout
     ) {
@@ -529,7 +538,7 @@ class SchedulesFragment : Fragment() {
             specialShimmerFrameLayout.visibility = View.GONE
         }
     }
-
+    // Logic function for configuring bottom sheet
     private fun configureBottomSheet(view: View, specialStatus: Boolean ) {
         val bottomSheetLayout
             = view.findViewById<LinearLayout>(R.id.bottom_sheet_layout)
@@ -560,12 +569,12 @@ class SchedulesFragment : Fragment() {
             }
         }
     }
-
+    // Check internet connection in the background and set status on main thread
     private suspend fun checkInternetBackgroundTask(context: Context) {
         val internetStatus = checkInternet(context)
         setStatusOnMainThread("internetStatus", internetStatus)
     }
-
+    // Logic function for checking internet connection
     private fun checkInternet(context: Context): Boolean {
         val connectivityManager
             = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -577,7 +586,7 @@ class SchedulesFragment : Fragment() {
             else -> false
         }
     }
-
+    // Logic function for checking if user is on mobile data connection
     private fun isMobileData(context: Context): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -601,8 +610,7 @@ class SchedulesFragment : Fragment() {
         }
         return false
     }
-
-
+    // Update ListView in the background
     private suspend fun updateListViewBackgroundTask(source: Int, destination: Int) {
         logThread("updateListViewBackgroundTask")
         val arrivalsArrayList = getArrivalsBackgroundTask(source, destination)
@@ -629,6 +637,7 @@ class SchedulesFragment : Fragment() {
             e.printStackTrace()
         }
     }
+    // Get arrivals in the background
     private fun getArrivalsBackgroundTask(sourceId: Int, destinationId: Int): ArrayList<Arrival> {
         return try {
             val travelTime = viewModel.schedules.getTravelTime(sourceId, destinationId)
@@ -641,6 +650,7 @@ class SchedulesFragment : Fragment() {
             ArrayList()
         }
     }
+    // Set status for various elements on main thread
     private suspend fun setStatusOnMainThread(key: String, value: Boolean) {
         withContext(Main) {
             when (key) {
@@ -666,6 +676,7 @@ class SchedulesFragment : Fragment() {
             }
         }
     }
+    // Logger which prints thread name
     private fun logThread(methodName: String){
         Log.d(methodName, Thread.currentThread().name)
     }

@@ -18,7 +18,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.databinding.FragmentStationDetailsBinding
-import com.google.android.material.transition.MaterialFadeThrough
 
 class StationDetailsFragment : Fragment() {
     private var _binding: FragmentStationDetailsBinding? = null
@@ -35,8 +34,6 @@ class StationDetailsFragment : Fragment() {
         _binding = FragmentStationDetailsBinding.inflate(inflater, container, false)
         val root: View = binding.root
         setLayout(root, stationDetailsViewModel.stationDetailsList[stationName])
-
-        enterTransition = MaterialFadeThrough()
         return root
     }
     private fun setLayout(view: View, stationDetails: Map<String, Any>?) {
