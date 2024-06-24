@@ -1,9 +1,9 @@
 package com.davidp799.patcotoday.utils;
 
-import android.widget.ListView;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class EnableNestedScrolling {
-    public static void enable(ListView myListView) {
-        myListView.setNestedScrollingEnabled(true);
+    public static void enable(RecyclerView myRecyclerView) {
+        myRecyclerView.setNestedScrollingEnabled(true);
     }
 }

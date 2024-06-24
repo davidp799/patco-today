@@ -1,33 +1,39 @@
 package com.davidp799.patcotoday.ui.map
 
-import android.content.Context
-import android.widget.ArrayAdapter
 import android.view.ViewGroup
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import com.davidp799.patcotoday.R
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.RecyclerView
 
-class MapListAdapter(private val mContext: Context, resource: Int, private val mObjects: Array<String>): ArrayAdapter<String>(mContext, resource, mObjects) {
-    class ViewHolder(view: View) {
-        val image: ImageView = view.findViewById<View>(R.id.item_image) as ImageView
-        val entry: TextView = view.findViewById<View>(R.id.item_text) as TextView
+class MapListAdapter(
+    private val stations: Array<String>,
+    private val onItemClick: (String, View) -> Unit
+) : RecyclerView.Adapter<MapListAdapter.StationViewHolder>() {
+    class StationViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val image: ImageView = view.findViewById(R.id.item_image)
+        val entry: TextView = view.findViewById(R.id.item_text)
     }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StationViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.map_adapter_view_layout, parent, false)
+        return StationViewHolder(view)
+    }
+    override fun onBindViewHolder(holder: StationViewHolder, position: Int) {
+        val station = stations[position]
+        ViewCompat.setTransitionName(holder.itemView, "station_${station}")
+        holder.entry.text = station
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view: View
-        val inflater = LayoutInflater.from(mContext)
-        view = inflater.inflate(R.layout.map_adapter_view_layout, parent, false)
-        val viewHolder = ViewHolder(view)
-        view.tag = viewHolder
-
-        viewHolder.entry.text = mObjects[position]
         if (position == 0) {
-            viewHolder.image.setImageResource(R.drawable.ic_timeline_start_tt)
-        } else if (position == mObjects.size-1) {
-            viewHolder.image.setImageResource(R.drawable.ic_timeline_end_tt)
+            holder.image.setImageResource(R.drawable.ic_timeline_start_tt)
+        } else if (position == stations.size - 1) {
+            holder.image.setImageResource(R.drawable.ic_timeline_end_tt)
         }
-        return view
+
+        holder.itemView.setOnClickListener { onItemClick(station, holder.itemView) }
     }
+    override fun getItemCount(): Int = stations.size
 }
