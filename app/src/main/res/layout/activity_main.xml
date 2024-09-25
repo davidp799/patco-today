@@ -16,6 +16,8 @@
         android:fitsSystemWindows="true"
         android:theme="@style/Theme.PatcoToday.AppBarOverlay"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/navigation_rail_linear_layout"
+        app:layout_constraintEnd_toEndOf="parent"
         app:liftOnScroll="true">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -28,14 +30,35 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <LinearLayout
+        android:id="@+id/navigation_rail_linear_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.navigationrail.NavigationRailView
+            android:id="@+id/navigation_rail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/windowBackground"
+            app:menu="@menu/global_nav_menu" />
+
+    </LinearLayout>
+
     <fragment
         android:id="@+id/nav_host_fragment_activity_main"
         android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintVertical_weight="0.9"
         app:defaultNavHost="true"
         app:layout_constraintTop_toBottomOf="@+id/main_app_bar"
+        app:layout_constraintStart_toEndOf="@id/navigation_rail_linear_layout"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/nav_view"
         app:navGraph="@navigation/mobile_navigation" />
 
@@ -47,8 +70,8 @@
         android:layout_marginEnd="0dp"
         android:background="?android:attr/windowBackground"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
+        app:layout_constraintStart_toEndOf="@id/navigation_rail_linear_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:menu="@menu/global_nav_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
@@ -28,6 +29,7 @@ import com.davidp799.patcotoday.databinding.ActivityMainBinding
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.navigationrail.NavigationRailView
 import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
@@ -65,6 +67,12 @@ class MainActivity : AppCompatActivity() {
             requestReview()
             runBackgroundTasks()
         }
+        setupNavigationForOrientation(resources.configuration.orientation)
+    }
+    // Handle orientation change
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        setupNavigationForOrientation(newConfig.orientation)
     }
     // Handle back button
     override fun onSupportNavigateUp(): Boolean {
@@ -80,12 +88,16 @@ class MainActivity : AppCompatActivity() {
     }
     // Set Navigation View
     private fun setNavView(configurationSet: Set<Int>) {
-        val navView: BottomNavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
+        // set up action bar
         val appBarConfiguration = AppBarConfiguration(configurationSet)
         setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
-        navView.setOnItemSelectedListener { item ->
+        // set up bottom navigation and navigation rail
+        val bottomNavigationView: BottomNavigationView = binding.navView
+        val navigationRailView: NavigationRailView = binding.navigationRail
+
+        bottomNavigationView.setupWithNavController(navController)
+        bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_schedules -> {
                     if (navController.currentDestination?.id == R.id.navigation_schedules) {
@@ -117,6 +129,45 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        navigationRailView.setupWithNavController(navController)
+        navigationRailView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_schedules -> {
+                    if (navController.currentDestination?.id == R.id.navigation_schedules) {
+                        val bottomSheetLayout
+                                = findViewById<LinearLayout>(R.id.bottom_sheet_layout)
+                        val bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+                                = BottomSheetBehavior.from(bottomSheetLayout)
+                        bottomSheetLayout.visibility = View.VISIBLE
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    } else {
+                        navController.navigate(R.id.navigation_schedules)
+                    }
+                    true
+                }
+                R.id.navigation_map -> {
+                    if (navController.currentDestination?.id != R.id.navigation_map) {
+                        navController.navigate(R.id.navigation_map)
+                    } else if (navController.currentDestination?.id == R.id.navigation_station_details) {
+                        navController.navigateUp() // Go back to map page
+                    }
+                    true
+                }
+                R.id.navigation_info -> {
+                    if (navController.currentDestination?.id != R.id.navigation_info) {
+                        navController.navigate(R.id.navigation_info)
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun setupNavigationForOrientation(orientation: Int) {
+        binding.navView.visibility = if (orientation == Configuration.ORIENTATION_PORTRAIT) View.VISIBLE else View.GONE
+        binding.navigationRail.visibility = if (orientation == Configuration.ORIENTATION_LANDSCAPE) View.VISIBLE else View.GONE
     }
     // Set Settings Menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
