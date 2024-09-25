@@ -160,13 +160,15 @@ class SchedulesFragment : Fragment() {
                 updateListViewBackgroundTask(viewModel.fromIndex, viewModel.toIndex)
                 checkSpecialBackgroundTask(requireContext(), view)
             }
-            arrivalsListView.adapter =
+            val schedulesAdapter: ArrayAdapter<Arrival> =
                 SchedulesListAdapter(
                     context,
                     R.layout.adapter_view_layout,
                     viewModel.schedulesArrayList,
                     0
                 )
+            arrivalsListView.adapter = schedulesAdapter
+            schedulesAdapter.notifyDataSetChanged()
             stationsArrayAdapter = ArrayAdapter(
                 requireContext(),
                 R.layout.dropdown_item,
@@ -210,13 +212,15 @@ class SchedulesFragment : Fragment() {
                     checkSpecialBackgroundTask(requireContext(), view)
                 }
                 // Update listView adapter
-                arrivalsListView.adapter =
+                val schedulesAdapter: ArrayAdapter<Arrival> =
                     SchedulesListAdapter(
                         context,
                         R.layout.adapter_view_layout,
                         viewModel.schedulesArrayList,
                         0
                     )
+                arrivalsListView.adapter = schedulesAdapter
+                schedulesAdapter.notifyDataSetChanged()
             }
         return textView
     }
