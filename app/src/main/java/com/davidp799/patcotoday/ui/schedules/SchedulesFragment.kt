@@ -3,10 +3,12 @@ package com.davidp799.patcotoday.ui.schedules
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
+import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +22,7 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -34,6 +37,7 @@ import com.davidp799.patcotoday.utils.ParsePDF
 import com.davidp799.patcotoday.utils.Trip
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.transition.MaterialFadeThrough
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
@@ -72,6 +76,8 @@ class SchedulesFragment : Fragment() {
     private lateinit var specialShimmerFrameLayout: ShimmerFrameLayout
     private lateinit var specialViewButton: Button
     private lateinit var stationsArrayAdapter: ArrayAdapter<String>
+    // Orientation
+    private var currentOrientation: Int = Configuration.ORIENTATION_PORTRAIT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,8 +110,50 @@ class SchedulesFragment : Fragment() {
         val fromTextView = initStationSelectorTextView(root, R.id.fromTextView, false)
         val toTextView = initStationSelectorTextView(root, R.id.toTextView, true)
         initReverseStationsButton(root, fromTextView, toTextView)
+        setupAppBarForOrientation(resources.configuration.orientation, root)
+
         return root
     }
+    // Handle orientation change
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val root: View = binding.root
+
+        currentOrientation = newConfig.orientation
+        setupAppBarForOrientation(newConfig.orientation, root)
+    }
+
+    private fun setupAppBarForOrientation(orientation: Int, view: View) {
+        val stationSelectionsVertLayout = view.findViewById<LinearLayoutCompat>(R.id.stationSelectionsVertLayout)
+        val fromTextView = view.findViewById<TextInputLayout>(R.id.fromTextInputLayout)
+        val toTextView = view.findViewById<TextInputLayout>(R.id.toTextInputLayout)
+        // Change LinearLayoutCompat orientation to horizontal if landscape
+        stationSelectionsVertLayout.orientation = if (orientation == Configuration.ORIENTATION_PORTRAIT) LinearLayoutCompat.VERTICAL else LinearLayoutCompat.HORIZONTAL
+
+        // Get the LinearLayoutCompat.LayoutParams of the TextInputLayouts
+        val fromParams = fromTextView.layoutParams as LinearLayoutCompat.LayoutParams
+        val toParams = toTextView.layoutParams as LinearLayoutCompat.LayoutParams
+
+        // Set width to 0 and weight to 0.5 for both TextInputLayouts
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            fromParams.width = 0
+            fromParams.weight = 0.5f
+            toParams.width = 0
+            toParams.weight = 0.5f
+        } else {
+            fromParams.width = LinearLayoutCompat.LayoutParams.MATCH_PARENT
+            fromParams.weight = 0f
+            toParams.width = LinearLayoutCompat.LayoutParams.MATCH_PARENT
+            toParams.weight = 0f
+        }
+
+        // Apply the updated layout parameters
+        fromTextView.layoutParams = fromParams
+        toTextView.layoutParams = toParams
+
+    }
+
+    // Handle resume
     override fun onResume() {
         super.onResume()
         val root: View = binding.root

@@ -55,6 +55,8 @@ class MainActivity : AppCompatActivity() {
     private val urlString
         = "https://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip"
     private val gtfsFileName = "gtfs.zip"
+    // Orientation
+    private var currentOrientation: Int = Configuration.ORIENTATION_PORTRAIT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +74,7 @@ class MainActivity : AppCompatActivity() {
     // Handle orientation change
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        currentOrientation = newConfig.orientation
         setupNavigationForOrientation(newConfig.orientation)
     }
     // Handle back button
