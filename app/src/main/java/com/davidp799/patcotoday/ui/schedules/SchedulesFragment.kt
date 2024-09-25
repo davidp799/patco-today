@@ -99,6 +99,8 @@ class SchedulesFragment : Fragment() {
         // Initialize station selector elements
         stationsArrayAdapter =
             ArrayAdapter(requireContext(), R.layout.dropdown_item, viewModel.stationOptions)
+        stationsArrayAdapter.notifyDataSetChanged()
+
         val fromTextView = initStationSelectorTextView(root, R.id.fromTextView, false)
         val toTextView = initStationSelectorTextView(root, R.id.toTextView, true)
         initReverseStationsButton(root, fromTextView, toTextView)
@@ -116,6 +118,8 @@ class SchedulesFragment : Fragment() {
             R.layout.dropdown_item,
             viewModel.stationOptions
         )
+        stationsArrayAdapter.notifyDataSetChanged()
+
         fromTextView.setText(viewModel.fromString)
         fromTextView.setAdapter(stationsArrayAdapter)
         toTextView.setText(viewModel.toString)
@@ -168,6 +172,7 @@ class SchedulesFragment : Fragment() {
                 R.layout.dropdown_item,
                 viewModel.stationOptions
             )
+            stationsArrayAdapter.notifyDataSetChanged()
             fromTextView.setText(viewModel.stationOptions[viewModel.fromIndex])
             fromTextView.dismissDropDown()
             toTextView.setText(viewModel.stationOptions[viewModel.toIndex])
