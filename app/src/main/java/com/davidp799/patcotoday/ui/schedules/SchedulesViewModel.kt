@@ -12,7 +12,7 @@ class SchedulesViewModel : ViewModel() {
     // Station Data
     var fromIndex = 0
     var fromString = "Lindenwold"
-    var toIndex = 12
+    var toIndex = 13
     var toString = "15-16th & Locust"
     // directory
     val directory: String = "/data/data/com.davidp799.patcotoday/files/data/"
@@ -49,6 +49,7 @@ class SchedulesViewModel : ViewModel() {
         "Ferry Avenue",
         "Broadway",
         "City Hall",
+        "Franklin Square",
         "8th and Market",
         "9-10th & Locust",
         "12-13th & Locust",

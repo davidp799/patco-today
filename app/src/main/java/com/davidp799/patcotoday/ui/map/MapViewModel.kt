@@ -6,7 +6,7 @@ class MapViewModel : ViewModel() {
     private val _stationList = arrayOf(
         "Lindenwold", "Ashland", "Woodcrest", "Haddonfield",
         "Westmont", "Collingswood", "Ferry Avenue", "Broadway",
-        "City Hall", "8th & Market", "9/10th & Locust",
+        "City Hall", "Franklin Square", "8th & Market", "9/10th & Locust",
         "12/13th & Locust", "15/16th & Locust"
     )
     private val _stationLinks = arrayOf(
@@ -19,6 +19,7 @@ class MapViewModel : ViewModel() {
         "https://www.ridepatco.org/stations/ferryave.asp",
         "https://www.ridepatco.org/stations/broadway.asp",
         "https://www.ridepatco.org/stations/cityhall.asp",
+        "https://www.ridepatco.org/stations/franklinsquare.asp",
         "https://www.ridepatco.org/stations/8th.asp",
         "https://www.ridepatco.org/stations/9th.asp",
         "https://www.ridepatco.org/stations/12th.asp",

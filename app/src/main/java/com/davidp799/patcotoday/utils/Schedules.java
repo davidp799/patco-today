@@ -19,7 +19,7 @@ import java.util.Objects;
 /** Class which analyzes PATCO Transit GTFS data to provide a list of upcoming arrivals
  *  based on provided source and destination stations and day of week. */
 public class Schedules {
-    private final List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 24, 26, 27, 28);
+    private final List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 22, 24, 26, 27, 28);
 
     // Codes representing weekday or weekend status; Used to determine service_id
     private final int dayOfWeekNumber = LocalDate.now().getDayOfWeek().getValue();

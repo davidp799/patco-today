@@ -144,9 +144,28 @@ class StationDetailsViewModel : ViewModel() {
                     "Camden Waterfront\n" +
                     "Hall of Justice (for jury duty)"
         ),
+        "Franklin Square" to mapOf(
+            "title" to "Franklin Square Station",
+            "description" to "7th & Race Streets, Philadelphia, PA",
+            "amenities" to mapOf(
+                "elevator" to "Elevator",
+                "escalator" to "Escalator",
+                "bikeRacks" to "Bike Racks"
+            ),
+            "hours" to "",
+            "gatedParking" to "",
+            "meters" to "",
+            "walkingDistance" to "African American Museum\n" +
+                    "Chinatown Business District\n" +
+                    "Franklin Music Hall\n" +
+                    "Franklin Square Park\n" +
+                    "Independence Visitor Center\n" +
+                    "National Constitution Center\n" +
+                    "Philadelphia's Old City"
+        ),
         "8th & Market" to mapOf(
             "title" to "8th & Market Street Station",
-            "description" to "Market Street and North 5th Street, Camden NJ",
+            "description" to "8th & Market Street, Philadelphia, PA",
             "amenities" to mapOf(
                 "elevator" to "Elevator",
                 "escalator" to "Escalator",
