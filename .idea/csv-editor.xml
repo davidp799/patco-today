@@ -17,7 +17,28 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\app\src\main\assets\sundays-east.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\assets\sundays-west.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\app\src\main\assets\weekdays-east.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\app\src\main\assets\weekdays-west.csv">
           <value>
             <Attribute>
               <option name="separator" value=":" />
