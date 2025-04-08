@@ -18,7 +18,7 @@
             android:id="@+id/schedulesConfigBarPortrait"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <include layout="@layout/schedules_config_bar" />
+            <include layout="@layout/schedules_config_bar_layout" />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <View
@@ -38,24 +38,24 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
-                <include layout="@layout/arrivals_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
+                <include layout="@layout/schedule_placeholder_layout" />
 
             </LinearLayout>
 
@@ -73,7 +73,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <include layout="@layout/bottom_sheet_dialog_layout" />
+        <include layout="@layout/bottom_sheet_layout" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

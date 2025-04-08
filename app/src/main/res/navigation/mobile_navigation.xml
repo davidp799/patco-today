@@ -23,9 +23,9 @@
 
     <fragment
         android:id="@+id/navigation_station_details"
-        android:name="com.davidp799.patcotoday.ui.map.stationDetails.StationDetailsFragment"
+        android:name="com.davidp799.patcotoday.ui.map.mapItemDetails.MapItemDetailsFragment"
         android:label="@string/title_map"
-        tools:layout="@layout/fragment_station_details">
+        tools:layout="@layout/fragment_map_details">
         <argument
             android:name="stationName"
             app:argType="string" />
@@ -43,7 +43,7 @@
 
     <fragment
         android:id="@+id/navigation_info_details"
-        android:name="com.davidp799.patcotoday.ui.info.infoDetails.InfoDetailsFragment"
+        android:name="com.davidp799.patcotoday.ui.info.infoItemDetails.InfoItemDetailsFragment"
         android:label="@string/title_info"
         tools:layout="@layout/fragment_info_details">
         <argument

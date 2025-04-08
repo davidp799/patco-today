@@ -53,7 +53,7 @@ class MapFragment : Fragment() {
             val action = MapFragmentDirections
                 .actionNavigationMapToNavigationStationDetails(stationName)
             val extras = FragmentNavigatorExtras(
-//                itemView to "station_${stationName}"
+                itemView to "station_${stationName}"
             )
             navController.navigate(action, extras)
         }

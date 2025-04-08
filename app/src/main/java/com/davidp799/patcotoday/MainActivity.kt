@@ -17,7 +17,6 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
@@ -86,92 +85,65 @@ class MainActivity : AppCompatActivity() {
     private fun setAppLayout() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.topAppBar))
-        window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
     }
     // Set Navigation View
     private fun setNavView(configurationSet: Set<Int>) {
+        // Initialize nav components for landscape and portrait modes
+        val bottomNavView: BottomNavigationView = binding.bottomNavView
+        val navRailView: NavigationRailView = binding.navRailView
+        val navViews = listOf(bottomNavView, navRailView)
+
+        // Each menu should be considered as top level destinations.
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
+        navViews.forEach { it.setupWithNavController(navController) }
+
         // set up action bar
         val appBarConfiguration = AppBarConfiguration(configurationSet)
         setupActionBarWithNavController(navController, appBarConfiguration)
-        // set up bottom navigation and navigation rail
-        val bottomNavigationView: BottomNavigationView = binding.navView
-        val navigationRailView: NavigationRailView = binding.navigationRail
 
-        bottomNavigationView.setupWithNavController(navController)
-        bottomNavigationView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_schedules -> {
-                    if (navController.currentDestination?.id == R.id.navigation_schedules) {
-                        val bottomSheetLayout
-                                = findViewById<LinearLayout>(R.id.bottom_sheet_layout)
-                        val bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
-                                = BottomSheetBehavior.from(bottomSheetLayout)
-                        bottomSheetLayout.visibility = View.VISIBLE
-                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    } else {
-                        navController.navigate(R.id.navigation_schedules)
+        // Set item click actions for nav components
+        navViews.forEach {
+            it.setOnItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.navigation_schedules -> {
+                        if (navController.currentDestination?.id == R.id.navigation_schedules) {
+                            val bottomSheetLayout =
+                                findViewById<LinearLayout>(R.id.bottom_sheet_layout)
+                            val bottomSheetBehavior: BottomSheetBehavior<LinearLayout> =
+                                BottomSheetBehavior.from(bottomSheetLayout)
+                            bottomSheetLayout.visibility = View.VISIBLE
+                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                        } else {
+                            navController.navigate(R.id.navigation_schedules)
+                        }
+                        true
                     }
-                    true
-                }
-                R.id.navigation_map -> {
-                    if (navController.currentDestination?.id != R.id.navigation_map) {
-                        navController.navigate(R.id.navigation_map)
-                    } else if (navController.currentDestination?.id == R.id.navigation_station_details) {
-                        navController.navigateUp() // Go back to map page
+                    R.id.navigation_map -> {
+                        if (navController.currentDestination?.id != R.id.navigation_map) {
+                            navController.navigate(R.id.navigation_map)
+                        } else if (navController.currentDestination?.id == R.id.navigation_station_details) {
+                            navController.navigateUp() // Go back to map page
+                        }
+                        true
                     }
-                    true
-                }
-                R.id.navigation_info -> {
-                    if (navController.currentDestination?.id != R.id.navigation_info) {
-                        navController.navigate(R.id.navigation_info)
+                    R.id.navigation_info -> {
+                        if (navController.currentDestination?.id != R.id.navigation_info) {
+                            navController.navigate(R.id.navigation_info)
+                        }
+                        true
                     }
-                    true
+                    else -> false
                 }
-                else -> false
             }
         }
 
-        navigationRailView.setupWithNavController(navController)
-        navigationRailView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_schedules -> {
-                    if (navController.currentDestination?.id == R.id.navigation_schedules) {
-                        val bottomSheetLayout
-                                = findViewById<LinearLayout>(R.id.bottom_sheet_layout)
-                        val bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
-                                = BottomSheetBehavior.from(bottomSheetLayout)
-                        bottomSheetLayout.visibility = View.VISIBLE
-                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    } else {
-                        navController.navigate(R.id.navigation_schedules)
-                    }
-                    true
-                }
-                R.id.navigation_map -> {
-                    if (navController.currentDestination?.id != R.id.navigation_map) {
-                        navController.navigate(R.id.navigation_map)
-                    } else if (navController.currentDestination?.id == R.id.navigation_station_details) {
-                        navController.navigateUp() // Go back to map page
-                    }
-                    true
-                }
-                R.id.navigation_info -> {
-                    if (navController.currentDestination?.id != R.id.navigation_info) {
-                        navController.navigate(R.id.navigation_info)
-                    }
-                    true
-                }
-                else -> false
-            }
-        }
     }
 
     private fun setupNavigationForOrientation(orientation: Int) {
-        binding.navView.visibility = if (orientation == Configuration.ORIENTATION_PORTRAIT) View.VISIBLE else View.GONE
-        binding.navigationRail.visibility = if (orientation == Configuration.ORIENTATION_LANDSCAPE) View.VISIBLE else View.GONE
+        binding.bottomNavView.visibility = if (orientation == Configuration.ORIENTATION_PORTRAIT) View.VISIBLE else View.GONE
+        binding.navRailView.visibility = if (orientation == Configuration.ORIENTATION_LANDSCAPE) View.VISIBLE else View.GONE
     }
+
     // Set Settings Menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater

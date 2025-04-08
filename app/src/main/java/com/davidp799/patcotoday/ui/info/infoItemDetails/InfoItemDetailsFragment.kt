@@ -1,4 +1,4 @@
-package com.davidp799.patcotoday.ui.info.infoDetails
+package com.davidp799.patcotoday.ui.info.infoItemDetails
 
 import android.content.Intent
 import android.graphics.Color
@@ -17,7 +17,7 @@ import com.davidp799.patcotoday.databinding.FragmentInfoDetailsBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.transition.MaterialContainerTransform
 
-class InfoDetailsFragment : Fragment() {
+class InfoItemDetailsFragment : Fragment() {
 
     private var _binding: FragmentInfoDetailsBinding? = null
     private val binding get() = _binding!!
@@ -41,7 +41,7 @@ class InfoDetailsFragment : Fragment() {
     ): View {
         val itemSelected = arguments?.getString("itemSelected")
         val infoDetailsViewModel =
-            ViewModelProvider(this)[InfoDetailsViewModel::class.java]
+            ViewModelProvider(this)[InfoItemDetailsViewModel::class.java]
         _binding = FragmentInfoDetailsBinding.inflate(inflater, container, false)
         val root: View = binding.root
         
@@ -87,11 +87,11 @@ class InfoDetailsFragment : Fragment() {
         return root
     }
 
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//        val transitionName = "info_${arguments?.getString("itemSelected")}"
-//        val infoDetailsContainer = view.findViewById<MaterialCardView>(R.id.info_details_container)
-//        ViewCompat.setTransitionName(infoDetailsContainer, transitionName)
-//
-//    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val transitionName = "info_${arguments?.getString("itemSelected")}"
+        val infoDetailsContainer = view.findViewById<MaterialCardView>(R.id.info_details_container)
+        ViewCompat.setTransitionName(infoDetailsContainer, transitionName)
+
+    }
 }

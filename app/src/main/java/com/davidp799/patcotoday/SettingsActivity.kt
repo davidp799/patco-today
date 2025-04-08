@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -28,12 +27,9 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         // User Interface
-        val window = this.window
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
 
         // Shared Preferences
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)

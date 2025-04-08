@@ -5,6 +5,7 @@
     android:id="@+id/info_details_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:transitionName="info_details"
     app:cardCornerRadius="0dp"
     app:strokeColor="@android:color/transparent"
     app:strokeWidth="0dp">
@@ -18,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            tools:context=".ui.info.infoDetails.InfoDetailsFragment">
+            tools:context=".ui.info.infoItemDetails.InfoItemDetailsFragment">
 
             <TextView
                 android:id="@+id/titleTextView"
@@ -73,7 +74,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
 
-                <include layout="@layout/fares_table_layout" />
+                <include layout="@layout/info_fares_table_layout" />
 
                 <TextView
                     android:id="@+id/faresTextViewChildFaresTitle"

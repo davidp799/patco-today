@@ -1,4 +1,4 @@
-package com.davidp799.patcotoday.ui.map.stationDetails
+package com.davidp799.patcotoday.ui.map.mapItemDetails
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -19,12 +19,12 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.davidp799.patcotoday.R
-import com.davidp799.patcotoday.databinding.FragmentStationDetailsBinding
+import com.davidp799.patcotoday.databinding.FragmentMapDetailsBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.transition.MaterialContainerTransform
 
-class StationDetailsFragment : Fragment() {
-    private var _binding: FragmentStationDetailsBinding? = null
+class MapItemDetailsFragment : Fragment() {
+    private var _binding: FragmentMapDetailsBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,8 +46,8 @@ class StationDetailsFragment : Fragment() {
     ): View {
         val stationName = arguments?.getString("stationName")
         val stationDetailsViewModel =
-            ViewModelProvider(this)[StationDetailsViewModel::class.java]
-        _binding = FragmentStationDetailsBinding.inflate(inflater, container, false)
+            ViewModelProvider(this)[MapItemDetailsViewModel::class.java]
+        _binding = FragmentMapDetailsBinding.inflate(inflater, container, false)
         val root: View = binding.root
         setLayout(root, stationDetailsViewModel.stationDetailsList[stationName])
         return root
@@ -55,9 +55,9 @@ class StationDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        val transitionName = "station_${arguments?.getString("stationName")}"
-//        val detailsContainer = view.findViewById<MaterialCardView>(R.id.details_container)
-//        ViewCompat.setTransitionName(detailsContainer, transitionName)
+        val transitionName = "station_${arguments?.getString("stationName")}"
+        val detailsContainer = view.findViewById<MaterialCardView>(R.id.details_container)
+        ViewCompat.setTransitionName(detailsContainer, transitionName)
     }
 
     private fun setLayout(view: View, stationDetails: Map<String, Any>?) {

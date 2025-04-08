@@ -63,7 +63,7 @@ class InfoFragment : Fragment() {
                     val action = InfoFragmentDirections
                         .actionNavigationInfoToNavigationInfoDetails(activeItem)
                     val extras = FragmentNavigatorExtras(
-//                        itemView to "info_${activeItem}"
+                        itemView to "info_${activeItem}"
                     )
                     navController.navigate(action, extras)
                 } else {
