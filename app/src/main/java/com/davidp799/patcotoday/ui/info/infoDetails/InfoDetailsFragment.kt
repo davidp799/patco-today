@@ -87,11 +87,11 @@ class InfoDetailsFragment : Fragment() {
         return root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val transitionName = "info_${arguments?.getString("itemSelected")}"
-        val infoDetailsContainer = view.findViewById<MaterialCardView>(R.id.info_details_container)
-        ViewCompat.setTransitionName(infoDetailsContainer, transitionName)
-
-    }
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//        val transitionName = "info_${arguments?.getString("itemSelected")}"
+//        val infoDetailsContainer = view.findViewById<MaterialCardView>(R.id.info_details_container)
+//        ViewCompat.setTransitionName(infoDetailsContainer, transitionName)
+//
+//    }
 }

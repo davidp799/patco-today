@@ -55,9 +55,9 @@ class StationDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val transitionName = "station_${arguments?.getString("stationName")}"
-        val detailsContainer = view.findViewById<MaterialCardView>(R.id.details_container)
-        ViewCompat.setTransitionName(detailsContainer, transitionName)
+//        val transitionName = "station_${arguments?.getString("stationName")}"
+//        val detailsContainer = view.findViewById<MaterialCardView>(R.id.details_container)
+//        ViewCompat.setTransitionName(detailsContainer, transitionName)
     }
 
     private fun setLayout(view: View, stationDetails: Map<String, Any>?) {

@@ -24,7 +24,7 @@ class InfoListAdapter(
     }
     override fun onBindViewHolder(holder: InfoViewHolder, position: Int) {
         holder.entry.text = items[position]
-        ViewCompat.setTransitionName(holder.itemView, "info_${items[position]}")
+//        ViewCompat.setTransitionName(holder.itemView, "info_${items[position]}")
 
         when (position) {
             0 -> holder.image.setImageResource(R.drawable.ic_info_fares_tt)

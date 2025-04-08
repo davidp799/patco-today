@@ -60,7 +60,7 @@
     <string name="pref_title_feedback">Send App Feedback</string>
     <string name="pref_summary_feedback">Email developer</string>
     <string name="pref_title_version">Application Version</string>
-    <string name="pref_summary_version">1.3.1</string>
+    <string name="pref_summary_version">1.3.2</string>
     <string name="pref_title_licenses">Open Source Licenses</string>
     <string name="pref_summary_licenses">View the GNU General Public License</string>
     <string name="pref_title_updates">Check for Updates</string>
@@ -95,7 +95,7 @@
     <string name="download_on_mobile_data_summary">Automatically download special schedules when WiFi is not available</string>
     <string name="changelog_title">What\'s New</string>
     <string name="changelog_message">
-        \n1. Added details for the new Franklin Square station in Philadelphia.\n\n2. Fixed a bug where viewing station details would cause a crash for some users.\n\n3. Improved layout for tablet users by moving the navigation bar to the left side.\n\n4. General UI improvements.</string>
+        \n1.  Temporarily removed animations for station and fare details pages in order to resolve user crashes.</string>
     <string name="changelog_ok_button">Great!</string>
 
     <!--StationDetailsFragment-->
