@@ -28,7 +28,7 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/Theme.PatcoToday.PopupOverlay"
-                app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+                app:navigationIcon="@drawable/ic_arrow_back_24dp"
                 app:title="@string/menu_settings"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
