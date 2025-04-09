@@ -5,11 +5,10 @@
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground">
 
-<Space
+    <Space
         android:layout_height="match_parent"
         android:layout_width="0sp"
-        android:layout_weight=".05">
-    </Space>
+        android:layout_weight=".05" />
 
     <ImageView
         android:id="@+id/item_image"
@@ -27,7 +26,7 @@
         android:layout_gravity="center"
         android:layout_height="wrap_content"
         android:layout_width="0sp"
-        android:layout_weight=".50"/>
+        android:layout_weight=".50" />
 
     <ImageView
         android:layout_height="match_parent"
@@ -39,6 +38,6 @@
     <Space
         android:layout_height="match_parent"
         android:layout_width="0sp"
-        android:layout_weight=".05"/>
+        android:layout_weight=".05" />
 
 </LinearLayout>

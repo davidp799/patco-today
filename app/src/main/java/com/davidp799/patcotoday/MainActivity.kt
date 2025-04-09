@@ -17,6 +17,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
@@ -85,6 +86,8 @@ class MainActivity : AppCompatActivity() {
     private fun setAppLayout() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setSupportActionBar(findViewById<MaterialToolbar>(R.id.topAppBar))
+        window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
     }
     // Set Navigation View
     private fun setNavView(configurationSet: Set<Int>) {
