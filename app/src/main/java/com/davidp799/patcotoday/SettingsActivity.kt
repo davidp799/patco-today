@@ -28,8 +28,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         // User Interface
-        val window = this.window
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
@@ -86,6 +85,9 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 dynamicColorsPref?.isVisible = false
             }
+            val versionPreference: Preference? = findPreference("app_version")
+            versionPreference?.summary = BuildConfig.VERSION_NAME
+
         } // set as xml.preferences
 
         override fun onPreferenceTreeClick(preference: Preference): Boolean {

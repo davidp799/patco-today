@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.ImageView
 import com.davidp799.patcotoday.R
 import android.widget.TextView
-//import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class MapListAdapter(
@@ -19,12 +18,11 @@ class MapListAdapter(
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StationViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.map_adapter_view_layout, parent, false)
+            .inflate(R.layout.map_item_layout, parent, false)
         return StationViewHolder(view)
     }
     override fun onBindViewHolder(holder: StationViewHolder, position: Int) {
         val stationName = stations[position]
-//        ViewCompat.setTransitionName(holder.itemView, "station_${stationName}")
         holder.entry.text = stationName
 
         if (position == 0) {

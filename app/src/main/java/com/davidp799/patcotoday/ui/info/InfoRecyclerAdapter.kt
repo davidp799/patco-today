@@ -16,7 +16,7 @@ class InfoRecyclerAdapter(val mContext: Context, val resource: Int, val mObjects
         // inflates the info_adapter_view_layout view
         // that is used to hold list item
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.info_adapter_view_layout, parent, false)
+            .inflate(R.layout.info_item_layout, parent, false)
 
         return ViewHolder(view)
     }

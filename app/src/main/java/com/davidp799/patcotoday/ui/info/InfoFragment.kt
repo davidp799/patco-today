@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,7 +41,7 @@ class InfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postponeEnterTransition()
+        postponeEnterTransition() // TODO: Investigate if postponeEnterTransition() is a cause for user crashes
         val navController = findNavController()
 
         // recyclerview items
@@ -56,16 +55,13 @@ class InfoFragment : Fragment() {
 
         val infoAdapter = InfoListAdapter(
             viewModel.infoItems
-        ) { position, itemView ->
+        ) { position, _ ->
             try {
                 val activeItem = viewModel.infoItems[position]
                 if (activeItem == "Fares") {
                     val action = InfoFragmentDirections
                         .actionNavigationInfoToNavigationInfoDetails(activeItem)
-                    val extras = FragmentNavigatorExtras(
-//                        itemView to "info_${activeItem}"
-                    )
-                    navController.navigate(action, extras)
+                    navController.navigate(action)
                 } else {
                     val openLinksIntent =
                         Intent(Intent.ACTION_VIEW, Uri.parse(viewModel.infoLinks[position]))
@@ -79,7 +75,7 @@ class InfoFragment : Fragment() {
 
         // Resume once layout is finished
         (view.parent as? ViewGroup)?.doOnPreDraw {
-            startPostponedEnterTransition()
+            startPostponedEnterTransition() // TODO: Investigate if startPostponedEnterTransition() is a cause for user crashes
         }
     }
 

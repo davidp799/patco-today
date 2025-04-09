@@ -1,8 +1,8 @@
-package com.davidp799.patcotoday.ui.map.stationDetails
+package com.davidp799.patcotoday.ui.map.mapItemDetails
 
 import androidx.lifecycle.ViewModel
 
-class StationDetailsViewModel : ViewModel() {
+class MapItemDetailsViewModel : ViewModel() {
     private val _stationDetailsList = mapOf(
         "Lindenwold" to mapOf(
             "title" to "Lindenwold Station",

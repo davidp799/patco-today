@@ -62,22 +62,22 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
-                    <include layout="@layout/arrivals_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
+                    <include layout="@layout/schedule_placeholder_layout" />
 
                 </LinearLayout>
 

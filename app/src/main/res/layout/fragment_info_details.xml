@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            tools:context=".ui.info.infoDetails.InfoDetailsFragment">
+            tools:context=".ui.info.infoItemDetails.InfoItemDetailsFragment">
 
             <TextView
                 android:id="@+id/titleTextView"
@@ -73,7 +73,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/faresLinearLayout" />
 
-                <include layout="@layout/fares_table_layout" />
+                <include layout="@layout/info_fares_table_layout" />
 
                 <TextView
                     android:id="@+id/faresTextViewChildFaresTitle"

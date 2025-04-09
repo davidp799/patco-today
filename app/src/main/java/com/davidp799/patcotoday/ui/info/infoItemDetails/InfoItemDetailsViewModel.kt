@@ -1,8 +1,8 @@
-package com.davidp799.patcotoday.ui.info.infoDetails
+package com.davidp799.patcotoday.ui.info.infoItemDetails
 
 import androidx.lifecycle.ViewModel
 
-class InfoDetailsViewModel : ViewModel() {
+class InfoItemDetailsViewModel : ViewModel() {
     private val _infoDetailsList = mapOf(
         "Fares" to mapOf(
             "title" to "Fares",

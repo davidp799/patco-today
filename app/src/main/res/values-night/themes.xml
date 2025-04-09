@@ -61,7 +61,7 @@
     </style>
 
     <style name="PreferenceMaterialSwitch" parent="@style/Preference.SwitchPreferenceCompat.Material">
-        <item name="widgetLayout">@layout/preference_switch</item>
+        <item name="widgetLayout">@layout/settings_preference_switch</item>
     </style>
 
     <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">

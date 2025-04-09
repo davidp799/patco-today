@@ -8,7 +8,6 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
-import android.text.Layout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -211,7 +210,7 @@ class SchedulesFragment : Fragment() {
             val schedulesAdapter: ArrayAdapter<Arrival> =
                 SchedulesListAdapter(
                     context,
-                    R.layout.adapter_view_layout,
+                    R.layout.schedule_item_layout,
                     viewModel.schedulesArrayList,
                     0
                 )
@@ -263,7 +262,7 @@ class SchedulesFragment : Fragment() {
                 val schedulesAdapter: ArrayAdapter<Arrival> =
                     SchedulesListAdapter(
                         context,
-                        R.layout.adapter_view_layout,
+                        R.layout.schedule_item_layout,
                         viewModel.schedulesArrayList,
                         0
                     )
@@ -402,7 +401,7 @@ class SchedulesFragment : Fragment() {
                                 val specialArrayAdapter =
                                     SchedulesListAdapter(
                                         context,
-                                        R.layout.adapter_view_layout,
+                                        R.layout.schedule_item_layout,
                                         viewModel.specialSchedulesArrayList,
                                         0
                                     )
@@ -679,7 +678,7 @@ class SchedulesFragment : Fragment() {
                 val schedulesAdapter: ArrayAdapter<Arrival> =
                     SchedulesListAdapter(
                         context,
-                        R.layout.adapter_view_layout,
+                        R.layout.schedule_item_layout,
                         viewModel.schedulesArrayList,
                         scrollIndex
                     )

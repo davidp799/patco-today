@@ -1,9 +1,8 @@
-package com.davidp799.patcotoday.ui.map.stationDetails
+package com.davidp799.patcotoday.ui.map.mapItemDetails
 
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,29 +14,14 @@ import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.davidp799.patcotoday.R
-import com.davidp799.patcotoday.databinding.FragmentStationDetailsBinding
-import com.google.android.material.card.MaterialCardView
-import com.google.android.material.transition.MaterialContainerTransform
+import com.davidp799.patcotoday.databinding.FragmentMapDetailsBinding
 
-class StationDetailsFragment : Fragment() {
-    private var _binding: FragmentStationDetailsBinding? = null
+class MapItemDetailsFragment : Fragment() {
+    private var _binding: FragmentMapDetailsBinding? = null
     private val binding get() = _binding!!
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        sharedElementEnterTransition = MaterialContainerTransform().apply {
-            duration = 400
-            scrimColor = Color.TRANSPARENT
-        }
-        sharedElementReturnTransition = MaterialContainerTransform().apply {
-            duration = 400
-            scrimColor = Color.TRANSPARENT
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,18 +30,11 @@ class StationDetailsFragment : Fragment() {
     ): View {
         val stationName = arguments?.getString("stationName")
         val stationDetailsViewModel =
-            ViewModelProvider(this)[StationDetailsViewModel::class.java]
-        _binding = FragmentStationDetailsBinding.inflate(inflater, container, false)
+            ViewModelProvider(this)[MapItemDetailsViewModel::class.java]
+        _binding = FragmentMapDetailsBinding.inflate(inflater, container, false)
         val root: View = binding.root
         setLayout(root, stationDetailsViewModel.stationDetailsList[stationName])
         return root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-//        val transitionName = "station_${arguments?.getString("stationName")}"
-//        val detailsContainer = view.findViewById<MaterialCardView>(R.id.details_container)
-//        ViewCompat.setTransitionName(detailsContainer, transitionName)
     }
 
     private fun setLayout(view: View, stationDetails: Map<String, Any>?) {

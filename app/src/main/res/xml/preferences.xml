@@ -58,8 +58,7 @@
         <Preference
             app:iconSpaceReserved="false"
             android:key="app_version"
-            android:title="@string/pref_title_version"
-            android:summary="@string/pref_summary_version">
+            android:title="@string/pref_title_version">
         </Preference>
 
         <Preference
@@ -92,7 +91,6 @@
                 android:data="https://www.termsfeed.com/live/e56e7ea1-704d-45cf-9b6c-36c786290c1b" />
         </Preference>
 
-
-</PreferenceCategory>
+    </PreferenceCategory>
 
 </PreferenceScreen>

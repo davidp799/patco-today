@@ -19,7 +19,7 @@
         android:layout_height="60sp"
         android:layout_width="0sp"
         android:layout_weight=".10"
-        android:src="@drawable/ic_arrow_right_round" />
+        android:src="@drawable/ic_arrow_right_24dp" />
 
     <TextView
         android:id="@+id/textView2"

@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.ImageView
 import com.davidp799.patcotoday.R
 import android.widget.TextView
-import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class InfoListAdapter(
@@ -19,12 +18,11 @@ class InfoListAdapter(
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.info_adapter_view_layout, parent, false)
+        val view = inflater.inflate(R.layout.info_item_layout, parent, false)
         return InfoViewHolder(view)
     }
     override fun onBindViewHolder(holder: InfoViewHolder, position: Int) {
         holder.entry.text = items[position]
-//        ViewCompat.setTransitionName(holder.itemView, "info_${items[position]}")
 
         when (position) {
             0 -> holder.image.setImageResource(R.drawable.ic_info_fares_tt)
