@@ -9,12 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.davidp799.patcotoday.R
 import com.davidp799.patcotoday.databinding.FragmentInfoDetailsBinding
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.transition.MaterialContainerTransform
 
 class InfoItemDetailsFragment : Fragment() {
@@ -85,13 +83,5 @@ class InfoItemDetailsFragment : Fragment() {
             }
         }
         return root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val transitionName = "info_${arguments?.getString("itemSelected")}"
-        val infoDetailsContainer = view.findViewById<MaterialCardView>(R.id.info_details_container)
-        ViewCompat.setTransitionName(infoDetailsContainer, transitionName)
-
     }
 }

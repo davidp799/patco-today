@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.ImageView
 import com.davidp799.patcotoday.R
 import android.widget.TextView
-import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class InfoListAdapter(
@@ -24,7 +23,6 @@ class InfoListAdapter(
     }
     override fun onBindViewHolder(holder: InfoViewHolder, position: Int) {
         holder.entry.text = items[position]
-        ViewCompat.setTransitionName(holder.itemView, "info_${items[position]}")
 
         when (position) {
             0 -> holder.image.setImageResource(R.drawable.ic_info_fares_tt)

@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,7 +38,7 @@ class MapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postponeEnterTransition()
+        postponeEnterTransition() // TODO: Investigate if postponeEnterTransition() is a cause for user crashes
         val navController = findNavController()
 
         // recyclerview items
@@ -49,19 +48,16 @@ class MapFragment : Fragment() {
 
         val stationMapGeneralAdapter = MapListAdapter(
             viewModel.stationList
-        ) { stationName, itemView -> // Item click listener
+        ) { stationName, _ -> // Item click listener
             val action = MapFragmentDirections
                 .actionNavigationMapToNavigationStationDetails(stationName)
-            val extras = FragmentNavigatorExtras(
-                itemView to "station_${stationName}"
-            )
-            navController.navigate(action, extras)
+            navController.navigate(action)
         }
         stationMap.adapter = stationMapGeneralAdapter
 
         // Resume once layout is finished
         (view.parent as? ViewGroup)?.doOnPreDraw {
-            startPostponedEnterTransition()
+            startPostponedEnterTransition() // TODO: Investigate if startPostponedEnterTransition() is a cause for user crashes
         }
     }
     override fun onDestroyView() {

@@ -5,7 +5,6 @@
     android:id="@+id/details_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:transitionName="map_details"
     app:cardCornerRadius="0dp"
     app:strokeColor="@android:color/transparent"
     app:strokeWidth="0dp">
