@@ -4,9 +4,9 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -20,6 +20,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity_scrolling)
+        // TODO: Investigate '.remove' vs. '.add' as possible cause for crash
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
@@ -31,9 +32,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        window.statusBarColor = ContextCompat.getColor(this, R.color.transparent)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.transparent)
-
+        enableEdgeToEdge()
         // Shared Preferences
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.registerOnSharedPreferenceChangeListener(this)
