@@ -10,6 +10,7 @@
     tools:showIn="@layout/settings_activity_scrolling">
 
     <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/settings_fragment_linear_layout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical">
