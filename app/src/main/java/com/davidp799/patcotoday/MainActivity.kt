@@ -169,8 +169,9 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
         val sharedPreferencesEditor = sharedPreferences.edit()
         val savedVersionCode = sharedPreferences.getInt(prefVersionKeyCode, -1)
+        val showChangelog = false;
 
-        if ((currentVersionCode > savedVersionCode) || (savedVersionCode.equals(-1))) {
+        if (showChangelog && ((currentVersionCode > savedVersionCode) || (savedVersionCode.equals(-1)))) {
             Log.d(
                 "[checkIfFirstRun]",
                 "true: current = $currentVersionCode && saved = $savedVersionCode"
