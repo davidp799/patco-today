@@ -15,8 +15,8 @@ android {
         applicationId "com.davidp799.patcotoday"
         minSdk 28
         targetSdk 35
-        versionCode 19
-        versionName "1.3.4"
+        versionCode 20
+        versionName "1.4"
         buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.debug
