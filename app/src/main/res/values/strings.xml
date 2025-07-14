@@ -94,7 +94,9 @@
     <string name="download_on_mobile_data_summary">Automatically download special schedules when WiFi is not available</string>
     <string name="changelog_title">What\'s New</string>
     <string name="changelog_message">
-        \n1.  Temporarily removed animations for station and fare details pages in order to resolve user crashes.</string>
+        \n1.  Fix a bug where special schedules were sometimes not displayed even though they were in effect.
+        \n2.  Include new schedules in response to PATCO\'s announcement of "Phased Overnight Weekday Service Changes to Enhance Safety, Cleanliness and Efficiency".
+    </string>
     <string name="changelog_ok_button">Great!</string>
 
     <!--StationDetailsFragment-->
