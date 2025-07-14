@@ -20,9 +20,6 @@ import java.util.Objects;
 public class Schedules {
     private final List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 22, 24, 26, 27, 28);
 
-    // Codes representing weekday or weekend status; Used to determine service_id
-    private final int dayOfWeekNumber = LocalDate.now().getDayOfWeek().getValue();
-
     /** Returns the length in minutes between source station and destination station.
      * @return integer value of distance in minutes */
     public int getTravelTime(int source_id, int destination_id) {
@@ -48,11 +45,8 @@ public class Schedules {
 
         // Phase One: rotating closures
         if (!today.isBefore(phaseOneStart) && !today.isAfter(phaseOneEnd)) {
-            Log.d("[getTripId]", "phase one");
             if (isWeekday) {
-                Log.d("[getTripId]", "weekday");
                 if (!today.isBefore(LocalDate.of(2025, 7, 14)) && !today.isAfter(LocalDate.of(2025, 7, 25))) {
-                    Log.d("[getTripId]", "phase1-jul14-jul25-owl-");
                     return "phase1/jul14-jul25-owl-";
                 } else if (!today.isBefore(LocalDate.of(2025, 7, 28)) && !today.isAfter(LocalDate.of(2025, 8, 8))) {
                     return "phase1/jul28-aug8-owl-";
@@ -132,7 +126,7 @@ public class Schedules {
             }
             reader.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("[getSchedulesList]", "Error: " + e.getMessage());
         }
         return schedulesList;
     }
@@ -173,7 +167,7 @@ public class Schedules {
                 }
                 arrivals.add(i, thisArrival);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e("[getFormatArrival]", "Error: " + e.getMessage());
             }
         }
         return arrivals;
