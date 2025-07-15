@@ -1,6 +1,8 @@
 package com.davidp799.patcotoday.utils;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,9 +20,6 @@ import java.util.Objects;
 public class Schedules {
     private final List<Integer> timeBetween = Arrays.asList(0, 2, 3, 6, 8, 10, 12, 16, 18, 22, 24, 26, 27, 28);
 
-    // Codes representing weekday or weekend status; Used to determine service_id
-    private final int dayOfWeekNumber = LocalDate.now().getDayOfWeek().getValue();
-
     /** Returns the length in minutes between source station and destination station.
      * @return integer value of distance in minutes */
     public int getTravelTime(int source_id, int destination_id) {
@@ -28,16 +27,52 @@ public class Schedules {
     }
 
     /** Returns the travel schedule of the train.
-     * @return string trip id (weekdays-, saturdays-, sundays-) */
+     * @return string trip id (weekdays-, saturdays-, sundays-, or special schedule ids) */
     public String getTripId() {
-        if (dayOfWeekNumber >= 1 && dayOfWeekNumber <= 5) { // weekdays
+        LocalDate today = LocalDate.now();
+        int dayOfWeek = today.getDayOfWeek().getValue(); // 1=Monday, 7=Sunday
+
+        // Phase One: July 14 - August 29, 2025
+        LocalDate phaseOneStart = LocalDate.of(2025, 7, 14);
+        LocalDate phaseOneEnd = LocalDate.of(2025, 8, 29);
+
+        // Phase Two: September 1, 2025 - February 28, 2026 (6 months)
+        LocalDate phaseTwoStart = LocalDate.of(2025, 9, 1);
+        LocalDate phaseTwoEnd = phaseTwoStart.plusMonths(6).minusDays(1); // ends Feb 28, 2026
+
+        // Weekday owl hours: 12:00 a.m. to 4:30 a.m., Monday-Friday
+        boolean isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+
+        // Phase One: rotating closures
+        if (!today.isBefore(phaseOneStart) && !today.isAfter(phaseOneEnd)) {
+            if (isWeekday) {
+                if (!today.isBefore(LocalDate.of(2025, 7, 14)) && !today.isAfter(LocalDate.of(2025, 7, 25))) {
+                    return "phase1/jul14-jul25-owl-";
+                } else if (!today.isBefore(LocalDate.of(2025, 7, 28)) && !today.isAfter(LocalDate.of(2025, 8, 8))) {
+                    return "phase1/jul28-aug8-owl-";
+                } else if (!today.isBefore(LocalDate.of(2025, 8, 11)) && !today.isAfter(LocalDate.of(2025, 8, 22))) {
+                    return "phase1/aug11-aug22-owl-";
+                } else if (!today.isBefore(LocalDate.of(2025, 8, 25)) && !today.isAfter(LocalDate.of(2025, 8, 29))) {
+                    return "phase1/aug25-aug29-owl-";
+                }
+            }
+        }
+
+        // Phase Two: all stations closed during owl hours on weekdays
+        if (!today.isBefore(phaseTwoStart) && !today.isAfter(phaseTwoEnd) && isWeekday) {
+            return "phase2/owl-"; // All stations closed, no trains
+        }
+
+        // Default schedules
+        if (dayOfWeek >= 1 && dayOfWeek <= 5) { // weekdays
             return "weekdays-";
-        } else if (dayOfWeekNumber == 6) { // saturdays
+        } else if (dayOfWeek == 6) { // saturdays
             return "saturdays-";
         } else { // sundays
             return "sundays-";
         }
     }
+
     /** Returns the direction of the train.
      * @return integer route code (1 = Westbound, 2 = Eastbound) */
     public String getRouteID(int source_id, int destination_id) {
@@ -91,7 +126,7 @@ public class Schedules {
             }
             reader.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("[getSchedulesList]", "Error: " + e.getMessage());
         }
         return schedulesList;
     }
@@ -132,10 +167,9 @@ public class Schedules {
                 }
                 arrivals.add(i, thisArrival);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e("[getFormatArrival]", "Error: " + e.getMessage());
             }
         }
         return arrivals;
     }
 }
-

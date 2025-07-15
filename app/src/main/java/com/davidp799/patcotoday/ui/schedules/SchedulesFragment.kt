@@ -53,7 +53,9 @@ import java.net.URL
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -460,19 +462,43 @@ class SchedulesFragment : Fragment() {
             val currentMillis = System.currentTimeMillis()
             var filePath= viewModel.directory + "special/special0"
             try {
-                val url = URL(viewModel.specialURLs[0])
+                val today = LocalDate.now()
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                val todayStr = today.format(formatter)
+
+                // Find the URL that contains today's date
+                val matchingUrlIndex = viewModel.specialURLs.indexOfFirst { it.contains(todayStr) }
+                val matchingUrl = if (matchingUrlIndex != -1) viewModel.specialURLs[matchingUrlIndex] else null
+
+                if (matchingUrl == null) {
+                    Log.i("downloadSpecial", "No URL found for today's date: $todayStr")
+                    return false
+                }
+
+                // Keep only the matching URL and its corresponding text
+                viewModel.specialURLs = mutableListOf(matchingUrl) as ArrayList<String>
+                if (viewModel.specialTexts.size > matchingUrlIndex && matchingUrlIndex >= 0) {
+                    viewModel.specialTexts = mutableListOf(viewModel.specialTexts[matchingUrlIndex]) as ArrayList<String>
+                } else {
+                    viewModel.specialTexts.clear()
+                }
+
+                val url = URL(matchingUrl)
+                Log.i("downloadSpecial", "URL: $url")
                 filePath += if (url.toString().contains(".jpg")) {
                     ".jpg"
-                } else {".pdf"}
+                } else {
+                    ".pdf"
+                }
                 connection = url.openConnection() as HttpURLConnection
                 connection.connect()
                 if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                     Log.d(
                         "[downloadPDF]",
-                        "Server ResponseCode="
-                                + connection.responseCode.toString()
-                                + " ResponseMessage="
-                                + connection.responseMessage
+                        "Server ResponseCode=" +
+                                connection.responseCode.toString() +
+                                " ResponseMessage=" +
+                                connection.responseMessage
                     )
                 }
                 input = connection.inputStream
