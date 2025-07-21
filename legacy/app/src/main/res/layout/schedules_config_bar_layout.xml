@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/schedulesConfigHorizLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:orientation="horizontal">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/stationIconsVertLayout"
+        android:layout_width="0sp"
+        android:layout_height="match_parent"
+        android:layout_weight=".15"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/iconSource"
+            android:contentDescription="@string/source_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10sp"
+            app:srcCompat="@drawable/ic_source_tt"
+            tools:layout_editor_absoluteX="55dp"
+            tools:layout_editor_absoluteY="130dp" />
+
+        <ImageView
+            android:id="@+id/iconDots"
+            android:contentDescription="@string/dots_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10sp"
+            app:srcCompat="@drawable/ic_dots_tt"
+            tools:layout_editor_absoluteX="55dp"
+            tools:layout_editor_absoluteY="130dp" />
+
+        <ImageView
+            android:id="@+id/iconDestination"
+            android:contentDescription="@string/destination_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10sp"
+            app:srcCompat="@drawable/ic_destination_tt"
+            tools:layout_editor_absoluteX="55dp"
+            tools:layout_editor_absoluteY="130dp"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/stationSelectionsVertLayout"
+        android:layout_width="0sp"
+        android:layout_height="match_parent"
+        android:layout_weight=".70"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:id="@+id/fromTextInputLayout"
+            android:layout_width="match_parent"
+            android:maxWidth="488dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10sp"
+            android:layout_marginEnd="10sp"
+            app:boxCornerRadiusTopStart="16sp"
+            app:boxCornerRadiusTopEnd="16sp"
+            app:boxCornerRadiusBottomStart="16sp"
+            app:boxCornerRadiusBottomEnd="16sp"
+            android:contentDescription="@string/travel_from_station">
+
+            <AutoCompleteTextView
+                android:id="@+id/fromTextView"
+                android:layout_width="match_parent"
+                android:maxWidth="488dp"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:maxLines="1"
+                android:text="@string/from"
+                android:textColor="@color/material_on_surface_emphasis_high_type"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                tools:ignore="LabelFor" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:id="@+id/toTextInputLayout"
+            android:layout_width="match_parent"
+            android:maxWidth="488dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10sp"
+            android:layout_marginEnd="10sp"
+            app:boxCornerRadiusTopStart="16sp"
+            app:boxCornerRadiusTopEnd="16sp"
+            app:boxCornerRadiusBottomStart="16sp"
+            app:boxCornerRadiusBottomEnd="16sp"
+            android:contentDescription="@string/travel_to_station">
+
+            <AutoCompleteTextView
+                android:id="@+id/toTextView"
+                android:layout_width="match_parent"
+                android:maxWidth="488dp"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:maxLines="1"
+                android:text="@string/to"
+                android:textStyle="bold"
+                android:textColor="@color/material_on_surface_emphasis_high_type"
+                android:textSize="14sp"
+                tools:ignore="LabelFor" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <RelativeLayout
+        android:id="@+id/stationsReverseButtonLayout"
+        android:layout_width="0sp"
+        android:layout_height="match_parent"
+        android:layout_weight=".15">
+
+        <ImageButton
+            android:id="@+id/reverseStationsButton"
+            android:layout_width="48sp"
+            android:layout_height="48sp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_swap_round_48"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/reverse_stations" />
+
+    </RelativeLayout>
+
+</LinearLayout>
