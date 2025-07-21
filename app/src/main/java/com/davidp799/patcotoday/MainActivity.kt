@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.davidp799.patcotoday.ui.components.BottomNavigationBar
+import com.davidp799.patcotoday.ui.components.TopNavigationBar
 import com.davidp799.patcotoday.ui.navigation.Navigation
 import com.davidp799.patcotoday.ui.theme.PatcoTodayTheme
 
@@ -30,12 +31,14 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val navController = rememberNavController()
     Scaffold(
+        topBar = { TopNavigationBar(navController = navController) },
         bottomBar = { BottomNavigationBar(navController = navController) },
         modifier = Modifier
     ) { innerPadding ->
-        // Provide padding to the Navigation component
-        Modifier.padding(innerPadding)
-        Navigation(navController = navController)
+        Navigation(
+            navController = navController,
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }
 
