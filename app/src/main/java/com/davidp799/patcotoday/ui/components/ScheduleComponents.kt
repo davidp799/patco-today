@@ -3,7 +3,7 @@ package com.davidp799.patcotoday.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.rounded.ArrowRightAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,8 +38,8 @@ fun DropShadow(
 @Composable
 fun ScheduleItem(
     arrival: Arrival,
-    isHighlighted: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isHighlighted: Boolean = false
 ) {
     val textStyle = if (isHighlighted) {
         MaterialTheme.typography.titleLarge.copy(
@@ -70,7 +70,7 @@ fun ScheduleItem(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowForward,
+                imageVector = Icons.AutoMirrored.Rounded.ArrowRightAlt,
                 contentDescription = "Arrival time arrow",
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.onSurface

@@ -1,5 +1,6 @@
 package com.davidp799.patcotoday.ui.screens
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,7 +62,7 @@ class SchedulesScreenViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
-            // Simulate loading delay
+            // TODO: Replace with actual load... Simulate loading delay
             kotlinx.coroutines.delay(1000)
 
             // Mock data for now - replace with actual schedule loading logic
@@ -102,6 +103,7 @@ class SchedulesScreenViewModel : ViewModel() {
 
     private fun findNextArrivalIndex(arrivals: List<Arrival>): Int {
         // Mock implementation - replace with actual time comparison logic
+        Log.d("[SchedulesScreenViewModel]", "Arrivals: $arrivals")
         return 0
     }
 
