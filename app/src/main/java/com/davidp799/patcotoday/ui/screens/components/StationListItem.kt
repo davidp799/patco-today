@@ -3,6 +3,7 @@ package com.davidp799.patcotoday.ui.screens.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Circle
@@ -81,7 +82,7 @@ private fun TimelineIcon(
                 modifier = Modifier
                     .width(3.dp)
                     .height(20.dp)
-                    .clip(CircleShape),
+                    .clip(RoundedCornerShape(bottomStart = 1.5.dp, bottomEnd = 1.5.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalDivider(
@@ -97,7 +98,7 @@ private fun TimelineIcon(
         // Station dot
         Box(
             modifier = Modifier
-                .size(if (isFirst || isLast) 16.dp else 12.dp)
+                .size(24.dp)
                 .clip(CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -119,7 +120,7 @@ private fun TimelineIcon(
                 modifier = Modifier
                     .width(3.dp)
                     .height(20.dp)
-                    .clip(CircleShape),
+                    .clip(RoundedCornerShape(topStart = 1.5.dp, topEnd = 1.5.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 HorizontalDivider(
