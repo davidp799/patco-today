@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -76,8 +77,14 @@ fun SchedulesScreen(
                         .padding(horizontal = 16.dp),
                     contentPadding = PaddingValues(bottom = 96.dp)
                 ) {
-                    items(18) { // Show 18 shimmer items like the original
+                    items(18) { index ->
                         ScheduleItemShimmer(alpha = shimmerAlpha)
+                        if (index < 17) { // Don't add divider after last item
+                            HorizontalDivider(
+                                modifier = Modifier.alpha(shimmerAlpha),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                            )
+                        }
                     }
                 }
             }
@@ -98,6 +105,11 @@ fun SchedulesScreen(
                             isHighlighted = index == uiState.scrollToIndex,
                             modifier = Modifier.fillMaxWidth()
                         )
+                        if (index < uiState.arrivals.size - 1) { // Don't add divider after last item
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                            )
+                        }
                     }
                 }
             }
