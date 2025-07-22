@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidp799.patcotoday.utils.Arrival
@@ -84,6 +85,35 @@ fun ScheduleItem(
             fontSize = 22.sp,
             modifier = Modifier.weight(0.45f),
             textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DropShadowPreview() {
+    MaterialTheme {
+        DropShadow()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ScheduleItemPreview() {
+    MaterialTheme {
+        ScheduleItem(
+            arrival = Arrival("7:30 AM", "45 min")
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ScheduleItemHighlightedPreview() {
+    MaterialTheme {
+        ScheduleItem(
+            arrival = Arrival("8:15 AM", "42 min"),
+            isHighlighted = true
         )
     }
 }
