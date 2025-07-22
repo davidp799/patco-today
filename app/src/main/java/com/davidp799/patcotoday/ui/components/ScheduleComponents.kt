@@ -53,7 +53,7 @@ fun ScheduleItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Arrival time

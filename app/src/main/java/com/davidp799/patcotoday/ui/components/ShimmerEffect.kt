@@ -58,7 +58,7 @@ fun ScheduleItemShimmer(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 12.dp)
             .alpha(alpha),
         verticalAlignment = Alignment.CenterVertically
     ) {
