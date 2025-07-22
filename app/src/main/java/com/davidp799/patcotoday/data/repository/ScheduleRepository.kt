@@ -3,7 +3,10 @@ package com.davidp799.patcotoday.data.repository
 import android.content.Context
 import com.davidp799.patcotoday.data.api.ScheduleApiService
 import com.davidp799.patcotoday.data.local.FileManager
+import com.davidp799.patcotoday.data.local.CsvScheduleParser
 import com.davidp799.patcotoday.data.models.ApiResponse
+import com.davidp799.patcotoday.utils.Arrival
+import com.davidp799.patcotoday.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
@@ -14,10 +17,11 @@ import java.util.*
 class ScheduleRepository(context: Context) {
 
     private val fileManager = FileManager(context)
+    private val csvParser = CsvScheduleParser(context)
     private val apiService: ScheduleApiService
 
-    // Replace with your actual API key and base URL
-    private val apiKey = "your_api_key_here" // TODO: Move to BuildConfig or secure storage
+    // API key now read from BuildConfig, which gets it from local.properties
+    private val apiKey = BuildConfig.API_KEY
     private val baseUrl = "https://pyy0z7hm81.execute-api.us-east-1.amazonaws.com/"
 
     init {
@@ -64,6 +68,10 @@ class ScheduleRepository(context: Context) {
                 Result.failure(e)
             }
         }
+    }
+
+    suspend fun getScheduleForRoute(fromStation: String, toStation: String): List<Arrival> {
+        return csvParser.parseScheduleForRoute(fromStation, toStation)
     }
 
     private suspend fun downloadSpecialSchedules(date: String, eastboundUrl: String, westboundUrl: String) {

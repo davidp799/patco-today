@@ -54,23 +54,32 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
             repository.fetchAndUpdateSchedules()
                 .onSuccess { apiResponse ->
-                    // For now, we'll generate mock data based on the current stations
-                    // TODO: Parse actual CSV files and generate real schedule data
-                    val mockArrivals = generateMockArrivals()
+                    // Get real schedule data using CSV parser
+                    val realArrivals = repository.getScheduleForRoute(
+                        fromStation = _uiState.value.fromStation,
+                        toStation = _uiState.value.toStation
+                    )
+
                     val hasSpecial = apiResponse.specialSchedules != null
 
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        arrivals = mockArrivals,
+                        arrivals = realArrivals.ifEmpty { generateMockArrivals() }, // Fallback to mock if no data
                         hasSpecialSchedule = hasSpecial,
-                        scrollToIndex = findNextArrival(mockArrivals)
+                        scrollToIndex = findNextArrival(realArrivals.ifEmpty { generateMockArrivals() })
                     )
                 }
                 .onFailure { error ->
+                    // Try to get cached schedule data even if API fails
+                    val cachedArrivals = repository.getScheduleForRoute(
+                        fromStation = _uiState.value.fromStation,
+                        toStation = _uiState.value.toStation
+                    )
+
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         errorMessage = error.message,
-                        arrivals = generateMockArrivals() // Fallback to mock data
+                        arrivals = cachedArrivals.ifEmpty { generateMockArrivals() } // Final fallback to mock data
                     )
                 }
         }
@@ -118,8 +127,43 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
     }
 
     private fun findNextArrival(arrivals: List<Arrival>): Int {
-        // Simple logic to find the next upcoming arrival
-        // TODO: Implement proper time comparison logic
-        return (arrivals.size * 0.3).toInt() // Mock: scroll to about 30% down the list
+        if (arrivals.isEmpty()) return 0
+
+        val currentTime = java.util.Calendar.getInstance()
+        val currentHour = currentTime.get(java.util.Calendar.HOUR_OF_DAY)
+        val currentMinute = currentTime.get(java.util.Calendar.MINUTE)
+        val currentTotalMinutes = currentHour * 60 + currentMinute
+
+        for (i in arrivals.indices) {
+            try {
+                val arrivalTime = arrivals[i].arrivalTime
+                    .replace(" AM", "")
+                    .replace(" PM", "")
+
+                val parts = arrivalTime.split(":")
+                val hour = parts[0].toInt()
+                val minute = parts[1].toInt()
+
+                // Convert to 24-hour format
+                val hour24 = if (arrivals[i].arrivalTime.contains("PM") && hour != 12) {
+                    hour + 12
+                } else if (arrivals[i].arrivalTime.contains("AM") && hour == 12) {
+                    0
+                } else {
+                    hour
+                }
+
+                val arrivalTotalMinutes = hour24 * 60 + minute
+
+                // Return index of first arrival that's in the future
+                if (arrivalTotalMinutes >= currentTotalMinutes) {
+                    return i
+                }
+            } catch (e: Exception) {
+                continue
+            }
+        }
+
+        return 0 // Default to first item if no future arrivals found
     }
 }

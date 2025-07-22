@@ -1,6 +1,15 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+}
+
+// Load local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -10,7 +19,7 @@ android {
     defaultConfig {
         applicationId = "com.davidp799.patcotoday"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "2.0"
 
@@ -18,10 +27,21 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // For development, read from local.properties if available
+        val apiKey = localProperties.getProperty("API_KEY") ?: "ZMz6Y9oU9I9nfPK2PHuR09zN4lYrFdG49it2znq2"
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
 
     buildTypes {
+        debug {
+            // Use local.properties for development
+            val devApiKey = localProperties.getProperty("API_KEY") ?: "ZMz6Y9oU9I9nfPK2PHuR09zN4lYrFdG49it2znq2"
+            buildConfigField("String", "API_KEY", "\"$devApiKey\"")
+        }
         release {
+            // Use the production API key for release builds
+            buildConfigField("String", "API_KEY", "\"ZMz6Y9oU9I9nfPK2PHuR09zN4lYrFdG49it2znq2\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -39,6 +59,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
