@@ -1,44 +1,75 @@
 package com.davidp799.patcotoday.ui.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.davidp799.patcotoday.ui.components.TripConfigurationBar
+import com.davidp799.patcotoday.ui.components.DropShadow
+import com.davidp799.patcotoday.ui.components.ScheduleItem
+import com.davidp799.patcotoday.ui.components.ScheduleItemShimmer
 
 @Composable
-fun SchedulesScreen() {
-    var fromStation by remember { mutableStateOf("Lindenwold") }
-    var toStation by remember { mutableStateOf("15-16th & Locust") }
+fun SchedulesScreen(
+    viewModel: SchedulesScreenViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val listState = rememberLazyListState()
+
+    // Auto-scroll to next arrival when data loads
+    LaunchedEffect(uiState.arrivals, uiState.scrollToIndex) {
+        if (uiState.arrivals.isNotEmpty() && uiState.scrollToIndex > 0) {
+            listState.animateScrollToItem(uiState.scrollToIndex)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         TripConfigurationBar(
-            fromStation = fromStation,
-            toStation = toStation,
-            onFromStationChange = { fromStation = it },
-            onToStationChange = { toStation = it },
-            onReverseStationsClick = {
-                val temp = fromStation
-                fromStation = toStation
-                toStation = temp
-            }
+            fromStation = uiState.fromStation,
+            toStation = uiState.toStation,
+            onFromStationChange = { viewModel.updateFromStation(it) },
+            onToStationChange = { viewModel.updateToStation(it) },
+            onReverseStationsClick = { viewModel.reverseStations() },
+            stations = viewModel.stationOptions
         )
 
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "Schedules Screen")
+        DropShadow()
+
+        // Schedule list with shimmer loading
+        if (uiState.isLoading) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                contentPadding = PaddingValues(bottom = 96.dp)
+            ) {
+                items(18) { // Show 18 shimmer items like the original
+                    ScheduleItemShimmer()
+                }
+            }
+        } else {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                contentPadding = PaddingValues(bottom = 96.dp)
+            ) {
+                itemsIndexed(uiState.arrivals) { index, arrival ->
+                    ScheduleItem(
+                        arrival = arrival,
+                        isHighlighted = index == uiState.scrollToIndex,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 }
-
