@@ -14,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.davidp799.patcotoday.ui.components.TripConfigurationBar
-import com.davidp799.patcotoday.ui.components.DropShadow
 import com.davidp799.patcotoday.ui.components.ScheduleItem
 import com.davidp799.patcotoday.ui.components.ScheduleItemShimmer
 
@@ -64,8 +63,6 @@ fun SchedulesScreen(
             onReverseStationsClick = { viewModel.reverseStations() },
             stations = viewModel.stationOptions
         )
-
-        DropShadow()
 
         // Schedule list with animated shimmer loading
         Box(modifier = Modifier.fillMaxSize()) {
