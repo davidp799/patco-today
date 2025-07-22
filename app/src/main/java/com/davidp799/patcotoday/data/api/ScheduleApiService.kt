@@ -7,7 +7,7 @@ import retrofit2.http.Header
 import retrofit2.http.Query
 
 interface ScheduleApiService {
-    @GET("/")
+    @GET("prod")
     suspend fun getSchedules(
         @Query("schedule_date") scheduleDate: String,
         @Query("last_updated") lastUpdated: String,

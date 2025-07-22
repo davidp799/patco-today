@@ -1,6 +1,7 @@
 package com.davidp799.patcotoday.data.local
 
 import android.content.Context
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -45,8 +46,12 @@ class FileManager(private val context: Context) {
     suspend fun downloadAndSaveFile(url: String, fileName: String, isSpecial: Boolean = false, date: String? = null): Boolean {
         return withContext(Dispatchers.IO) {
             try {
+                Log.d("[ApiDebug]", "Starting file download - URL: $url, File: $fileName, Special: $isSpecial, Date: $date")
+
                 val request = Request.Builder().url(url).build()
                 val response = client.newCall(request).execute()
+
+                Log.d("[ApiDebug]", "File download response - Success: ${response.isSuccessful}, Code: ${response.code}, Content Length: ${response.body?.contentLength()}")
 
                 if (response.isSuccessful) {
                     val directory = if (isSpecial && date != null) {
@@ -56,6 +61,8 @@ class FileManager(private val context: Context) {
                     }
 
                     val file = File(directory, fileName)
+                    Log.d("[ApiDebug]", "Saving file to: ${file.absolutePath}")
+
                     val inputStream = response.body?.byteStream()
                     val outputStream = FileOutputStream(file)
 
@@ -63,11 +70,14 @@ class FileManager(private val context: Context) {
                     inputStream?.close()
                     outputStream.close()
 
+                    Log.d("[ApiDebug]", "File saved successfully - Size: ${file.length()} bytes, Path: ${file.absolutePath}")
                     true
                 } else {
+                    Log.e("[ApiDebug]", "File download failed - Code: ${response.code}, URL: $url")
                     false
                 }
             } catch (e: Exception) {
+                Log.e("[ApiDebug]", "File download exception for $fileName: ${e.message}", e)
                 e.printStackTrace()
                 false
             }
@@ -120,7 +130,10 @@ class FileManager(private val context: Context) {
     }
 
     fun getSpecialScheduleFile(date: String, fileName: String): File? {
+        Log.d("[ApiDebug]", "Looking for special schedule file - Date: $date, File: $fileName")
         val file = File(getSpecialSchedulesDirectory(date), fileName)
-        return if (file.exists()) file else null
+        val exists = file.exists()
+        Log.d("[ApiDebug]", "Special schedule file exists: $exists, Path: ${file.absolutePath}")
+        return if (exists) file else null
     }
 }

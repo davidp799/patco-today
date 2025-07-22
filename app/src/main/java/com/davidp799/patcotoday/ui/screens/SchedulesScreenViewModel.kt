@@ -1,6 +1,7 @@
 package com.davidp799.patcotoday.ui.screens
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidp799.patcotoday.data.repository.ScheduleRepository
@@ -50,10 +51,12 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
     fun loadScheduleData() {
         viewModelScope.launch {
+            Log.d("[ApiDebug]", "Starting to load schedule data for route: ${_uiState.value.fromStation} -> ${_uiState.value.toStation}")
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
             repository.fetchAndUpdateSchedules()
                 .onSuccess { apiResponse ->
+                    Log.d("[ApiDebug]", "API call successful, getting arrival times from repository")
                     // Get real schedule data using CSV parser
                     val realArrivals = repository.getScheduleForRoute(
                         fromStation = _uiState.value.fromStation,
@@ -61,37 +64,49 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                     )
 
                     val hasSpecial = apiResponse.specialSchedules != null
+                    Log.d("[ApiDebug]", "Retrieved ${realArrivals.size} arrivals, has special schedule: $hasSpecial")
 
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        arrivals = realArrivals.ifEmpty { generateMockArrivals() }, // Fallback to mock if no data
+                        arrivals = realArrivals.ifEmpty {
+                            Log.d("[ApiDebug]", "No real arrivals found, falling back to mock data")
+                            generateMockArrivals()
+                        },
                         hasSpecialSchedule = hasSpecial,
                         scrollToIndex = findNextArrival(realArrivals.ifEmpty { generateMockArrivals() })
                     )
                 }
                 .onFailure { error ->
+                    Log.e("[ApiDebug]", "API call failed: ${error.message}, trying to get cached arrivals")
                     // Try to get cached schedule data even if API fails
                     val cachedArrivals = repository.getScheduleForRoute(
                         fromStation = _uiState.value.fromStation,
                         toStation = _uiState.value.toStation
                     )
 
+                    Log.d("[ApiDebug]", "Retrieved ${cachedArrivals.size} cached arrivals")
+
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         errorMessage = error.message,
-                        arrivals = cachedArrivals.ifEmpty { generateMockArrivals() } // Final fallback to mock data
+                        arrivals = cachedArrivals.ifEmpty {
+                            Log.d("[ApiDebug]", "No cached arrivals found, falling back to mock data")
+                            generateMockArrivals()
+                        }
                     )
                 }
         }
     }
 
     fun updateFromStation(station: String) {
+        Log.d("[ApiDebug]", "Updating from station: ${_uiState.value.fromStation} -> $station")
         _uiState.value = _uiState.value.copy(fromStation = station)
         // Reload schedule data when stations change
         loadScheduleData()
     }
 
     fun updateToStation(station: String) {
+        Log.d("[ApiDebug]", "Updating to station: ${_uiState.value.toStation} -> $station")
         _uiState.value = _uiState.value.copy(toStation = station)
         // Reload schedule data when stations change
         loadScheduleData()
@@ -100,6 +115,8 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
     fun reverseStations() {
         val currentFrom = _uiState.value.fromStation
         val currentTo = _uiState.value.toStation
+        Log.d("[ApiDebug]", "Reversing stations: $currentFrom <-> $currentTo")
+
         _uiState.value = _uiState.value.copy(
             fromStation = currentTo,
             toStation = currentFrom
