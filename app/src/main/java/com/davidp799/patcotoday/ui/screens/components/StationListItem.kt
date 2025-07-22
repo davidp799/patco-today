@@ -27,7 +27,7 @@ fun StationListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onStationClick(station) }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 0.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Left side: Timeline icon representation
