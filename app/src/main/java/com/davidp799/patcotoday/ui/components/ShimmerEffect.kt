@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -50,11 +51,15 @@ fun Modifier.shimmerEffect(): Modifier = composed {
 }
 
 @Composable
-fun ScheduleItemShimmer() {
+fun ScheduleItemShimmer(
+    modifier: Modifier = Modifier,
+    alpha: Float = 1f
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .alpha(alpha),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Left side shimmer
@@ -66,14 +71,6 @@ fun ScheduleItemShimmer() {
                 modifier = Modifier
                     .width(100.dp)
                     .height(24.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .shimmerEffect()
-            )
-            Spacer(modifier = Modifier.height(5.dp))
-            Box(
-                modifier = Modifier
-                    .width(85.dp)
-                    .height(20.dp)
                     .clip(RoundedCornerShape(4.dp))
                     .shimmerEffect()
             )
@@ -101,14 +98,6 @@ fun ScheduleItemShimmer() {
                 modifier = Modifier
                     .width(100.dp)
                     .height(24.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .shimmerEffect()
-            )
-            Spacer(modifier = Modifier.height(5.dp))
-            Box(
-                modifier = Modifier
-                    .width(85.dp)
-                    .height(20.dp)
                     .clip(RoundedCornerShape(4.dp))
                     .shimmerEffect()
             )
