@@ -64,14 +64,14 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
         // Configure edge-to-edge with proper system bar styles
         enableEdgeToEdge(
             statusBarStyle = if (useDarkTheme) {
-                SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                SystemBarStyle.dark(android.graphics.Color.BLACK)
             } else {
-                SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
+                SystemBarStyle.light(android.graphics.Color.WHITE, android.graphics.Color.BLACK)
             },
             navigationBarStyle = if (useDarkTheme) {
-                SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                SystemBarStyle.dark(android.graphics.Color.BLACK)
             } else {
-                SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
+                SystemBarStyle.light(android.graphics.Color.WHITE, android.graphics.Color.BLACK)
             }
         )
 
