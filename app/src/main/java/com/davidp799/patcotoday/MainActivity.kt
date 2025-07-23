@@ -106,27 +106,16 @@ fun MainScreen() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // Only create ViewModel when on schedules screen
-    val schedulesViewModel: SchedulesScreenViewModel? = if (currentRoute == "schedules") {
-        viewModel()
-    } else {
-        null
-    }
-
-    val schedulesUiState by schedulesViewModel?.uiState?.collectAsState() ?: run {
-        androidx.compose.runtime.remember {
-            androidx.compose.runtime.mutableStateOf(
-                com.davidp799.patcotoday.ui.screens.SchedulesUiState()
-            )
-        }
-    }
+    // Create ViewModel instance once and reuse it
+    val schedulesViewModel: SchedulesScreenViewModel = viewModel()
+    val schedulesUiState by schedulesViewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
             TopNavigationBar(
                 navController = navController,
                 onRefreshClick = if (currentRoute == "schedules") {
-                    { schedulesViewModel?.refreshSchedules() }
+                    { schedulesViewModel.refreshSchedules() }
                 } else null,
                 isRefreshing = schedulesUiState.isRefreshing
             )
@@ -136,7 +125,8 @@ fun MainScreen() {
     ) { innerPadding ->
         Navigation(
             navController = navController,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null
         )
     }
 }

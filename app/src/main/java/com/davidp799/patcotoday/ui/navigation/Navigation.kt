@@ -7,18 +7,27 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.davidp799.patcotoday.ui.screens.InformationScreen
 import com.davidp799.patcotoday.ui.screens.SchedulesScreen
+import com.davidp799.patcotoday.ui.screens.SchedulesScreenViewModel
 import com.davidp799.patcotoday.ui.screens.SettingsScreen
 import com.davidp799.patcotoday.ui.screens.StationMapScreen
 
 @Composable
-fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) {
+fun Navigation(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    schedulesViewModel: SchedulesScreenViewModel? = null
+) {
     NavHost(
         navController = navController,
         startDestination = Screen.Schedules.route,
         modifier = modifier
     ) {
         composable(Screen.Schedules.route) {
-            SchedulesScreen()
+            if (schedulesViewModel != null) {
+                SchedulesScreen(viewModel = schedulesViewModel)
+            } else {
+                SchedulesScreen()
+            }
         }
         composable(Screen.StationMap.route) {
             StationMapScreen()
