@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +41,8 @@ fun DropShadow(
 fun ScheduleItem(
     arrival: Arrival,
     modifier: Modifier = Modifier,
-    isHighlighted: Boolean = false
+    isHighlighted: Boolean = false,
+    isPast: Boolean = false
 ) {
     val textStyle = if (isHighlighted) {
         MaterialTheme.typography.titleLarge.copy(
@@ -50,10 +52,17 @@ fun ScheduleItem(
         MaterialTheme.typography.titleLarge
     }
 
+    val textColor = if (isPast) {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
+            .padding(vertical = 12.dp)
+            .alpha(if (isPast) 0.7f else 1f),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Arrival time
@@ -61,6 +70,7 @@ fun ScheduleItem(
             text = arrival.arrivalTime,
             style = textStyle,
             fontSize = 22.sp,
+            color = textColor,
             modifier = Modifier.weight(0.45f),
             textAlign = TextAlign.Center
         )
@@ -74,7 +84,11 @@ fun ScheduleItem(
                 imageVector = Icons.AutoMirrored.Rounded.ArrowRightAlt,
                 contentDescription = "Arrival time arrow",
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface
+                tint = if (isPast) {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                }
             )
         }
 
@@ -83,6 +97,7 @@ fun ScheduleItem(
             text = arrival.destinationTime,
             style = textStyle,
             fontSize = 22.sp,
+            color = textColor,
             modifier = Modifier.weight(0.45f),
             textAlign = TextAlign.Center
         )
@@ -114,6 +129,17 @@ fun ScheduleItemHighlightedPreview() {
         ScheduleItem(
             arrival = Arrival("8:15 AM", "9:00 AM"),
             isHighlighted = true
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ScheduleItemPastPreview() {
+    MaterialTheme {
+        ScheduleItem(
+            arrival = Arrival("6:00 AM", "6:45 AM"),
+            isPast = true
         )
     }
 }

@@ -24,6 +24,38 @@ fun SchedulesScreen(
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
 
+    // Function to determine if an arrival is in the past
+    fun isArrivalInPast(arrival: com.davidp799.patcotoday.utils.Arrival): Boolean {
+        return try {
+            val currentTime = java.util.Calendar.getInstance()
+            val currentHour = currentTime.get(java.util.Calendar.HOUR_OF_DAY)
+            val currentMinute = currentTime.get(java.util.Calendar.MINUTE)
+            val currentTotalMinutes = currentHour * 60 + currentMinute
+
+            val arrivalTime = arrival.arrivalTime
+                .replace(" AM", "")
+                .replace(" PM", "")
+
+            val parts = arrivalTime.split(":")
+            val hour = parts[0].toInt()
+            val minute = parts[1].toInt()
+
+            // Convert to 24-hour format
+            val hour24 = if (arrival.arrivalTime.contains("PM") && hour != 12) {
+                hour + 12
+            } else if (arrival.arrivalTime.contains("AM") && hour == 12) {
+                0
+            } else {
+                hour
+            }
+
+            val arrivalTotalMinutes = hour24 * 60 + minute
+            arrivalTotalMinutes < currentTotalMinutes
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     // Animate shimmer fade in/out
     val shimmerAlpha by animateFloatAsState(
         targetValue = if (uiState.isLoading) 1f else 0f,
@@ -97,9 +129,11 @@ fun SchedulesScreen(
                     contentPadding = PaddingValues(bottom = 96.dp)
                 ) {
                     itemsIndexed(uiState.arrivals) { index, arrival ->
+                        val isPast = isArrivalInPast(arrival)
                         ScheduleItem(
                             arrival = arrival,
                             isHighlighted = index == uiState.scrollToIndex,
+                            isPast = isPast,
                             modifier = Modifier.fillMaxWidth()
                         )
                         if (index < uiState.arrivals.size - 1) { // Don't add divider after last item

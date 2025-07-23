@@ -253,34 +253,8 @@ class CsvScheduleParser(private val context: Context) {
 
         Log.d("[ApiDebug]", "Filtering arrivals - Current time: $currentHour:$currentMinute ($currentTotalMinutes minutes)")
 
-        val futureArrivals = arrivals.filter { arrival ->
-            try {
-                val arrivalTime = arrival.arrivalTime
-                    .replace(" AM", "")
-                    .replace(" PM", "")
-
-                val parts = arrivalTime.split(":")
-                val hour = parts[0].toInt()
-                val minute = parts[1].toInt()
-
-                // Convert to 24-hour format
-                val hour24 = if (arrival.arrivalTime.contains("PM") && hour != 12) {
-                    hour + 12
-                } else if (arrival.arrivalTime.contains("AM") && hour == 12) {
-                    0
-                } else {
-                    hour
-                }
-
-                val arrivalTotalMinutes = hour24 * 60 + minute
-
-                // Show arrivals from now onwards
-                arrivalTotalMinutes >= currentTotalMinutes
-            } catch (e: Exception) {
-                Log.e("[ApiDebug]", "Error filtering arrival time ${arrival.arrivalTime}: ${e.message}")
-                false
-            }
-        }.sortedBy { arrival ->
+        // Sort all arrivals by time (don't filter out past arrivals anymore)
+        val sortedArrivals = arrivals.sortedBy { arrival ->
             try {
                 val arrivalTime = arrival.arrivalTime
                     .replace(" AM", "")
@@ -302,7 +276,7 @@ class CsvScheduleParser(private val context: Context) {
             }
         }
 
-        Log.d("[ApiDebug]", "Filtered and sorted arrivals: ${futureArrivals.size} future arrivals")
-        return futureArrivals
+        Log.d("[ApiDebug]", "Sorted all arrivals: ${sortedArrivals.size} total arrivals")
+        return sortedArrivals
     }
 }
