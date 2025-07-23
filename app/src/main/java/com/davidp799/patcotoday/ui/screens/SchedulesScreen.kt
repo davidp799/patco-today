@@ -122,11 +122,6 @@ fun SchedulesScreen(
                 )
             }
         },
-        sheetPeekHeight = when {
-            !uiState.hasSpecialSchedule -> 0.dp
-            uiState.hasUserDismissedSheet -> 48.dp
-            else -> 120.dp
-        },
         modifier = Modifier.fillMaxSize()
     ) {
         Column(
@@ -261,11 +256,6 @@ private fun Boolean.SchedulesScreenContent(
                     onViewSchedule = onOpenSpecialSchedulePdf
                 )
             }
-        },
-        sheetPeekHeight = when {
-            !hasSpecialSchedule -> 0.dp
-            this -> 48.dp
-            else -> 96.dp
         },
         modifier = Modifier.fillMaxSize()
     ) {
