@@ -53,7 +53,7 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
         loadScheduleData()
     }
 
-    fun loadScheduleData() {
+    private fun loadScheduleData() {
         viewModelScope.launch {
             Log.d("[ApiDebug]", "Starting to load schedule data for route: ${_uiState.value.fromStation} -> ${_uiState.value.toStation}")
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
@@ -151,7 +151,7 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                 // Make API call to fetch and update schedules
                 val result = repository.fetchAndUpdateSchedules()
 
-                result.onSuccess { apiResponse ->
+                result.onSuccess {
                     Log.d("[ApiDebug]", "Manual refresh successful, reloading schedule data")
 
                     // After API call, reload the schedule data from local storage
