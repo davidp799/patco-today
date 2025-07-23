@@ -177,7 +177,9 @@ class CsvScheduleParser(private val context: Context) {
         val fromIndex = stations.indexOf(fromStation)
         val toIndex = stations.indexOf(toStation)
 
-        return if (fromIndex < toIndex) "eastbound" else "westbound"
+        // If destination index is greater than source index, then it is westbound
+        // Else, it is eastbound
+        return if (toIndex > fromIndex) "westbound" else "eastbound"
     }
 
     private fun getCurrentDayType(): String {
