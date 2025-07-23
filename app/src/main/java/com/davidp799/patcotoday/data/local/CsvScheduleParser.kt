@@ -44,6 +44,34 @@ class CsvScheduleParser(private val context: Context) {
         }
     }
 
+    /**
+     * Parse schedule from assets folder as fallback when API fails and no local files exist
+     */
+    suspend fun parseScheduleFromAssets(
+        fromStation: String,
+        toStation: String
+    ): List<Arrival> {
+        return withContext(Dispatchers.IO) {
+            try {
+                Log.d("[ApiDebug]", "Parsing schedule from assets for route: $fromStation -> $toStation")
+
+                val dayType = getCurrentDayType()
+                val direction = determineDirection(fromStation, toStation)
+                val fileName = "${dayType}-${direction}.csv"
+
+                Log.d("[ApiDebug]", "Reading from assets file: $fileName")
+
+                val arrivals = parseCsvFromAssets(fileName, fromStation, toStation)
+                Log.d("[ApiDebug]", "Assets schedule parsed - Found ${arrivals.size} arrivals")
+                arrivals
+            } catch (e: Exception) {
+                Log.e("[ApiDebug]", "Exception parsing schedule from assets for route $fromStation -> $toStation: ${e.message}", e)
+                e.printStackTrace()
+                emptyList()
+            }
+        }
+    }
+
     private fun parseSpecialSchedule(fromStation: String, toStation: String, date: String): List<Arrival> {
         Log.d("[ApiDebug]", "Checking for special schedule - Date: $date")
         val direction = determineDirection(fromStation, toStation)
@@ -171,6 +199,68 @@ class CsvScheduleParser(private val context: Context) {
         }
     }
 
+    private fun parseCsvFromAssets(fileName: String, fromStation: String, toStation: String): List<Arrival> {
+        val arrivals = mutableListOf<Arrival>()
+
+        try {
+            Log.d("[ApiDebug]", "Starting CSV parsing from assets for file: $fileName")
+            val inputStream = context.assets.open(fileName)
+            val lines = inputStream.bufferedReader().readLines()
+            inputStream.close()
+
+            if (lines.isEmpty()) {
+                Log.w("[ApiDebug]", "Assets CSV file is empty: $fileName")
+                return emptyList()
+            }
+
+            Log.d("[ApiDebug]", "Assets CSV file has ${lines.size} lines")
+
+            // Get station indices from predefined station list
+            val fromStationIndex = getStationIndex(fromStation)
+            val toStationIndex = getStationIndex(toStation)
+
+            Log.d("[ApiDebug]", "Station indices - From '$fromStation': $fromStationIndex, To '$toStation': $toStationIndex")
+
+            if (fromStationIndex == -1 || toStationIndex == -1) {
+                Log.e("[ApiDebug]", "Could not find station indices for the given stations")
+                return emptyList()
+            }
+
+            // Parse all data rows (no header to skip)
+            var validArrivals = 0
+            for (i in 0 until lines.size) {
+                val row = lines[i].split(",").map { it.trim().replace("\"", "") }
+
+                if (row.size > maxOf(fromStationIndex, toStationIndex)) {
+                    val fromTime = row[fromStationIndex]
+                    val toTime = row[toStationIndex]
+
+                    if (fromTime.isNotEmpty() && toTime.isNotEmpty() &&
+                        fromTime != "--" && toTime != "--" &&
+                        fromTime.uppercase() != "CLOSED" && toTime.uppercase() != "CLOSED") {
+
+                        val formattedFromTime = formatTime(fromTime)
+                        val formattedToTime = formatTime(toTime)
+
+                        arrivals.add(Arrival(
+                            arrivalTime = formattedFromTime,
+                            destinationTime = formattedToTime,
+                            isSpecialSchedule = false
+                        ))
+                        validArrivals++
+                    }
+                }
+            }
+
+            Log.d("[ApiDebug]", "Successfully parsed $validArrivals arrivals from assets file: $fileName")
+
+        } catch (e: Exception) {
+            Log.e("[ApiDebug]", "Error parsing CSV from assets file $fileName: ${e.message}", e)
+        }
+
+        return arrivals
+    }
+
     private fun getStationIndex(stationName: String): Int {
         return getStationList().indexOf(stationName)
     }
@@ -191,7 +281,7 @@ class CsvScheduleParser(private val context: Context) {
 
         // If destination index is greater than source index, then it is westbound
         // Else, it is eastbound
-        return if (toIndex > fromIndex) "westbound" else "eastbound"
+        return if (toIndex > fromIndex) "west" else "east"
     }
 
     private fun getCurrentDayType(): String {

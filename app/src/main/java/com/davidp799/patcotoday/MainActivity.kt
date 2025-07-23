@@ -97,8 +97,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                     // If this was a first run, notify any listening ViewModels that data is now available
                     if (isFirstRun) {
                         Log.d("[ApiDebug]", "MainActivity: Notifying ViewModels that first-run data is available")
-                        // We'll use a simple broadcast mechanism or shared state
-                        // For now, we'll use SharedPreferences to signal completion
+                        // Mark first run as completed
                         prefs.edit().putBoolean("first_run_completed", true).apply()
                     }
 
@@ -115,28 +114,36 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                 .onFailure { error ->
                     Log.e("[ApiDebug]", "MainActivity: Initial API call failed: ${error.message}")
 
-                    // Even on failure, if it was a first run, we should signal completion
-                    // so the UI doesn't hang indefinitely
+                    // If this was a first run and the API failed, mark it completed anyway
+                    // so the UI can proceed with fallback CSV data from assets
                     if (isFirstRun) {
-                        Log.d("[ApiDebug]", "MainActivity: First-run API failed, but signaling completion to prevent hanging")
-                        prefs.edit().putLong("first_run_failed", System.currentTimeMillis()).apply()
+                        Log.d("[ApiDebug]", "MainActivity: First-run API failed, marking as completed to enable CSV fallback")
+                        prefs.edit()
+                            .putBoolean("first_run_completed", true)
+                            .putBoolean("using_fallback_data", true)
+                            .apply()
                     }
 
                     // Show appropriate error message based on error type
                     val errorMessage = when (error) {
                         is UnknownHostException -> {
-                            "No internet connection. Using cached schedules."
+                            if (isFirstRun) "No internet connection. Using offline schedules."
+                            else "No internet connection. Using cached schedules."
                         }
                         is SocketTimeoutException -> {
-                            "Request timed out. Using cached schedules."
+                            if (isFirstRun) "Request timed out. Using offline schedules."
+                            else "Request timed out. Using cached schedules."
                         }
                         else -> {
                             if (error.message?.contains("404") == true) {
-                                "Schedule service unavailable. Using cached schedules."
+                                if (isFirstRun) "Schedule service unavailable. Using offline schedules."
+                                else "Schedule service unavailable. Using cached schedules."
                             } else if (error.message?.contains("500") == true) {
-                                "Server error. Using cached schedules."
+                                if (isFirstRun) "Server error. Using offline schedules."
+                                else "Server error. Using cached schedules."
                             } else {
-                                "Failed to update schedules. Using cached data."
+                                if (isFirstRun) "Failed to download schedules. Using offline data."
+                                else "Failed to update schedules. Using cached data."
                             }
                         }
                     }

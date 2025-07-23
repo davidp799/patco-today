@@ -15,8 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ScheduleRepository(context: Context) {
-
+class ScheduleRepository(private val context: Context) {
     private val fileManager = FileManager(context)
     private val csvParser = CsvScheduleParser(context)
     private val apiService: ScheduleApiService
@@ -84,13 +83,61 @@ class ScheduleRepository(context: Context) {
 
     suspend fun getScheduleForRoute(fromStation: String, toStation: String): List<Arrival> {
         Log.d("[ApiDebug]", "Getting arrival times for route: $fromStation -> $toStation")
+
+        // First try to get from local files (downloaded from API)
         val arrivals = csvParser.parseScheduleForRoute(fromStation, toStation)
-        Log.d("[ApiDebug]", "Found ${arrivals.size} arrival times for route: $fromStation -> $toStation")
-        return arrivals
+
+        if (arrivals.isNotEmpty()) {
+            Log.d("[ApiDebug]", "Found ${arrivals.size} arrival times from local files for route: $fromStation -> $toStation")
+            return arrivals
+        }
+
+        // If no local data found, fall back to assets
+        Log.d("[ApiDebug]", "No local data found, falling back to assets for route: $fromStation -> $toStation")
+        val assetArrivals = csvParser.parseScheduleFromAssets(fromStation, toStation)
+        Log.d("[ApiDebug]", "Found ${assetArrivals.size} arrival times from assets for route: $fromStation -> $toStation")
+
+        return assetArrivals
     }
 
     fun hasScheduleData(): Boolean {
-        return fileManager.hasScheduleData()
+        // First check if we have downloaded files
+        val hasLocalData = fileManager.hasScheduleData()
+
+        if (hasLocalData) {
+            return true
+        }
+
+        // If no local data, check if we have fallback CSV files in assets
+        return hasAssetScheduleData()
+    }
+
+    private fun hasAssetScheduleData(): Boolean {
+        return try {
+            val assetFiles = listOf(
+                "weekdays-east.csv",
+                "weekdays-west.csv",
+                "saturdays-east.csv",
+                "saturdays-west.csv",
+                "sundays-east.csv",
+                "sundays-west.csv"
+            )
+
+            // Check if at least some essential asset files exist
+            val existingFiles = assetFiles.count { fileName ->
+                try {
+                    context.assets.open(fileName).use { true }
+                } catch (e: Exception) {
+                    false
+                }
+            }
+
+            Log.d("[ApiDebug]", "Found $existingFiles out of ${assetFiles.size} asset schedule files")
+            existingFiles >= 4 // Need at least weekdays and one weekend day type
+        } catch (e: Exception) {
+            Log.e("[ApiDebug]", "Error checking asset schedule data: ${e.message}")
+            false
+        }
     }
 
     private suspend fun downloadSpecialSchedules(date: String, eastboundUrl: String, westboundUrl: String, pdfUrl: String) {
