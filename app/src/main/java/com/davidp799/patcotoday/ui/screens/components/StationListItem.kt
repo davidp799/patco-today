@@ -137,80 +137,47 @@ private fun TimelineIcon(
 
 @Preview(showBackground = true)
 @Composable
-private fun StationListItemPreview() {
+fun StationListItemPreview() {
     MaterialTheme {
+        // Mock station data for preview
+        val mockStation = Station(
+            id = "lindenwold",
+            name = "Lindenwold",
+            fullName = "Lindenwold Station",
+            address = "901 N. Berlin Road, Lindenwold, NJ 08021",
+            amenities = StationAmenities(
+                elevator = "Elevator",
+                escalator = "Escalator",
+                bikeRacks = "Bike Racks",
+                taxiService = "Taxi Service",
+                parking = "Parking"
+            ),
+            hours = "Station is open 24/7.",
+            gatedParking = "$1 from 5 am to 10 am (pay with FREEDOM card only). Free after 10 am.",
+            meters = "",
+            walkingDistance = "UMDNJ-School of Osteopathic Medicine\nKennedy University Hospital",
+            fareZone = FareZone.LINDENWOLD_GROUP,
+            fareInfo = FareInfo("$1.60", "$3.20", "$3.00", "$6.00")
+        )
+
         Column {
-            // Preview first station (Lindenwold)
+            // Show different positions in the timeline
             StationListItem(
-                station = Station(
-                    id = "lindenwold",
-                    name = "Lindenwold",
-                    fullName = "Lindenwold Station",
-                    address = "901 N. Berlin Road, Lindenwold, NJ 08021",
-                    amenities = StationAmenities(
-                        elevator = "Elevator",
-                        escalator = "Escalator",
-                        bikeRacks = "Bike Racks",
-                        taxiService = "Taxi Service",
-                        parking = "Parking"
-                    ),
-                    hours = "Station is open 24/7.",
-                    gatedParking = "$1 from 5 am to 10 am (pay with FREEDOM card only). Free after 10 am.",
-                    meters = "",
-                    walkingDistance = "UMDNJ-School of Osteopathic Medicine\nKennedy University Hospital",
-                    fareZone = FareZone.LINDENWOLD_GROUP,
-                    fareInfo = FareInfo("$1.60", "$3.20", "$3.00", "$6.00")
-                ),
+                station = mockStation.copy(name = "Lindenwold"),
                 position = 0,
                 totalStations = 14,
                 onStationClick = { }
             )
-            
-            // Preview middle station (Haddonfield)
+            HorizontalDivider()
             StationListItem(
-                station = Station(
-                    id = "haddonfield",
-                    name = "Haddonfield",
-                    fullName = "Haddonfield Station",
-                    address = "Kings Highway West and Washington Avenue, Haddonfield, NJ",
-                    amenities = StationAmenities(
-                        elevator = "Elevator",
-                        escalator = "Escalator",
-                        bikeRacks = "Bike Racks",
-                        taxiService = "Taxi Service",
-                        parking = "Parking"
-                    ),
-                    hours = "Station is open 24/7.",
-                    gatedParking = "$1 from 5 am to 10 am (pay with FREEDOM card only). Free after 10 am.",
-                    meters = "25¢ for 2 hours. (Use Quarters Only)",
-                    walkingDistance = "Shopping & Fine Dining\nHistoric Indian King Tavern\nHadrosaurus Foulkii Dinosaur",
-                    fareZone = FareZone.HADDONFIELD_GROUP,
-                    fareInfo = FareInfo("$1.60", "$3.20", "$2.60", "$5.20")
-                ),
-                position = 5,
+                station = mockStation.copy(name = "Haddonfield"),
+                position = 3,
                 totalStations = 14,
                 onStationClick = { }
             )
-            
-            // Preview last station (15/16th & Locust)
+            HorizontalDivider()
             StationListItem(
-                station = Station(
-                    id = "15_16_locust",
-                    name = "15/16th & Locust",
-                    fullName = "15/16th & Locust Street Station",
-                    address = "15th & Locust Street, Philadelphia, PA",
-                    amenities = StationAmenities(
-                        elevator = "Elevator",
-                        escalator = "Up Escalator",
-                        bikeRacks = "Bike Racks"
-                    ),
-                    hours = "Station is open 24/7.",
-                    gatedParking = "",
-                    meters = "",
-                    walkingDistance = "Avenue of the Arts\nKimmel Center\nAcademy of Music\nMerriam Theater\nWilma Theaters\nUniversity of the Arts\nRittenhouse Square",
-                    fareZone = FareZone.PHILADELPHIA,
-                    fareInfo = FareInfo("$3.00", "$6.00", "$1.40", "$2.80")
-                ),
+                station = mockStation.copy(name = "15–16th & Locust"),
                 position = 13,
                 totalStations = 14,
                 onStationClick = { }

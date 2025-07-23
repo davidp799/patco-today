@@ -22,9 +22,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.davidp799.patcotoday.ui.screens.models.Station
 import com.davidp799.patcotoday.ui.screens.models.StationAmenities
+import com.davidp799.patcotoday.ui.screens.models.FareInfo
+import com.davidp799.patcotoday.ui.screens.models.FareZone
 
 @Composable
 fun StationDetailsSheet(
@@ -364,5 +367,42 @@ private fun openAddress(context: Context, address: String) {
         val clip = ClipData.newPlainText("Station Address", address)
         clipboard.setPrimaryClip(clip)
         Toast.makeText(context, "Address copied to clipboard", Toast.LENGTH_SHORT).show()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun StationDetailsSheetPreview() {
+    MaterialTheme {
+        // Mock station data for preview
+        val mockStation = Station(
+            id = "lindenwold",
+            name = "Lindenwold",
+            fullName = "Lindenwold Station",
+            address = "1 Lindenwold Station, Lindenwold, NJ 08021",
+            hours = "Monday - Friday: 5:00 AM - 12:00 AM\nSaturday - Sunday: 6:00 AM - 12:00 AM",
+            gatedParking = "Available 24/7 - $2.00 per day",
+            meters = "2-hour parking available on adjacent streets",
+            walkingDistance = "Lindenwold Regional Shopping Center, various restaurants",
+            amenities = StationAmenities(
+                elevator = "Available",
+                escalator = "Available",
+                bikeRacks = "10 spaces",
+                taxiService = "Available",
+                parking = "500 spaces"
+            ),
+            fareZone = FareZone.LINDENWOLD_GROUP,
+            fareInfo = FareInfo(
+                newJerseyOneWay = "$2.25",
+                newJerseyRoundTrip = "$4.50",
+                philadelphiaOneWay = "$5.60",
+                philadelphiaRoundTrip = "$11.20"
+            )
+        )
+
+        StationDetailsSheet(
+            station = mockStation,
+            onDismiss = { }
+        )
     }
 }

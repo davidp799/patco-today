@@ -171,6 +171,7 @@ fun SpecialScheduleBottomSheet(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun SpecialScheduleBottomSheetPreview() {

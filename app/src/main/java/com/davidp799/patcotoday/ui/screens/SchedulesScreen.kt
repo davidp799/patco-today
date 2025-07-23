@@ -122,7 +122,11 @@ fun SchedulesScreen(
                 )
             }
         },
-        sheetPeekHeight = if (uiState.hasSpecialSchedule && uiState.hasUserDismissedSheet) 48.dp else 0.dp,
+        sheetPeekHeight = when {
+            !uiState.hasSpecialSchedule -> 0.dp
+            uiState.hasUserDismissedSheet -> 48.dp
+            else -> 120.dp
+        },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Column(

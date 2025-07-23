@@ -9,13 +9,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.davidp799.patcotoday.ui.navigation.bottomNavItems
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,4 +66,28 @@ fun TopNavigationBar(
             }
         }
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TopNavigationBarPreview() {
+    MaterialTheme {
+        TopNavigationBar(
+            navController = rememberNavController(),
+            onRefreshClick = { },
+            isRefreshing = false
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TopNavigationBarRefreshingPreview() {
+    MaterialTheme {
+        TopNavigationBar(
+            navController = rememberNavController(),
+            onRefreshClick = { },
+            isRefreshing = true
+        )
+    }
 }
