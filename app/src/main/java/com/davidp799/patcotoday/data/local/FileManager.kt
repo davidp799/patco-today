@@ -88,17 +88,6 @@ class FileManager(private val context: Context) {
         return downloadAndSaveFile(url, fileName, isSpecial = true, date = date)
     }
 
-    fun getLastModifiedTime(fileName: String): String {
-        val file = File(getRegularSchedulesDirectory(), fileName)
-        return if (file.exists()) {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
-            dateFormat.format(Date(file.lastModified()))
-        } else {
-            // Return a very old date if file doesn't exist
-            "2020-01-01T00:00:00Z"
-        }
-    }
-
     fun getOldestLastModified(): String {
         val files = listOf(
             "weekdays_east.csv",
@@ -126,11 +115,6 @@ class FileManager(private val context: Context) {
         } else {
             dateFormat.format(Date(oldestTime))
         }
-    }
-
-    fun fileExists(fileName: String): Boolean {
-        val file = File(getRegularSchedulesDirectory(), fileName)
-        return file.exists()
     }
 
     fun getSpecialScheduleFile(date: String, fileName: String): File? {
