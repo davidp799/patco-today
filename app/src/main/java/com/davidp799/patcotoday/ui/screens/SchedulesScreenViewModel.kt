@@ -54,41 +54,21 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
             Log.d("[ApiDebug]", "Starting to load schedule data for route: ${_uiState.value.fromStation} -> ${_uiState.value.toStation}")
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
-            repository.fetchAndUpdateSchedules()
-                .onSuccess { apiResponse ->
-                    Log.d("[ApiDebug]", "API call successful, getting arrival times from repository")
-                    // Get real schedule data using CSV parser
-                    val realArrivals = repository.getScheduleForRoute(
-                        fromStation = _uiState.value.fromStation,
-                        toStation = _uiState.value.toStation
-                    )
+            // Only get schedule data from local storage, no API call
+            val arrivals = repository.getScheduleForRoute(
+                fromStation = _uiState.value.fromStation,
+                toStation = _uiState.value.toStation
+            )
 
-                    val hasSpecial = apiResponse.specialSchedules != null
-                    Log.d("[ApiDebug]", "Retrieved ${realArrivals.size} arrivals, has special schedule: $hasSpecial")
+            Log.d("[ApiDebug]", "Retrieved ${arrivals.size} arrivals from local storage")
 
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        arrivals = realArrivals,
-                        hasSpecialSchedule = hasSpecial,
-                        scrollToIndex = findNextArrival(realArrivals)
-                    )
-                }
-                .onFailure { error ->
-                    Log.e("[ApiDebug]", "API call failed: ${error.message}, trying to get cached arrivals")
-                    // Try to get cached schedule data even if API fails
-                    val cachedArrivals = repository.getScheduleForRoute(
-                        fromStation = _uiState.value.fromStation,
-                        toStation = _uiState.value.toStation
-                    )
-
-                    Log.d("[ApiDebug]", "Retrieved ${cachedArrivals.size} cached arrivals")
-
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMessage = error.message,
-                        arrivals = cachedArrivals
-                    )
-                }
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                arrivals = arrivals,
+                hasSpecialSchedule = false, // Will be determined by the CSV parser
+                scrollToIndex = findNextArrival(arrivals),
+                errorMessage = if (arrivals.isEmpty()) "No schedule data available" else null
+            )
         }
     }
 
