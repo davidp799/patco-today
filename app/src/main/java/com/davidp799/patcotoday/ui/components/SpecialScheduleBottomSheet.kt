@@ -1,41 +1,28 @@
 package com.davidp799.patcotoday.ui.components
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.EventNote
+import androidx.compose.material.icons.automirrored.filled.EventNote
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpecialScheduleBottomSheet(
-    sheetState: BottomSheetScaffoldState,
-    onViewSchedule: () -> Unit,
-    modifier: Modifier = Modifier
+    onViewSchedule: () -> Unit
 ) {
-    val context = LocalContext.current
+    LocalContext.current
 
     Column(
         modifier = Modifier
@@ -114,7 +101,7 @@ fun SpecialScheduleBottomSheet(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.EventNote,
+                    imageVector = Icons.AutoMirrored.Filled.EventNote,
                     contentDescription = "View Schedule",
                     modifier = Modifier.size(24.dp)
                 )
@@ -127,7 +114,7 @@ fun SpecialScheduleBottomSheet(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Icon(
-                    imageVector = Icons.Default.OpenInNew,
+                    imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                     contentDescription = "Open PDF",
                     modifier = Modifier.size(18.dp)
                 )
@@ -178,7 +165,6 @@ fun SpecialScheduleBottomSheetPreview() {
     MaterialTheme {
         // Mock BottomSheetScaffoldState for preview
         SpecialScheduleBottomSheet(
-            sheetState = rememberBottomSheetScaffoldState(),
             onViewSchedule = { }
         )
     }

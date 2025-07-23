@@ -300,7 +300,7 @@ private fun FareTableRow(
     roundTrip: String,
     isHeader: Boolean
 ) {
-    val backgroundColor = if (isHeader) {
+    if (isHeader) {
         MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
     } else {
         Color.Transparent

@@ -118,7 +118,6 @@ fun SchedulesScreen(
         sheetContent = {
             if (uiState.hasSpecialSchedule) {
                 SpecialScheduleBottomSheet(
-                    sheetState = bottomSheetState,
                     onViewSchedule = { viewModel.openSpecialSchedulePdf() }
                 )
             }
@@ -263,7 +262,6 @@ private fun Boolean.SchedulesScreenContent(
         sheetContent = {
             if (hasSpecialSchedule) {
                 SpecialScheduleBottomSheet(
-                    sheetState = bottomSheetState,
                     onViewSchedule = onOpenSpecialSchedulePdf
                 )
             }
