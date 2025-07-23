@@ -11,10 +11,13 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
@@ -183,7 +186,7 @@ fun MainScreen() {
             )
         }
 
-        // Global blur overlay when refreshing schedules
+        // Blur overlay when refreshing schedules
         if (overlayAlpha > 0f) {
             Box(
                 modifier = Modifier
@@ -192,6 +195,20 @@ fun MainScreen() {
                         Color.Black.copy(alpha = overlayAlpha)
                     )
             )
+        }
+
+        // Loading indicator on top of blur
+        if (schedulesUiState.isRefreshing) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(48.dp),
+                    strokeWidth = 4.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }
