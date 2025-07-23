@@ -1,6 +1,5 @@
 package com.davidp799.patcotoday.ui.screens
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -36,7 +35,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val sharedPrefs = remember {
-        context.getSharedPreferences("${context.packageName}_preferences", Context.MODE_PRIVATE)
+        androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
     }
 
     // State for preferences

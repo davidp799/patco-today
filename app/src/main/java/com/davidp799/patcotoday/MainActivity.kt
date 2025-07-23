@@ -1,5 +1,6 @@
 package com.davidp799.patcotoday
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -23,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.preference.PreferenceManager
 import com.davidp799.patcotoday.data.repository.ScheduleRepository
 import com.davidp799.patcotoday.ui.components.BottomNavigationBar
 import com.davidp799.patcotoday.ui.components.TopNavigationBar
@@ -33,7 +35,7 @@ import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var scheduleRepository: ScheduleRepository
 
@@ -43,6 +45,10 @@ class MainActivity : ComponentActivity() {
 
         // Initialize repository
         scheduleRepository = ScheduleRepository(this)
+
+        // Register preference change listener
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        prefs.registerOnSharedPreferenceChangeListener(this)
 
         // Make API call once on app start
         lifecycleScope.launch {
@@ -97,6 +103,21 @@ class MainActivity : ComponentActivity() {
                 MainScreen()
             }
         }
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            "device_theme", "dynamic_colors" -> {
+                // Recreate activity to apply theme changes
+                recreate()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .unregisterOnSharedPreferenceChangeListener(this)
     }
 
     private fun showToast(message: String) {

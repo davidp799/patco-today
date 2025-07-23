@@ -95,16 +95,6 @@ fun SettingsScreenWithBlur() {
     val schedulesViewModel: SchedulesScreenViewModel = viewModel()
     val schedulesUiState by schedulesViewModel.uiState.collectAsState()
 
-    // Animate blur effect when refreshing schedules
-    val blurRadius by animateFloatAsState(
-        targetValue = if (schedulesUiState.isRefreshing) 8f else 0f,
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        ),
-        label = "settings_blur_effect"
-    )
-
     // Animate overlay alpha when refreshing schedules
     val overlayAlpha by animateFloatAsState(
         targetValue = if (schedulesUiState.isRefreshing) 0.3f else 0f,
