@@ -6,17 +6,23 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.davidp799.patcotoday.data.repository.ScheduleRepository
 import com.davidp799.patcotoday.ui.components.BottomNavigationBar
 import com.davidp799.patcotoday.ui.components.TopNavigationBar
@@ -110,24 +116,57 @@ fun MainScreen() {
     val schedulesViewModel: SchedulesScreenViewModel = viewModel()
     val schedulesUiState by schedulesViewModel.uiState.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopNavigationBar(
+    // Animate blur effect when refreshing schedules
+    val blurRadius by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (currentRoute == "schedules" && schedulesUiState.isRefreshing) 8f else 0f,
+        animationSpec = tween(
+            durationMillis = 300,
+            easing = FastOutSlowInEasing
+        ),
+        label = "main_blur_effect"
+    )
+
+    // Animate overlay alpha when refreshing schedules
+    val overlayAlpha by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (currentRoute == "schedules" && schedulesUiState.isRefreshing) 0.3f else 0f,
+        animationSpec = tween(
+            durationMillis = 300,
+            easing = FastOutSlowInEasing
+        ),
+        label = "main_overlay_fade"
+    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                TopNavigationBar(
+                    navController = navController,
+                    onRefreshClick = if (currentRoute == "schedules") {
+                        { schedulesViewModel.refreshSchedules() }
+                    } else null,
+                    isRefreshing = schedulesUiState.isRefreshing
+                )
+            },
+            bottomBar = { BottomNavigationBar(navController = navController) },
+            modifier = Modifier.blur(radius = blurRadius.dp)
+        ) { innerPadding ->
+            Navigation(
                 navController = navController,
-                onRefreshClick = if (currentRoute == "schedules") {
-                    { schedulesViewModel.refreshSchedules() }
-                } else null,
-                isRefreshing = schedulesUiState.isRefreshing
+                modifier = Modifier.padding(innerPadding),
+                schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null
             )
-        },
-        bottomBar = { BottomNavigationBar(navController = navController) },
-        modifier = Modifier
-    ) { innerPadding ->
-        Navigation(
-            navController = navController,
-            modifier = Modifier.padding(innerPadding),
-            schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null
-        )
+        }
+
+        // Global blur overlay when refreshing schedules
+        if (overlayAlpha > 0f) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Color.Black.copy(alpha = overlayAlpha)
+                    )
+            )
+        }
     }
 }
 

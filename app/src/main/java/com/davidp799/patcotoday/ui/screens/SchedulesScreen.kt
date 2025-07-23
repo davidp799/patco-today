@@ -80,26 +80,6 @@ fun SchedulesScreen(
         label = "content_fade"
     )
 
-    // Animate blur effect when refreshing
-    val blurRadius by animateFloatAsState(
-        targetValue = if (uiState.isRefreshing) 8f else 0f,
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        ),
-        label = "blur_effect"
-    )
-
-    // Animate overlay alpha when refreshing
-    val overlayAlpha by animateFloatAsState(
-        targetValue = if (uiState.isRefreshing) 0.3f else 0f,
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        ),
-        label = "overlay_fade"
-    )
-
     // Auto-scroll to next arrival when data loads
     LaunchedEffect(uiState.arrivals, uiState.scrollToIndex) {
         if (uiState.arrivals.isNotEmpty() && uiState.scrollToIndex > 0 && !uiState.isLoading) {
@@ -109,81 +89,64 @@ fun SchedulesScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .blur(radius = blurRadius.dp)
-        ) {
-            TripConfigurationBar(
-                fromStation = uiState.fromStation,
-                toStation = uiState.toStation,
-                onFromStationChange = { viewModel.updateFromStation(it) },
-                onToStationChange = { viewModel.updateToStation(it) },
-                onReverseStationsClick = { viewModel.reverseStations() },
-                stations = viewModel.stationOptions
-            )
+    Column(modifier = Modifier.fillMaxSize()) {
+        TripConfigurationBar(
+            fromStation = uiState.fromStation,
+            toStation = uiState.toStation,
+            onFromStationChange = { viewModel.updateFromStation(it) },
+            onToStationChange = { viewModel.updateToStation(it) },
+            onReverseStationsClick = { viewModel.reverseStations() },
+            stations = viewModel.stationOptions
+        )
 
-            // Schedule list with animated shimmer loading
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Shimmer loading state
-                if (uiState.isLoading || shimmerAlpha > 0f) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        contentPadding = PaddingValues(bottom = 96.dp)
-                    ) {
-                        items(18) { index ->
-                            ScheduleItemShimmer(alpha = shimmerAlpha)
-                            if (index < 17) { // Don't add divider after last item
-                                HorizontalDivider(
-                                    modifier = Modifier.alpha(shimmerAlpha),
-                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // Actual content
-                if (!uiState.isLoading || contentAlpha > 0f) {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp)
-                            .alpha(contentAlpha),
-                        contentPadding = PaddingValues(bottom = 96.dp)
-                    ) {
-                        itemsIndexed(uiState.arrivals) { index, arrival ->
-                            val isPast = isArrivalInPast(arrival)
-                            ScheduleItem(
-                                arrival = arrival,
-                                isHighlighted = index == uiState.scrollToIndex,
-                                isPast = isPast,
-                                modifier = Modifier.fillMaxWidth()
+        // Schedule list with animated shimmer loading
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Shimmer loading state
+            if (uiState.isLoading || shimmerAlpha > 0f) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    contentPadding = PaddingValues(bottom = 96.dp)
+                ) {
+                    items(18) { index ->
+                        ScheduleItemShimmer(alpha = shimmerAlpha)
+                        if (index < 17) { // Don't add divider after last item
+                            HorizontalDivider(
+                                modifier = Modifier.alpha(shimmerAlpha),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                             )
-                            if (index < uiState.arrivals.size - 1) { // Don't add divider after last item
-                                HorizontalDivider(
-                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                                )
-                            }
                         }
                     }
                 }
             }
-        }
 
-        // Blur overlay when refreshing
-        if (overlayAlpha > 0f) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Color.Black.copy(alpha = overlayAlpha)
-                    )
-            )
+            // Actual content
+            if (!uiState.isLoading || contentAlpha > 0f) {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .alpha(contentAlpha),
+                    contentPadding = PaddingValues(bottom = 96.dp)
+                ) {
+                    itemsIndexed(uiState.arrivals) { index, arrival ->
+                        val isPast = isArrivalInPast(arrival)
+                        ScheduleItem(
+                            arrival = arrival,
+                            isHighlighted = index == uiState.scrollToIndex,
+                            isPast = isPast,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        if (index < uiState.arrivals.size - 1) { // Don't add divider after last item
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
