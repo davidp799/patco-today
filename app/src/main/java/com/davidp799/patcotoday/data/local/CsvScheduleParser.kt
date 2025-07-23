@@ -111,9 +111,9 @@ class CsvScheduleParser(private val context: Context) {
                 return emptyList()
             }
 
-            // Parse data rows (skip header row)
+            // Parse all data rows (no header to skip)
             var validArrivals = 0
-            for (i in 1 until lines.size) {
+            for (i in 0 until lines.size) {
                 val row = lines[i].split(",").map { it.trim().replace("\"", "") }
 
                 if (row.size > maxOf(fromStationIndex, toStationIndex)) {
@@ -121,7 +121,8 @@ class CsvScheduleParser(private val context: Context) {
                     val toTime = row[toStationIndex]
 
                     if (fromTime.isNotEmpty() && toTime.isNotEmpty() &&
-                        fromTime != "--" && toTime != "--") {
+                        fromTime != "--" && toTime != "--" &&
+                        fromTime.uppercase() != "CLOSED" && toTime.uppercase() != "CLOSED") {
 
                         val formattedFromTime = formatTime(fromTime)
                         val formattedToTime = formatTime(toTime)
@@ -135,7 +136,7 @@ class CsvScheduleParser(private val context: Context) {
                 }
             }
 
-            Log.d("[ApiDebug]", "Parsed $validArrivals valid arrivals from ${lines.size - 1} data rows")
+            Log.d("[ApiDebug]", "Parsed $validArrivals valid arrivals from ${lines.size} data rows")
 
             // Filter future arrivals and sort by time
             val filteredArrivals = filterAndSortArrivals(arrivals)
