@@ -8,7 +8,6 @@ import androidx.navigation.compose.composable
 import com.davidp799.patcotoday.ui.screens.InformationScreen
 import com.davidp799.patcotoday.ui.screens.SchedulesScreen
 import com.davidp799.patcotoday.ui.screens.SchedulesScreenViewModel
-import com.davidp799.patcotoday.ui.screens.SettingsScreen
 import com.davidp799.patcotoday.ui.screens.StationMapScreen
 
 @Composable
@@ -34,9 +33,6 @@ fun Navigation(
         }
         composable(Screen.Information.route) {
             InformationScreen()
-        }
-        composable("settings") {
-            SettingsScreen(navController)
         }
     }
 }

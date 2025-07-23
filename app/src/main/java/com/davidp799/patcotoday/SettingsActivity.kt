@@ -1,10 +1,14 @@
-package com.davidp799.patcotoday.ui.screens
+package com.davidp799.patcotoday
 
-import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,24 +20,73 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.davidp799.patcotoday.BuildConfig
-import com.davidp799.patcotoday.R
+import androidx.preference.PreferenceManager
+import com.davidp799.patcotoday.ui.theme.PatcoTodayTheme
 import kotlin.random.Random
+
+class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
+        // Register preference change listener
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        prefs.registerOnSharedPreferenceChangeListener(this)
+
+        setContent {
+            PatcoTodayTheme {
+                SettingsScreen()
+            }
+        }
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            "device_theme" -> {
+                val pref = sharedPreferences?.getString(key, "3")
+                when (pref?.toInt()) {
+                    1 -> androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+                        androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+                    )
+                    2 -> androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+                        androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+                    )
+                    3 -> androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+                        androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    )
+                }
+            }
+            "dynamic_colors" -> {
+                val pref = sharedPreferences?.getBoolean(key, false)
+                if (pref == true && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    com.google.android.material.color.DynamicColors.applyToActivitiesIfAvailable(application)
+                }
+            }
+        }
+        recreate()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .unregisterOnSharedPreferenceChangeListener(this)
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen() {
     val context = LocalContext.current
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val sharedPrefs = remember {
-        context.getSharedPreferences("${context.packageName}_preferences", Context.MODE_PRIVATE)
+        PreferenceManager.getDefaultSharedPreferences(context)
     }
 
     // State for preferences
@@ -54,17 +107,21 @@ fun SettingsScreen(navController: NavController) {
     )
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
+            LargeTopAppBar(
                 title = { Text("Settings") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(onClick = {
+                        (context as? ComponentActivity)?.finish()
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
-                }
+                },
+                scrollBehavior = scrollBehavior
             )
         }
     ) { innerPadding ->
@@ -325,7 +382,6 @@ fun SettingsSwitchItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThemeSelectionDialog(
     selectedTheme: Int,
@@ -376,10 +432,4 @@ fun ThemeSelectionDialog(
             }
         }
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SettingsScreenPreview() {
-    SettingsScreen(navController = rememberNavController())
 }

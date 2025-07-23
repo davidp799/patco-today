@@ -1,5 +1,6 @@
 package com.davidp799.patcotoday.ui.components
 
+import android.content.Intent
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Refresh
@@ -14,11 +15,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.davidp799.patcotoday.SettingsActivity
 import com.davidp799.patcotoday.ui.navigation.bottomNavItems
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,6 +31,7 @@ fun TopNavigationBar(
     onRefreshClick: (() -> Unit)? = null,
     isRefreshing: Boolean = false
 ) {
+    val context = LocalContext.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -49,19 +53,25 @@ fun TopNavigationBar(
                     } else {
                         Icon(
                             imageVector = Icons.TwoTone.Refresh,
-                            contentDescription = "Refresh Schedules"
+                            contentDescription = "Refresh",
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
             }
         },
         actions = {
-            IconButton(onClick = {
-                navController.navigate("settings")
-            }) {
+            // Settings button
+            IconButton(
+                onClick = {
+                    val intent = Intent(context, SettingsActivity::class.java)
+                    context.startActivity(intent)
+                }
+            ) {
                 Icon(
                     imageVector = Icons.TwoTone.Settings,
-                    contentDescription = "Settings"
+                    contentDescription = "Settings",
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
