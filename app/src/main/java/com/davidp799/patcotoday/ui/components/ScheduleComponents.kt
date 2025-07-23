@@ -2,6 +2,7 @@ package com.davidp799.patcotoday.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowRightAlt
 import androidx.compose.material3.*
@@ -58,49 +59,81 @@ fun ScheduleItem(
         MaterialTheme.colorScheme.onSurface
     }
 
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp)
-            .alpha(if (isPast) 0.7f else 1f),
-        verticalAlignment = Alignment.CenterVertically
+            .alpha(if (isPast) 0.7f else 1f)
     ) {
-        // Arrival time
-        Text(
-            text = arrival.arrivalTime,
-            style = textStyle,
-            fontSize = 22.sp,
-            color = textColor,
-            modifier = Modifier.weight(0.45f),
-            textAlign = TextAlign.Center
-        )
-
-        // Arrow
-        Box(
-            modifier = Modifier.weight(0.10f),
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.ArrowRightAlt,
-                contentDescription = "Arrival time arrow",
-                modifier = Modifier.size(24.dp),
-                tint = if (isPast) {
-                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                }
+            // Arrival time
+            Text(
+                text = arrival.arrivalTime,
+                style = textStyle,
+                fontSize = 22.sp,
+                color = textColor,
+                modifier = Modifier.weight(0.45f),
+                textAlign = TextAlign.Center
+            )
+
+            // Arrow
+            Box(
+                modifier = Modifier.weight(0.10f),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowRightAlt,
+                    contentDescription = "Arrival time arrow",
+                    modifier = Modifier.size(24.dp),
+                    tint = if (isPast) {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    }
+                )
+            }
+
+            // Destination time
+            Text(
+                text = arrival.destinationTime,
+                style = textStyle,
+                fontSize = 22.sp,
+                color = textColor,
+                modifier = Modifier.weight(0.45f),
+                textAlign = TextAlign.Center
             )
         }
 
-        // Destination time
-        Text(
-            text = arrival.destinationTime,
-            style = textStyle,
-            fontSize = 22.sp,
-            color = textColor,
-            modifier = Modifier.weight(0.45f),
-            textAlign = TextAlign.Center
-        )
+        // Special schedule indicator
+        if (arrival.isSpecialSchedule) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "Special Schedule",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -140,6 +173,27 @@ fun ScheduleItemPastPreview() {
         ScheduleItem(
             arrival = Arrival("6:00 AM", "6:45 AM"),
             isPast = true
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ScheduleItemSpecialSchedulePreview() {
+    MaterialTheme {
+        ScheduleItem(
+            arrival = Arrival("8:45 AM", "9:30 AM", isSpecialSchedule = true)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ScheduleItemSpecialScheduleHighlightedPreview() {
+    MaterialTheme {
+        ScheduleItem(
+            arrival = Arrival("9:15 AM", "10:00 AM", isSpecialSchedule = true),
+            isHighlighted = true
         )
     }
 }

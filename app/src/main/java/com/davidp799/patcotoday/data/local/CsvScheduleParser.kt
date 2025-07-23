@@ -86,9 +86,10 @@ class CsvScheduleParser(private val context: Context) {
 
     private fun parseCsvFile(file: File, fromStation: String, toStation: String): List<Arrival> {
         val arrivals = mutableListOf<Arrival>()
+        val isSpecialScheduleFile = file.name.contains("special_schedule")
 
         try {
-            Log.d("[ApiDebug]", "Starting CSV parsing for file: ${file.name}")
+            Log.d("[ApiDebug]", "Starting CSV parsing for file: ${file.name} (Special: $isSpecialScheduleFile)")
             val reader = BufferedReader(FileReader(file))
             val lines = reader.readLines()
             reader.close()
@@ -113,6 +114,7 @@ class CsvScheduleParser(private val context: Context) {
 
             // Parse all data rows (no header to skip)
             var validArrivals = 0
+            var specialArrivals = 0
             for (i in 0 until lines.size) {
                 val row = lines[i].split(",").map { it.trim().replace("\"", "") }
 
@@ -127,9 +129,24 @@ class CsvScheduleParser(private val context: Context) {
                         val formattedFromTime = formatTime(fromTime)
                         val formattedToTime = formatTime(toTime)
 
+                        // For special schedule files, check the boolean flag at the end
+                        val isSpecial = if (isSpecialScheduleFile && row.size > 14) {
+                            // The last column should contain "true" or "false"
+                            val specialFlag = row.last().lowercase().trim()
+                            val isSpecialLine = specialFlag == "true"
+                            if (isSpecialLine) {
+                                specialArrivals++
+                                Log.d("[ApiDebug]", "Found special arrival: $formattedFromTime -> $formattedToTime")
+                            }
+                            isSpecialLine
+                        } else {
+                            false
+                        }
+
                         arrivals.add(Arrival(
                             arrivalTime = formattedFromTime,
-                            destinationTime = formattedToTime
+                            destinationTime = formattedToTime,
+                            isSpecialSchedule = isSpecial
                         ))
                         validArrivals++
                     }
@@ -137,6 +154,9 @@ class CsvScheduleParser(private val context: Context) {
             }
 
             Log.d("[ApiDebug]", "Parsed $validArrivals valid arrivals from ${lines.size} data rows")
+            if (isSpecialScheduleFile) {
+                Log.d("[ApiDebug]", "Found $specialArrivals special schedule arrivals out of $validArrivals total")
+            }
 
             // Filter future arrivals and sort by time
             val filteredArrivals = filterAndSortArrivals(arrivals)

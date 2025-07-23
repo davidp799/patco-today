@@ -17,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpecialScheduleBottomSheet(
     onViewSchedule: () -> Unit
@@ -75,7 +74,7 @@ fun SpecialScheduleBottomSheet(
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = "PATCO is operating on a modified schedule today. Please check the official schedule document for accurate times.",
+                    text = "PATCO is operating on a modified schedule. Special arrivals will be flagged in the schedule list. Please refer to the official schedule document for more information.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     lineHeight = 20.sp
@@ -158,7 +157,6 @@ fun SpecialScheduleBottomSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun SpecialScheduleBottomSheetPreview() {
