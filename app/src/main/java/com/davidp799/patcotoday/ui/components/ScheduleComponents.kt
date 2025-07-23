@@ -78,9 +78,9 @@ fun ScheduleItem(
             )
         }
 
-        // Travel time
+        // Destination time
         Text(
-            text = arrival.travelTime,
+            text = arrival.destinationTime,
             style = textStyle,
             fontSize = 22.sp,
             modifier = Modifier.weight(0.45f),
@@ -102,7 +102,7 @@ fun DropShadowPreview() {
 fun ScheduleItemPreview() {
     MaterialTheme {
         ScheduleItem(
-            arrival = Arrival("7:30 AM", "45 min")
+            arrival = Arrival("7:30 AM", "8:15 AM")
         )
     }
 }
@@ -112,7 +112,7 @@ fun ScheduleItemPreview() {
 fun ScheduleItemHighlightedPreview() {
     MaterialTheme {
         ScheduleItem(
-            arrival = Arrival("8:15 AM", "42 min"),
+            arrival = Arrival("8:15 AM", "9:00 AM"),
             isHighlighted = true
         )
     }

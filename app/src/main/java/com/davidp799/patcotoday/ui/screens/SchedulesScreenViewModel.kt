@@ -68,12 +68,9 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        arrivals = realArrivals.ifEmpty {
-                            Log.d("[ApiDebug]", "No real arrivals found, falling back to mock data")
-                            generateMockArrivals()
-                        },
+                        arrivals = realArrivals,
                         hasSpecialSchedule = hasSpecial,
-                        scrollToIndex = findNextArrival(realArrivals.ifEmpty { generateMockArrivals() })
+                        scrollToIndex = findNextArrival(realArrivals)
                     )
                 }
                 .onFailure { error ->
@@ -89,10 +86,7 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         errorMessage = error.message,
-                        arrivals = cachedArrivals.ifEmpty {
-                            Log.d("[ApiDebug]", "No cached arrivals found, falling back to mock data")
-                            generateMockArrivals()
-                        }
+                        arrivals = cachedArrivals
                     )
                 }
         }
@@ -134,10 +128,24 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
         for (i in 0..23) {
             val hour = (baseHour + i) % 24
             val minute = listOf(15, 45).random()
-            val timeString = String.format("%02d:%02d", hour, minute)
-            val travelTime = "${(35..50).random()} min"
 
-            arrivals.add(Arrival(timeString, travelTime))
+            // Calculate destination time (add 30-50 minutes to source time)
+            val travelMinutes = (30..50).random()
+            val destinationTotalMinutes = (hour * 60 + minute + travelMinutes) % (24 * 60)
+            val destinationHour = destinationTotalMinutes / 60
+            val destinationMinute = destinationTotalMinutes % 60
+
+            // Format source time
+            val sourceAmPm = if (hour < 12) "AM" else "PM"
+            val sourceDisplayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+            val sourceTimeString = String.format("%d:%02d %s", sourceDisplayHour, minute, sourceAmPm)
+
+            // Format destination time
+            val destAmPm = if (destinationHour < 12) "AM" else "PM"
+            val destDisplayHour = if (destinationHour == 0) 12 else if (destinationHour > 12) destinationHour - 12 else destinationHour
+            val destTimeString = String.format("%d:%02d %s", destDisplayHour, destinationMinute, destAmPm)
+
+            arrivals.add(Arrival(sourceTimeString, destTimeString))
         }
 
         return arrivals

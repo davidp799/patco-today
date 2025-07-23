@@ -15,6 +15,9 @@ class CsvScheduleParser(private val context: Context) {
 
     private val fileManager = FileManager(context)
 
+    // Time differences between consecutive stations in minutes
+    private val timeBetween = listOf(0, 2, 3, 6, 8, 10, 12, 16, 18, 22, 24, 26, 27, 28)
+
     data class ScheduleEntry(
         val station: String,
         val arrivalTime: String,
@@ -129,10 +132,12 @@ class CsvScheduleParser(private val context: Context) {
                     if (fromTime.isNotEmpty() && toTime.isNotEmpty() &&
                         fromTime != "--" && toTime != "--") {
 
-                        val travelTime = calculateTravelTime(fromTime, toTime)
+                        val formattedFromTime = formatTime(fromTime)
+                        val formattedToTime = formatTime(toTime)
+
                         arrivals.add(Arrival(
-                            arrivalTime = formatTime(fromTime),
-                            travelTime = travelTime
+                            arrivalTime = formattedFromTime,
+                            destinationTime = formattedToTime
                         ))
                         validArrivals++
                     }
@@ -192,9 +197,32 @@ class CsvScheduleParser(private val context: Context) {
     private fun formatTime(time: String): String {
         // Handle different time formats that might be in the CSV
         return try {
+            val cleanTime = time.replace("\"", "").trim()
+
+            // Handle formats like "630A" or "1145P"
+            if (cleanTime.matches(Regex("\\d{3,4}[AP]"))) {
+                val timeDigits = cleanTime.dropLast(1)
+                val amPm = if (cleanTime.endsWith("A")) "AM" else "PM"
+
+                val hour = if (timeDigits.length == 3) {
+                    timeDigits.substring(0, 1).toInt()
+                } else {
+                    timeDigits.substring(0, 2).toInt()
+                }
+
+                val minute = if (timeDigits.length == 3) {
+                    timeDigits.substring(1).toInt()
+                } else {
+                    timeDigits.substring(2).toInt()
+                }
+
+                val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+                return String.format("%d:%02d %s", displayHour, minute, amPm)
+            }
+
             // If time is already in HH:mm format
-            if (time.contains(":") && time.length <= 5) {
-                val parts = time.split(":")
+            if (cleanTime.contains(":")) {
+                val parts = cleanTime.split(":")
                 val hour = parts[0].toInt()
                 val minute = parts[1].toInt()
 
@@ -204,37 +232,69 @@ class CsvScheduleParser(private val context: Context) {
                 String.format("%d:%02d %s", displayHour, minute, amPm)
             } else {
                 // If time is in other format, try to parse and convert
-                time
+                cleanTime
             }
         } catch (e: Exception) {
+            Log.e("[ApiDebug]", "Error formatting time $time: ${e.message}")
             time // Return original if parsing fails
         }
     }
 
-    private fun calculateTravelTime(fromTime: String, toTime: String): String {
+    private fun parseTimeToMinutes(timeString: String): Int {
         return try {
-            val fromMinutes = parseTimeToMinutes(fromTime)
-            val toMinutes = parseTimeToMinutes(toTime)
+            val cleanTime = timeString.replace(" AM", "").replace(" PM", "").trim()
+            val parts = cleanTime.split(":")
+            val hour = parts[0].toInt()
+            val minute = parts[1].toInt()
 
-            val travelMinutes = if (toMinutes >= fromMinutes) {
-                toMinutes - fromMinutes
+            // Convert to 24-hour format
+            val hour24 = if (timeString.contains("PM") && hour != 12) {
+                hour + 12
+            } else if (timeString.contains("AM") && hour == 12) {
+                0
             } else {
-                // Handle next day arrival
-                (24 * 60 + toMinutes) - fromMinutes
+                hour
             }
 
-            Log.d("[ApiDebug]", "Calculated travel time: $fromTime -> $toTime = $travelMinutes min")
-            "$travelMinutes min"
+            hour24 * 60 + minute
         } catch (e: Exception) {
-            Log.e("[ApiDebug]", "Error calculating travel time from $fromTime to $toTime: ${e.message}")
-            "-- min"
+            Log.e("[ApiDebug]", "Error parsing time to minutes: $timeString")
+            0
         }
     }
 
-    private fun parseTimeToMinutes(time: String): Int {
-        val cleanTime = time.replace("\"", "").trim()
-        val parts = cleanTime.split(":")
-        return parts[0].toInt() * 60 + parts[1].toInt()
+    private fun calculateDestinationTime(sourceTime: String, fromStationIndex: Int, toStationIndex: Int): String {
+        return try {
+            val sourceMinutes = parseTimeToMinutes(sourceTime)
+
+            // Calculate travel time based on station indices
+            val travelMinutes = if (toStationIndex > fromStationIndex) {
+                // Eastbound
+                timeBetween[toStationIndex] - timeBetween[fromStationIndex]
+            } else {
+                // Westbound
+                timeBetween[fromStationIndex] - timeBetween[toStationIndex]
+            }
+
+            val destinationMinutes = sourceMinutes + travelMinutes
+
+            // Convert back to time format
+            val hour = (destinationMinutes / 60) % 24
+            val minute = destinationMinutes % 60
+
+            val amPm = if (hour < 12) "AM" else "PM"
+            val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+
+            String.format("%d:%02d %s", displayHour, minute, amPm)
+        } catch (e: Exception) {
+            Log.e("[ApiDebug]", "Error calculating destination time from $sourceTime: ${e.message}")
+            "--:-- --"
+        }
+    }
+
+    private fun getCurrentTimeInMinutes(): Int {
+        val calendar = Calendar.getInstance()
+        return calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
     }
 
     private fun filterAndSortArrivals(arrivals: List<Arrival>): List<Arrival> {
