@@ -220,8 +220,20 @@ class CsvScheduleParser(private val context: Context) {
                 return String.format("%d:%02d %s", displayHour, minute, amPm)
             }
 
-            // If time is already in HH:mm format
-            if (cleanTime.contains(":")) {
+            // Handle formats like "11:55P" or "6:30A" (partial format from CSV)
+            if (cleanTime.matches(Regex("\\d{1,2}:\\d{2}[AP]"))) {
+                val parts = cleanTime.split(":")
+                val hour = parts[0].toInt()
+                val minuteWithAmPm = parts[1]
+                val minute = minuteWithAmPm.dropLast(1).toInt()
+                val amPm = if (minuteWithAmPm.endsWith("A")) "AM" else "PM"
+
+                val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+                return String.format("%d:%02d %s", displayHour, minute, amPm)
+            }
+
+            // If time is already in HH:mm format (24-hour)
+            if (cleanTime.contains(":") && !cleanTime.contains("A") && !cleanTime.contains("P")) {
                 val parts = cleanTime.split(":")
                 val hour = parts[0].toInt()
                 val minute = parts[1].toInt()
@@ -231,7 +243,7 @@ class CsvScheduleParser(private val context: Context) {
 
                 String.format("%d:%02d %s", displayHour, minute, amPm)
             } else {
-                // If time is in other format, try to parse and convert
+                // If time is already properly formatted, return as is
                 cleanTime
             }
         } catch (e: Exception) {
