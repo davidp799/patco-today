@@ -102,7 +102,9 @@ fun SchedulesScreen(
 
     // Auto-scroll to next arrival when data loads
     LaunchedEffect(uiState.arrivals, uiState.scrollToIndex) {
-        if (uiState.arrivals.isNotEmpty() && uiState.scrollToIndex > 0) {
+        if (uiState.arrivals.isNotEmpty() && uiState.scrollToIndex > 0 && !uiState.isLoading) {
+            // Add a small delay to ensure the list is fully rendered
+            kotlinx.coroutines.delay(300)
             listState.animateScrollToItem(uiState.scrollToIndex)
         }
     }
