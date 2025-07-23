@@ -213,11 +213,7 @@ fun SchedulesScreenPreview() {
             Arrival("10:15 AM", "10:45 AM"),
             Arrival("10:30 AM", "11:00 AM"),
             Arrival("10:45 AM", "11:15 AM"),
-            Arrival("11:00 AM", "11:30 AM"),
-            Arrival("11:15 AM", "11:45 AM"),
-            Arrival("11:30 AM", "12:00 PM"),
-            Arrival("11:45 AM", "12:15 PM"),
-            Arrival("12:00 PM", "12:30 PM")
+            Arrival("11:00 AM", "11:30 AM")
         )
 
         false.SchedulesScreenContent(
@@ -269,10 +265,10 @@ private fun Boolean.SchedulesScreenContent(
         sheetPeekHeight = when {
             !hasSpecialSchedule -> 0.dp
             this -> 48.dp
-            else -> 120.dp
+            else -> 96.dp
         },
         modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
