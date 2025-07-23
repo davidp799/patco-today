@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.SystemBarStyle
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -184,7 +185,7 @@ fun MainScreen() {
     val schedulesUiState by schedulesViewModel.uiState.collectAsState()
 
     // Animate blur effect when refreshing schedules
-    val blurRadius by androidx.compose.animation.core.animateFloatAsState(
+    val blurRadius by animateFloatAsState(
         targetValue = if (currentRoute == "schedules" && schedulesUiState.isRefreshing) 8f else 0f,
         animationSpec = tween(
             durationMillis = 300,
@@ -194,7 +195,7 @@ fun MainScreen() {
     )
 
     // Animate overlay alpha when refreshing schedules
-    val overlayAlpha by androidx.compose.animation.core.animateFloatAsState(
+    val overlayAlpha by animateFloatAsState(
         targetValue = if (currentRoute == "schedules" && schedulesUiState.isRefreshing) 0.3f else 0f,
         animationSpec = tween(
             durationMillis = 300,

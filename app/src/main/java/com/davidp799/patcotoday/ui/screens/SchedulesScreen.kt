@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,16 @@ fun SchedulesScreen(
             initialValue = if (uiState.showSpecialScheduleSheet) SheetValue.PartiallyExpanded else SheetValue.Hidden,
             skipHiddenState = false
         )
+    )
+
+    // Animate blur effect when refreshing schedules
+    val blurRadius by animateFloatAsState(
+        targetValue = if (uiState.isFirstRun && uiState.isWaitingForFirstRunData) 8f else 0f,
+        animationSpec = tween(
+            durationMillis = 300,
+            easing = FastOutSlowInEasing
+        ),
+        label = "main_blur_effect"
     )
 
     // Handle bottom sheet state changes
@@ -148,7 +159,8 @@ fun SchedulesScreen(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 8.dp),
+                            .padding(horizontal = 8.dp)
+                            .blur(radius = blurRadius.dp), // Apply blur only to the shimmer content
                         contentPadding = PaddingValues(bottom = 0.dp)
                     ) {
                         items(18) { index ->
@@ -157,51 +169,6 @@ fun SchedulesScreen(
                                 HorizontalDivider(
                                     modifier = Modifier.alpha(shimmerAlpha),
                                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // Show "Loading initial data..." message for first run
-//                if (uiState.isFirstRun && uiState.isWaitingForFirstRunData) {
-                if (true) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surface), // Add solid background
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Card(
-                            modifier = Modifier
-                                .padding(32.dp)
-                                .fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer // Use surfaceContainer for better contrast
-                            ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(48.dp),
-                                    strokeWidth = 4.dp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Text(
-                                    text = "Loading schedule data...",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    textAlign = TextAlign.Center
-                                )
-                                Text(
-                                    text = "This may take a moment on first launch",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
@@ -229,6 +196,46 @@ fun SchedulesScreen(
                             if (index < uiState.arrivals.size - 1) { // Don't add divider after last item
                                 HorizontalDivider(
                                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Show "Loading initial data..." message for first run - positioned on top of blur
+                if (uiState.isFirstRun && uiState.isWaitingForFirstRunData) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)), // Semi-transparent overlay
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Card(
+                            modifier = Modifier
+                                .padding(32.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(48.dp),
+                                    strokeWidth = 4.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = "Loading schedule data...",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = "This may take a moment on first launch",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
