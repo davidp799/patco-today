@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.SystemBarStyle
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -43,10 +44,37 @@ class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPreferen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        // Get theme preferences to configure system bars
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val themePreference = prefs.getString("device_theme", "3")?.toInt() ?: 3
+        val isSystemInDarkTheme = resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
+                android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+        // Determine if we should use dark theme
+        val useDarkTheme = when (themePreference) {
+            1 -> false // Light theme
+            2 -> true  // Dark theme
+            3 -> isSystemInDarkTheme // Follow system
+            else -> isSystemInDarkTheme
+        }
+
+        // Configure edge-to-edge with proper system bar styles
+        enableEdgeToEdge(
+            statusBarStyle = if (useDarkTheme) {
+                SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
+            },
+            navigationBarStyle = if (useDarkTheme) {
+                SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
+            }
+        )
 
         // Register preference change listener
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.registerOnSharedPreferenceChangeListener(this)
 
         setContent {
