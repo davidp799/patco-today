@@ -9,6 +9,10 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,15 +22,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.preference.PreferenceManager
+import com.davidp799.patcotoday.ui.screens.SchedulesScreenViewModel
 import com.davidp799.patcotoday.ui.theme.PatcoTodayTheme
 import kotlin.random.Random
 
@@ -42,7 +51,7 @@ class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPreferen
 
         setContent {
             PatcoTodayTheme {
-                SettingsScreen()
+                SettingsScreenWithBlur()
             }
         }
     }
@@ -80,14 +89,85 @@ class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPreferen
     }
 }
 
+@Composable
+fun SettingsScreenWithBlur() {
+    // Create ViewModel instance for settings activity
+    val schedulesViewModel: SchedulesScreenViewModel = viewModel()
+    val schedulesUiState by schedulesViewModel.uiState.collectAsState()
+
+    // Animate blur effect when refreshing schedules
+    val blurRadius by animateFloatAsState(
+        targetValue = if (schedulesUiState.isRefreshing) 8f else 0f,
+        animationSpec = tween(
+            durationMillis = 300,
+            easing = FastOutSlowInEasing
+        ),
+        label = "settings_blur_effect"
+    )
+
+    // Animate overlay alpha when refreshing schedules
+    val overlayAlpha by animateFloatAsState(
+        targetValue = if (schedulesUiState.isRefreshing) 0.3f else 0f,
+        animationSpec = tween(
+            durationMillis = 300,
+            easing = FastOutSlowInEasing
+        ),
+        label = "settings_overlay_fade"
+    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        SettingsScreen(schedulesViewModel = schedulesViewModel)
+
+        // Blur overlay when refreshing schedules
+        if (overlayAlpha > 0f) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Color.Black.copy(alpha = overlayAlpha)
+                    )
+            )
+        }
+
+        // Loading indicator on top of blur
+        if (schedulesUiState.isRefreshing) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(48.dp),
+                    strokeWidth = 4.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val sharedPrefs = remember {
         PreferenceManager.getDefaultSharedPreferences(context)
     }
+
+    // Get refresh state for blur effect
+    val schedulesUiState by (schedulesViewModel?.uiState?.collectAsState() ?: remember {
+        mutableStateOf(com.davidp799.patcotoday.ui.screens.SchedulesUiState())
+    })
+
+    // Animate blur effect
+    val blurRadius by animateFloatAsState(
+        targetValue = if (schedulesUiState.isRefreshing) 8f else 0f,
+        animationSpec = tween(
+            durationMillis = 300,
+            easing = FastOutSlowInEasing
+        ),
+        label = "settings_content_blur"
+    )
 
     // State for preferences
     var selectedTheme by remember { mutableIntStateOf(sharedPrefs.getString("device_theme", "3")?.toInt() ?: 3) }
@@ -107,7 +187,9 @@ fun SettingsScreen() {
     )
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .blur(radius = blurRadius.dp),
         topBar = {
             LargeTopAppBar(
                 title = { Text("Settings") },
@@ -178,7 +260,7 @@ fun SettingsScreen() {
                     title = stringResource(R.string.pref_title_updates),
                     summary = stringResource(R.string.pref_summary_updates),
                     onClick = {
-                        Toast.makeText(context, "Your schedules are up to date.", Toast.LENGTH_SHORT).show()
+                        schedulesViewModel?.refreshSchedules()
                     }
                 )
             }

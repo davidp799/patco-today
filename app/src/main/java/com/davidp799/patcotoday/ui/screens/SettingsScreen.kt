@@ -30,7 +30,10 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(
+    navController: NavController,
+    schedulesViewModel: SchedulesScreenViewModel? = null
+) {
     val context = LocalContext.current
     val sharedPrefs = remember {
         context.getSharedPreferences("${context.packageName}_preferences", Context.MODE_PRIVATE)
@@ -121,7 +124,8 @@ fun SettingsScreen(navController: NavController) {
                     title = stringResource(R.string.pref_title_updates),
                     summary = stringResource(R.string.pref_summary_updates),
                     onClick = {
-                        Toast.makeText(context, "Your schedules are up to date.", Toast.LENGTH_SHORT).show()
+                        schedulesViewModel?.refreshSchedules()
+                            ?: Toast.makeText(context, "Your schedules are up to date.", Toast.LENGTH_SHORT).show()
                     }
                 )
             }
