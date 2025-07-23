@@ -9,15 +9,19 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.davidp799.patcotoday.data.repository.ScheduleRepository
 import com.davidp799.patcotoday.ui.components.BottomNavigationBar
 import com.davidp799.patcotoday.ui.components.TopNavigationBar
 import com.davidp799.patcotoday.ui.navigation.Navigation
+import com.davidp799.patcotoday.ui.screens.SchedulesScreenViewModel
 import com.davidp799.patcotoday.ui.theme.PatcoTodayTheme
 import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
@@ -99,8 +103,34 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    // Only create ViewModel when on schedules screen
+    val schedulesViewModel: SchedulesScreenViewModel? = if (currentRoute == "schedules") {
+        viewModel()
+    } else {
+        null
+    }
+
+    val schedulesUiState by schedulesViewModel?.uiState?.collectAsState() ?: run {
+        androidx.compose.runtime.remember {
+            androidx.compose.runtime.mutableStateOf(
+                com.davidp799.patcotoday.ui.screens.SchedulesUiState()
+            )
+        }
+    }
+
     Scaffold(
-        topBar = { TopNavigationBar(navController = navController) },
+        topBar = {
+            TopNavigationBar(
+                navController = navController,
+                onRefreshClick = if (currentRoute == "schedules") {
+                    { schedulesViewModel?.refreshSchedules() }
+                } else null,
+                isRefreshing = schedulesUiState.isRefreshing
+            )
+        },
         bottomBar = { BottomNavigationBar(navController = navController) },
         modifier = Modifier
     ) { innerPadding ->

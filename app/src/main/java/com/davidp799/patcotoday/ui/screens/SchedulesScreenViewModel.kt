@@ -18,7 +18,8 @@ data class SchedulesUiState(
     val toStation: String = "15–16th & Locust",
     val scrollToIndex: Int = 0,
     val errorMessage: String? = null,
-    val hasSpecialSchedule: Boolean = false
+    val hasSpecialSchedule: Boolean = false,
+    val isRefreshing: Boolean = false
 )
 
 class SchedulesScreenViewModel(application: Application) : AndroidViewModel(application) {
@@ -97,6 +98,47 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
         )
         // Reload schedule data when stations change
         loadScheduleData()
+    }
+
+    fun refreshSchedules() {
+        viewModelScope.launch {
+            Log.d("[ApiDebug]", "Manual refresh triggered for schedules")
+            _uiState.value = _uiState.value.copy(isRefreshing = true, errorMessage = null)
+
+            try {
+                // Make API call to fetch and update schedules
+                val result = repository.fetchAndUpdateSchedules()
+
+                result.onSuccess { apiResponse ->
+                    Log.d("[ApiDebug]", "Manual refresh successful, reloading schedule data")
+
+                    // After API call, reload the schedule data from local storage
+                    val arrivals = repository.getScheduleForRoute(
+                        fromStation = _uiState.value.fromStation,
+                        toStation = _uiState.value.toStation
+                    )
+
+                    _uiState.value = _uiState.value.copy(
+                        isRefreshing = false,
+                        arrivals = arrivals,
+                        scrollToIndex = findNextArrival(arrivals),
+                        errorMessage = if (arrivals.isEmpty()) "No schedule data available" else null
+                    )
+                }.onFailure { error ->
+                    Log.e("[ApiDebug]", "Manual refresh failed: ${error.message}")
+                    _uiState.value = _uiState.value.copy(
+                        isRefreshing = false,
+                        errorMessage = "Failed to refresh schedules: ${error.message}"
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("[ApiDebug]", "Exception during manual refresh: ${e.message}", e)
+                _uiState.value = _uiState.value.copy(
+                    isRefreshing = false,
+                    errorMessage = "Failed to refresh schedules"
+                )
+            }
+        }
     }
 
     private fun generateMockArrivals(): List<Arrival> {
