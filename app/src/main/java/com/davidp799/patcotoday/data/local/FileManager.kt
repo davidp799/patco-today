@@ -84,6 +84,10 @@ class FileManager(private val context: Context) {
         }
     }
 
+    suspend fun downloadAndSavePdf(url: String, fileName: String, date: String): Boolean {
+        return downloadAndSaveFile(url, fileName, isSpecial = true, date = date)
+    }
+
     fun getLastModifiedTime(fileName: String): String {
         val file = File(getRegularSchedulesDirectory(), fileName)
         return if (file.exists()) {

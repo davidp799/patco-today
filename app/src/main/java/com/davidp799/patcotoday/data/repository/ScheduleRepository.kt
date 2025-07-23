@@ -57,7 +57,7 @@ class ScheduleRepository(context: Context) {
                     // Download special schedules if available
                     apiResponse.specialSchedules?.let { special ->
                         Log.d("[ApiDebug]", "Special schedules found for date: ${special.scheduleDate}")
-                        downloadSpecialSchedules(special.scheduleDate, special.eastboundUrl, special.westboundUrl)
+                        downloadSpecialSchedules(special.scheduleDate, special.eastboundUrl, special.westboundUrl, special.pdfUrl)
                     }
 
                     // Download regular schedules if updated
@@ -89,7 +89,7 @@ class ScheduleRepository(context: Context) {
         return arrivals
     }
 
-    private suspend fun downloadSpecialSchedules(date: String, eastboundUrl: String, westboundUrl: String) {
+    private suspend fun downloadSpecialSchedules(date: String, eastboundUrl: String, westboundUrl: String, pdfUrl: String) {
         Log.d("[ApiDebug]", "Downloading special schedule - Eastbound from: $eastboundUrl")
         fileManager.downloadAndSaveFile(
             url = eastboundUrl,
@@ -103,6 +103,13 @@ class ScheduleRepository(context: Context) {
             url = westboundUrl,
             fileName = "special_schedule_westbound.csv",
             isSpecial = true,
+            date = date
+        )
+
+        Log.d("[ApiDebug]", "Downloading special schedule PDF from: $pdfUrl")
+        fileManager.downloadAndSavePdf(
+            url = pdfUrl,
+            fileName = "special_schedule.pdf",
             date = date
         )
     }
