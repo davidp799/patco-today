@@ -1,14 +1,17 @@
 package com.davidp799.patcotoday.ui.screens
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -140,8 +143,8 @@ fun SchedulesScreen(
 
             // Schedule list with animated shimmer loading
             Box(modifier = Modifier.fillMaxSize()) {
-                // Shimmer loading state
-                if (uiState.isLoading || shimmerAlpha > 0f) {
+                // Shimmer loading state (for both regular loading and first-run waiting)
+                if (uiState.isLoading || uiState.isWaitingForFirstRunData || shimmerAlpha > 0f) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
@@ -160,8 +163,53 @@ fun SchedulesScreen(
                     }
                 }
 
+                // Show "Loading initial data..." message for first run
+//                if (uiState.isFirstRun && uiState.isWaitingForFirstRunData) {
+                if (true) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surface), // Add solid background
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Card(
+                            modifier = Modifier
+                                .padding(32.dp)
+                                .fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface // Use solid surface color
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(48.dp),
+                                    strokeWidth = 4.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
+                                    text = "Loading schedule data...",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = "This may take a moment on first launch",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // Actual content
-                if (!uiState.isLoading || contentAlpha > 0f) {
+                if (!uiState.isLoading && !uiState.isWaitingForFirstRunData && (contentAlpha > 0f || uiState.arrivals.isNotEmpty())) {
                     LazyColumn(
                         state = listState,
                         modifier = Modifier

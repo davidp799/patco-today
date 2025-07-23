@@ -89,6 +89,10 @@ class ScheduleRepository(context: Context) {
         return arrivals
     }
 
+    fun hasScheduleData(): Boolean {
+        return fileManager.hasScheduleData()
+    }
+
     private suspend fun downloadSpecialSchedules(date: String, eastboundUrl: String, westboundUrl: String, pdfUrl: String) {
         Log.d("[ApiDebug]", "Downloading special schedule - Eastbound from: $eastboundUrl")
         fileManager.downloadAndSaveFile(

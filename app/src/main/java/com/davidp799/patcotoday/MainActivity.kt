@@ -84,9 +84,23 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
         // Make API call once on app start
         lifecycleScope.launch {
             Log.d("[ApiDebug]", "MainActivity: Starting initial API call on app startup")
+
+            // Check if this is a first run
+            val isFirstRun = !prefs.getBoolean("first_run_completed", false)
+            Log.d("[ApiDebug]", "MainActivity: First run detected: $isFirstRun")
+
             scheduleRepository.fetchAndUpdateSchedules()
                 .onSuccess { apiResponse ->
                     Log.d("[ApiDebug]", "MainActivity: Initial API call successful, schedules updated")
+
+                    // If this was a first run, notify any listening ViewModels that data is now available
+                    if (isFirstRun) {
+                        Log.d("[ApiDebug]", "MainActivity: Notifying ViewModels that first-run data is available")
+                        // We'll use a simple broadcast mechanism or shared state
+                        // For now, we'll use SharedPreferences to signal completion
+                        prefs.edit().putBoolean("first_run_completed", true).apply()
+                    }
+
                     // Check if regular schedules were updated
                     val regularSchedules = apiResponse.regularSchedules
                     if (regularSchedules != null) {
@@ -99,6 +113,13 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                 }
                 .onFailure { error ->
                     Log.e("[ApiDebug]", "MainActivity: Initial API call failed: ${error.message}")
+
+                    // Even on failure, if it was a first run, we should signal completion
+                    // so the UI doesn't hang indefinitely
+                    if (isFirstRun) {
+                        Log.d("[ApiDebug]", "MainActivity: First-run API failed, but signaling completion to prevent hanging")
+                        prefs.edit().putLong("first_run_failed", System.currentTimeMillis()).apply()
+                    }
 
                     // Show appropriate error message based on error type
                     val errorMessage = when (error) {

@@ -124,4 +124,22 @@ class FileManager(private val context: Context) {
         Log.d("[ApiDebug]", "Special schedule file exists: $exists, Path: ${file.absolutePath}")
         return if (exists) file else null
     }
+
+    fun hasScheduleData(): Boolean {
+        val requiredFiles = listOf(
+            "weekdays_east.csv",
+            "weekdays_west.csv",
+            "saturdays_east.csv",
+            "saturdays_west.csv",
+            "sundays_east.csv",
+            "sundays_west.csv"
+        )
+
+        val regularDir = getRegularSchedulesDirectory()
+        return requiredFiles.all { fileName ->
+            val file = File(regularDir, fileName)
+            Log.d("[ApiDebug]", "Checking file: ${file.absolutePath}, Exists: ${file.exists()}, Size: ${file.length()}")
+            file.exists() && file.length() > 0
+        }
+    }
 }

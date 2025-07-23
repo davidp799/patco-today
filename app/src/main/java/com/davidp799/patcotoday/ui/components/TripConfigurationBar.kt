@@ -79,7 +79,11 @@ fun TripConfigurationBar(
                         label = { Text("From") },
                         shape = RoundedCornerShape(12.dp),
                         readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = fromExpanded) },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                expanded = fromExpanded
+                            )
+                        },
                         colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -117,7 +121,11 @@ fun TripConfigurationBar(
                         label = { Text("To") },
                         shape = RoundedCornerShape(12.dp),
                         readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = toExpanded) },
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                expanded = toExpanded
+                            )
+                        },
                         colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                         modifier = Modifier
                             .fillMaxWidth()
