@@ -224,4 +224,5 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
         return 0 // Default to first item if no future arrivals found
     }
+
 }
