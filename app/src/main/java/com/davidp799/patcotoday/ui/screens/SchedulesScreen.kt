@@ -128,11 +128,11 @@ fun SchedulesScreen(
             else -> 120.dp
         },
         modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(0.dp)
         ) {
             TripConfigurationBar(
                 fromStation = uiState.fromStation,
@@ -150,7 +150,7 @@ fun SchedulesScreen(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 16.dp),
+                            .padding(horizontal = 8.dp),
                         contentPadding = PaddingValues(bottom = 0.dp)
                     ) {
                         items(18) { index ->
@@ -171,7 +171,7 @@ fun SchedulesScreen(
                         state = listState,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 16.dp)
+                            .padding(horizontal = 8.dp)
                             .alpha(contentAlpha),
                         contentPadding = PaddingValues(bottom = 0.dp)
                     ) {
@@ -276,7 +276,7 @@ private fun Boolean.SchedulesScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(0.dp)
         ) {
             TripConfigurationBar(
                 fromStation = fromStation,
@@ -292,7 +292,7 @@ private fun Boolean.SchedulesScreenContent(
                 state = listState,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 0.dp),
                 contentPadding = PaddingValues(bottom = 0.dp)
             ) {
                 itemsIndexed(arrivals) { index, arrival ->
