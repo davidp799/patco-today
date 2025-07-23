@@ -19,7 +19,10 @@ data class SchedulesUiState(
     val scrollToIndex: Int = 0,
     val errorMessage: String? = null,
     val hasSpecialSchedule: Boolean = false,
-    val isRefreshing: Boolean = false
+    val isRefreshing: Boolean = false,
+    val lastRefreshTime: Long = 0L,
+    val isSpamming: Boolean = false,
+    val lastClickTime: Long = 0L
 )
 
 class SchedulesScreenViewModel(application: Application) : AndroidViewModel(application) {
@@ -101,8 +104,47 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
     }
 
     fun refreshSchedules() {
+        val currentTime = System.currentTimeMillis()
+        val timeSinceLastClick = currentTime - _uiState.value.lastClickTime
+
+        // Update click time first
+        _uiState.value = _uiState.value.copy(lastClickTime = currentTime)
+
+        // Check if user is spam clicking (1 click per second or faster)
+        val isSpamClick = timeSinceLastClick < 1000L && _uiState.value.lastClickTime > 0
+
+        // If spam clicking detected, enter spam mode
+        if (isSpamClick) {
+            Log.d("[ApiDebug]", "Spam clicking detected - entering silent mode")
+            _uiState.value = _uiState.value.copy(isSpamming = true)
+
+            // Schedule spam mode reset after 5 seconds of no clicks
+            viewModelScope.launch {
+                kotlinx.coroutines.delay(5000)
+                // Only reset if 5 seconds have passed since the last click
+                if (System.currentTimeMillis() - _uiState.value.lastClickTime >= 5000) {
+                    Log.d("[ApiDebug]", "Spam mode cooldown complete - returning to normal")
+                    _uiState.value = _uiState.value.copy(isSpamming = false)
+                }
+            }
+        }
+
+        // If in spam mode, fake the refresh but do nothing
+        if (_uiState.value.isSpamming) {
+            Log.d("[ApiDebug]", "In spam mode - performing fake refresh")
+            _uiState.value = _uiState.value.copy(isRefreshing = true)
+
+            // Fake loading time (1-2 seconds)
+            viewModelScope.launch {
+                kotlinx.coroutines.delay((1000..2000).random().toLong())
+                _uiState.value = _uiState.value.copy(isRefreshing = false)
+            }
+            return
+        }
+
+        // Normal refresh logic
         viewModelScope.launch {
-            Log.d("[ApiDebug]", "Manual refresh triggered for schedules")
+            Log.d("[ApiDebug]", "Performing real refresh")
             _uiState.value = _uiState.value.copy(isRefreshing = true, errorMessage = null)
 
             try {
@@ -122,7 +164,8 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                         isRefreshing = false,
                         arrivals = arrivals,
                         scrollToIndex = findNextArrival(arrivals),
-                        errorMessage = if (arrivals.isEmpty()) "No schedule data available" else null
+                        errorMessage = if (arrivals.isEmpty()) "No schedule data available" else null,
+                        lastRefreshTime = System.currentTimeMillis()
                     )
                 }.onFailure { error ->
                     Log.e("[ApiDebug]", "Manual refresh failed: ${error.message}")
@@ -139,38 +182,6 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                 )
             }
         }
-    }
-
-    private fun generateMockArrivals(): List<Arrival> {
-        // Generate mock schedule data for now
-        // TODO: Replace with actual CSV parsing logic
-        val arrivals = mutableListOf<Arrival>()
-        val baseHour = 6
-
-        for (i in 0..23) {
-            val hour = (baseHour + i) % 24
-            val minute = listOf(15, 45).random()
-
-            // Calculate destination time (add 30-50 minutes to source time)
-            val travelMinutes = (30..50).random()
-            val destinationTotalMinutes = (hour * 60 + minute + travelMinutes) % (24 * 60)
-            val destinationHour = destinationTotalMinutes / 60
-            val destinationMinute = destinationTotalMinutes % 60
-
-            // Format source time
-            val sourceAmPm = if (hour < 12) "AM" else "PM"
-            val sourceDisplayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
-            val sourceTimeString = String.format("%d:%02d %s", sourceDisplayHour, minute, sourceAmPm)
-
-            // Format destination time
-            val destAmPm = if (destinationHour < 12) "AM" else "PM"
-            val destDisplayHour = if (destinationHour == 0) 12 else if (destinationHour > 12) destinationHour - 12 else destinationHour
-            val destTimeString = String.format("%d:%02d %s", destDisplayHour, destinationMinute, destAmPm)
-
-            arrivals.add(Arrival(sourceTimeString, destTimeString))
-        }
-
-        return arrivals
     }
 
     private fun findNextArrival(arrivals: List<Arrival>): Int {
