@@ -22,7 +22,8 @@ data class SchedulesUiState(
     val isRefreshing: Boolean = false,
     val lastRefreshTime: Long = 0L,
     val isSpamming: Boolean = false,
-    val lastClickTime: Long = 0L
+    val lastClickTime: Long = 0L,
+    val spamModeStartTime: Long = 0L
 )
 
 class SchedulesScreenViewModel(application: Application) : AndroidViewModel(application) {
@@ -105,36 +106,49 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
     fun refreshSchedules() {
         val currentTime = System.currentTimeMillis()
-        val timeSinceLastClick = currentTime - _uiState.value.lastClickTime
+        val currentState = _uiState.value
 
-        // Update click time first
-        _uiState.value = _uiState.value.copy(lastClickTime = currentTime)
+        // Check if we're currently in spam mode and if enough time has passed to exit
+        if (currentState.isSpamming) {
+            val timeSinceSpamStart = currentTime - currentState.spamModeStartTime
+            if (timeSinceSpamStart >= 5000L) {
+                Log.d("[ApiDebug]", "Spam mode timeout reached - exiting spam mode")
+                _uiState.value = currentState.copy(
+                    isSpamming = false,
+                    lastClickTime = currentTime
+                )
+                // Continue with normal refresh logic below
+            } else {
+                Log.d("[ApiDebug]", "Still in spam mode - performing fake refresh")
+                _uiState.value = currentState.copy(isRefreshing = true)
 
-        // Check if user is spam clicking (1 click per second or faster)
-        val isSpamClick = timeSinceLastClick < 1000L && _uiState.value.lastClickTime > 0
-
-        // If spam clicking detected, enter spam mode
-        if (isSpamClick) {
-            Log.d("[ApiDebug]", "Spam clicking detected - entering silent mode")
-            _uiState.value = _uiState.value.copy(isSpamming = true)
-
-            // Schedule spam mode reset after 5 seconds of no clicks
-            viewModelScope.launch {
-                kotlinx.coroutines.delay(5000)
-                // Only reset if 5 seconds have passed since the last click
-                if (System.currentTimeMillis() - _uiState.value.lastClickTime >= 5000) {
-                    Log.d("[ApiDebug]", "Spam mode cooldown complete - returning to normal")
-                    _uiState.value = _uiState.value.copy(isSpamming = false)
+                // Fake loading time (1-2 seconds)
+                viewModelScope.launch {
+                    kotlinx.coroutines.delay((1000..2000).random().toLong())
+                    _uiState.value = _uiState.value.copy(isRefreshing = false)
                 }
+                return
             }
         }
 
-        // If in spam mode, fake the refresh but do nothing
-        if (_uiState.value.isSpamming) {
-            Log.d("[ApiDebug]", "In spam mode - performing fake refresh")
-            _uiState.value = _uiState.value.copy(isRefreshing = true)
+        val timeSinceLastClick = currentTime - currentState.lastClickTime
 
-            // Fake loading time (1-2 seconds)
+        // Check if user is spam clicking (more than 3 clicks in 3 seconds)
+        val isSpamClick = timeSinceLastClick < 1000L && currentState.lastClickTime > 0
+
+        // Update click time
+        _uiState.value = currentState.copy(lastClickTime = currentTime)
+
+        // If spam clicking detected, enter spam mode
+        if (isSpamClick && !currentState.isSpamming) {
+            Log.d("[ApiDebug]", "Spam clicking detected - entering spam mode for 5 seconds")
+            _uiState.value = _uiState.value.copy(
+                isSpamming = true,
+                spamModeStartTime = currentTime,
+                isRefreshing = true
+            )
+
+            // Fake loading time and return
             viewModelScope.launch {
                 kotlinx.coroutines.delay((1000..2000).random().toLong())
                 _uiState.value = _uiState.value.copy(isRefreshing = false)
