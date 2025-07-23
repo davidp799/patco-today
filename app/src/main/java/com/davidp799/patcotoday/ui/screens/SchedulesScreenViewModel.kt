@@ -23,7 +23,9 @@ data class SchedulesUiState(
     val lastRefreshTime: Long = 0L,
     val isSpamming: Boolean = false,
     val lastClickTime: Long = 0L,
-    val spamModeStartTime: Long = 0L
+    val spamModeStartTime: Long = 0L,
+    val showSpecialScheduleSheet: Boolean = false,
+    val hasUserDismissedSheet: Boolean = false
 )
 
 class SchedulesScreenViewModel(application: Application) : AndroidViewModel(application) {
@@ -65,16 +67,39 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                 toStation = _uiState.value.toStation
             )
 
+            // Check if special schedules exist for today
+            val hasSpecialSchedule = checkForSpecialSchedules()
+
             Log.d("[ApiDebug]", "Retrieved ${arrivals.size} arrivals from local storage")
+            Log.d("[ApiDebug]", "Special schedules detected: $hasSpecialSchedule")
 
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
                 arrivals = arrivals,
-                hasSpecialSchedule = false, // Will be determined by the CSV parser
+                hasSpecialSchedule = hasSpecialSchedule,
+                showSpecialScheduleSheet = hasSpecialSchedule && !_uiState.value.hasUserDismissedSheet,
                 scrollToIndex = findNextArrival(arrivals),
                 errorMessage = if (arrivals.isEmpty()) "No schedule data available" else null
             )
         }
+    }
+
+    private fun checkForSpecialSchedules(): Boolean {
+        val context = getApplication<Application>()
+        val currentDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+
+        // Check if special schedule files exist for today
+        val specialDir = java.io.File(context.filesDir, "schedules/special/$currentDate")
+        val pdfFile = java.io.File(specialDir, "special_schedule.pdf")
+        val eastboundFile = java.io.File(specialDir, "special_schedule_eastbound.csv")
+        val westboundFile = java.io.File(specialDir, "special_schedule_westbound.csv")
+
+        val hasSpecialFiles = pdfFile.exists() || eastboundFile.exists() || westboundFile.exists()
+
+        Log.d("[ApiDebug]", "Checking for special schedules in: ${specialDir.absolutePath}")
+        Log.d("[ApiDebug]", "PDF exists: ${pdfFile.exists()}, Eastbound exists: ${eastboundFile.exists()}, Westbound exists: ${westboundFile.exists()}")
+
+        return hasSpecialFiles
     }
 
     fun updateFromStation(station: String) {
@@ -237,6 +262,65 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
         }
 
         return 0 // Default to first item if no future arrivals found
+    }
+
+    fun dismissSpecialScheduleSheet() {
+        _uiState.value = _uiState.value.copy(
+            showSpecialScheduleSheet = false,
+            hasUserDismissedSheet = true
+        )
+    }
+
+    fun showSpecialScheduleSheet() {
+        _uiState.value = _uiState.value.copy(
+            showSpecialScheduleSheet = true,
+            hasUserDismissedSheet = false
+        )
+    }
+
+    fun openSpecialSchedulePdf() {
+        val context = getApplication<Application>()
+        val currentDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+        val pdfFile = java.io.File(context.filesDir, "schedules/special/$currentDate/special_schedule.pdf")
+
+        if (pdfFile.exists()) {
+            try {
+                val uri = androidx.core.content.FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    pdfFile
+                )
+
+                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "application/pdf")
+                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                }
+
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                Log.e("[ApiDebug]", "Failed to open PDF: ${e.message}")
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = "Failed to open schedule PDF"
+                )
+            }
+        } else {
+            Log.e("[ApiDebug]", "PDF file not found: ${pdfFile.absolutePath}")
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "Schedule PDF not found"
+            )
+        }
+    }
+
+    // Call this when user navigates to schedules screen
+    fun onSchedulesScreenReselected() {
+        val currentState = _uiState.value
+        if (currentState.hasSpecialSchedule && currentState.hasUserDismissedSheet) {
+            // Bring back the sheet in peeking state, not dismissed
+            _uiState.value = currentState.copy(
+                showSpecialScheduleSheet = true,
+                hasUserDismissedSheet = false
+            )
+        }
     }
 
 }

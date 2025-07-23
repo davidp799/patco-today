@@ -147,7 +147,12 @@ fun MainScreen() {
                     isRefreshing = schedulesUiState.isRefreshing
                 )
             },
-            bottomBar = { BottomNavigationBar(navController = navController) },
+            bottomBar = {
+                BottomNavigationBar(
+                    navController = navController,
+                    onSchedulesReselected = { schedulesViewModel.onSchedulesScreenReselected() }
+                )
+            },
             modifier = Modifier.blur(radius = blurRadius.dp)
         ) { innerPadding ->
             Navigation(

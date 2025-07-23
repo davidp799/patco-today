@@ -5,8 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -16,13 +15,40 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.davidp799.patcotoday.ui.components.TripConfigurationBar
 import com.davidp799.patcotoday.ui.components.ScheduleItem
 import com.davidp799.patcotoday.ui.components.ScheduleItemShimmer
+import com.davidp799.patcotoday.ui.components.SpecialScheduleBottomSheet
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SchedulesScreen(
     viewModel: SchedulesScreenViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
+
+    // Bottom sheet state
+    val bottomSheetState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = if (uiState.showSpecialScheduleSheet) SheetValue.PartiallyExpanded else SheetValue.Hidden,
+            skipHiddenState = false
+        )
+    )
+
+    // Handle bottom sheet state changes
+    LaunchedEffect(uiState.showSpecialScheduleSheet) {
+        if (uiState.showSpecialScheduleSheet && !uiState.hasUserDismissedSheet) {
+            // Show as peeking by default, not fully expanded
+            bottomSheetState.bottomSheetState.partialExpand()
+        } else if (!uiState.showSpecialScheduleSheet) {
+            bottomSheetState.bottomSheetState.hide()
+        }
+    }
+
+    // Handle when user manually dismisses sheet
+    LaunchedEffect(bottomSheetState.bottomSheetState.targetValue) {
+        if (bottomSheetState.bottomSheetState.targetValue == SheetValue.Hidden && uiState.showSpecialScheduleSheet) {
+            viewModel.dismissSpecialScheduleSheet()
+        }
+    }
 
     // Function to determine if an arrival is in the past
     fun isArrivalInPast(arrival: com.davidp799.patcotoday.utils.Arrival): Boolean {
@@ -86,60 +112,78 @@ fun SchedulesScreen(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        TripConfigurationBar(
-            fromStation = uiState.fromStation,
-            toStation = uiState.toStation,
-            onFromStationChange = { viewModel.updateFromStation(it) },
-            onToStationChange = { viewModel.updateToStation(it) },
-            onReverseStationsClick = { viewModel.reverseStations() },
-            stations = viewModel.stationOptions
-        )
+    BottomSheetScaffold(
+        scaffoldState = bottomSheetState,
+        sheetContent = {
+            if (uiState.hasSpecialSchedule) {
+                SpecialScheduleBottomSheet(
+                    sheetState = bottomSheetState,
+                    onViewSchedule = { viewModel.openSpecialSchedulePdf() }
+                )
+            }
+        },
+        sheetPeekHeight = if (uiState.hasSpecialSchedule && uiState.hasUserDismissedSheet) 48.dp else 0.dp,
+        modifier = Modifier.fillMaxSize()
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            TripConfigurationBar(
+                fromStation = uiState.fromStation,
+                toStation = uiState.toStation,
+                onFromStationChange = { viewModel.updateFromStation(it) },
+                onToStationChange = { viewModel.updateToStation(it) },
+                onReverseStationsClick = { viewModel.reverseStations() },
+                stations = viewModel.stationOptions
+            )
 
-        // Schedule list with animated shimmer loading
-        Box(modifier = Modifier.fillMaxSize()) {
-            // Shimmer loading state
-            if (uiState.isLoading || shimmerAlpha > 0f) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    contentPadding = PaddingValues(bottom = 96.dp)
-                ) {
-                    items(18) { index ->
-                        ScheduleItemShimmer(alpha = shimmerAlpha)
-                        if (index < 17) { // Don't add divider after last item
-                            HorizontalDivider(
-                                modifier = Modifier.alpha(shimmerAlpha),
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                            )
+            // Schedule list with animated shimmer loading
+            Box(modifier = Modifier.fillMaxSize()) {
+                // Shimmer loading state
+                if (uiState.isLoading || shimmerAlpha > 0f) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        contentPadding = PaddingValues(bottom = 96.dp)
+                    ) {
+                        items(18) { index ->
+                            ScheduleItemShimmer(alpha = shimmerAlpha)
+                            if (index < 17) { // Don't add divider after last item
+                                HorizontalDivider(
+                                    modifier = Modifier.alpha(shimmerAlpha),
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            // Actual content
-            if (!uiState.isLoading || contentAlpha > 0f) {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                        .alpha(contentAlpha),
-                    contentPadding = PaddingValues(bottom = 96.dp)
-                ) {
-                    itemsIndexed(uiState.arrivals) { index, arrival ->
-                        val isPast = isArrivalInPast(arrival)
-                        ScheduleItem(
-                            arrival = arrival,
-                            isHighlighted = index == uiState.scrollToIndex,
-                            isPast = isPast,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        if (index < uiState.arrivals.size - 1) { // Don't add divider after last item
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                // Actual content
+                if (!uiState.isLoading || contentAlpha > 0f) {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp)
+                            .alpha(contentAlpha),
+                        contentPadding = PaddingValues(bottom = 96.dp)
+                    ) {
+                        itemsIndexed(uiState.arrivals) { index, arrival ->
+                            val isPast = isArrivalInPast(arrival)
+                            ScheduleItem(
+                                arrival = arrival,
+                                isHighlighted = index == uiState.scrollToIndex,
+                                isPast = isPast,
+                                modifier = Modifier.fillMaxWidth()
                             )
+                            if (index < uiState.arrivals.size - 1) { // Don't add divider after last item
+                                HorizontalDivider(
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                                )
+                            }
                         }
                     }
                 }
