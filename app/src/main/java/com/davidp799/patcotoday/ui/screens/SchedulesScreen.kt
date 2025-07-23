@@ -16,6 +16,7 @@ import com.davidp799.patcotoday.ui.components.TripConfigurationBar
 import com.davidp799.patcotoday.ui.components.ScheduleItem
 import com.davidp799.patcotoday.ui.components.ScheduleItemShimmer
 import com.davidp799.patcotoday.ui.components.SpecialScheduleBottomSheet
+import com.davidp799.patcotoday.utils.Arrival
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +52,7 @@ fun SchedulesScreen(
     }
 
     // Function to determine if an arrival is in the past
-    fun isArrivalInPast(arrival: com.davidp799.patcotoday.utils.Arrival): Boolean {
+    fun isArrivalInPast(arrival: Arrival): Boolean {
         return try {
             val currentTime = java.util.Calendar.getInstance()
             val currentHour = currentTime.get(java.util.Calendar.HOUR_OF_DAY)
@@ -151,7 +152,7 @@ fun SchedulesScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 16.dp),
-                        contentPadding = PaddingValues(bottom = 96.dp)
+                        contentPadding = PaddingValues(bottom = 0.dp)
                     ) {
                         items(18) { index ->
                             ScheduleItemShimmer(alpha = shimmerAlpha)
@@ -173,7 +174,7 @@ fun SchedulesScreen(
                             .fillMaxSize()
                             .padding(horizontal = 16.dp)
                             .alpha(contentAlpha),
-                        contentPadding = PaddingValues(bottom = 96.dp)
+                        contentPadding = PaddingValues(bottom = 0.dp)
                     ) {
                         itemsIndexed(uiState.arrivals) { index, arrival ->
                             val isPast = isArrivalInPast(arrival)
@@ -200,6 +201,116 @@ fun SchedulesScreen(
 @Composable
 fun SchedulesScreenPreview() {
     MaterialTheme {
-        SchedulesScreen()
+        // Create a mock UI state for preview
+        val mockArrivals = listOf(
+            Arrival("8:15 AM", "8:45 AM"),
+            Arrival("8:30 AM", "9:00 AM"),
+            Arrival("8:45 AM", "9:15 AM"),
+            Arrival("9:00 AM", "9:30 AM"),
+            Arrival("9:15 AM", "9:45 AM"),
+            Arrival("9:30 AM", "10:00 AM"),
+            Arrival("9:45 AM", "10:15 AM"),
+            Arrival("10:00 AM", "10:30 AM"),
+            Arrival("10:15 AM", "10:45 AM"),
+            Arrival("10:30 AM", "11:00 AM"),
+            Arrival("10:45 AM", "11:15 AM"),
+            Arrival("11:00 AM", "11:30 AM"),
+            Arrival("11:15 AM", "11:45 AM"),
+            Arrival("11:30 AM", "12:00 PM"),
+            Arrival("11:45 AM", "12:15 PM"),
+            Arrival("12:00 PM", "12:30 PM")
+        )
+
+        false.SchedulesScreenContent(
+            arrivals = mockArrivals,
+            fromStation = "Lindenwold",
+            toStation = "15–16th & Locust",
+            hasSpecialSchedule = true,
+            stationOptions = listOf("Lindenwold", "15–16th & Locust"),
+            onFromStationChange = { },
+            onToStationChange = { },
+            onReverseStationsClick = { },
+            onOpenSpecialSchedulePdf = { }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun Boolean.SchedulesScreenContent(
+    arrivals: List<Arrival>,
+    fromStation: String,
+    toStation: String,
+    hasSpecialSchedule: Boolean,
+    stationOptions: List<String>,
+    onFromStationChange: (String) -> Unit,
+    onToStationChange: (String) -> Unit,
+    onReverseStationsClick: () -> Unit,
+    onOpenSpecialSchedulePdf: () -> Unit
+) {
+    val listState = rememberLazyListState()
+
+    // Bottom sheet state for preview
+    val bottomSheetState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = if (hasSpecialSchedule && !this) SheetValue.PartiallyExpanded else SheetValue.Hidden,
+            skipHiddenState = false
+        )
+    )
+
+    BottomSheetScaffold(
+        scaffoldState = bottomSheetState,
+        sheetContent = {
+            if (hasSpecialSchedule) {
+                SpecialScheduleBottomSheet(
+                    sheetState = bottomSheetState,
+                    onViewSchedule = onOpenSpecialSchedulePdf
+                )
+            }
+        },
+        sheetPeekHeight = when {
+            !hasSpecialSchedule -> 0.dp
+            this -> 48.dp
+            else -> 120.dp
+        },
+        modifier = Modifier.fillMaxSize()
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            TripConfigurationBar(
+                fromStation = fromStation,
+                toStation = toStation,
+                onFromStationChange = onFromStationChange,
+                onToStationChange = onToStationChange,
+                onReverseStationsClick = onReverseStationsClick,
+                stations = stationOptions
+            )
+
+            // Schedule list
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                contentPadding = PaddingValues(bottom = 0.dp)
+            ) {
+                itemsIndexed(arrivals) { index, arrival ->
+                    ScheduleItem(
+                        arrival = arrival,
+                        isHighlighted = index == 0,
+                        isPast = false,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (index < arrivals.size - 1) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                        )
+                    }
+                }
+            }
+        }
     }
 }
