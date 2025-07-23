@@ -87,12 +87,6 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
             scheduleRepository.fetchAndUpdateSchedules()
                 .onSuccess { apiResponse ->
                     Log.d("[ApiDebug]", "MainActivity: Initial API call successful, schedules updated")
-
-                    // Check for special schedules
-                    if (apiResponse.specialSchedules != null) {
-                        showToast("Special schedules available")
-                    }
-
                     // Check if regular schedules were updated
                     val regularSchedules = apiResponse.regularSchedules
                     if (regularSchedules != null) {
