@@ -177,7 +177,7 @@ fun SchedulesScreen(
                                 .padding(32.dp)
                                 .fillMaxWidth(),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface // Use solid surface color
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer // Use surfaceContainer for better contrast
                             ),
                             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                         ) {
