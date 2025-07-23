@@ -45,7 +45,7 @@ class CsvScheduleParser(private val context: Context) {
             } catch (e: Exception) {
                 Log.e("[ApiDebug]", "Exception parsing schedule for route $fromStation -> $toStation: ${e.message}", e)
                 e.printStackTrace()
-                emptyList<Arrival>()
+                emptyList()
             }
         }
     }
@@ -106,19 +106,18 @@ class CsvScheduleParser(private val context: Context) {
 
             Log.d("[ApiDebug]", "CSV file has ${lines.size} lines")
 
-            // Parse header to find station columns
-            val header = lines[0].split(",").map { it.trim().replace("\"", "") }
-            val fromStationIndex = findStationIndex(header, fromStation)
-            val toStationIndex = findStationIndex(header, toStation)
+            // Get station indices from predefined station list instead of CSV header
+            val fromStationIndex = getStationIndex(fromStation)
+            val toStationIndex = getStationIndex(toStation)
 
             Log.d("[ApiDebug]", "Station indices - From '$fromStation': $fromStationIndex, To '$toStation': $toStationIndex")
 
             if (fromStationIndex == -1 || toStationIndex == -1) {
-                Log.e("[ApiDebug]", "Could not find station columns in CSV header")
+                Log.e("[ApiDebug]", "Could not find station indices for the given stations")
                 return emptyList()
             }
 
-            // Parse data rows
+            // Parse data rows (skip header row)
             var validArrivals = 0
             for (i in 1 until lines.size) {
                 val row = lines[i].split(",").map { it.trim().replace("\"", "") }
@@ -155,38 +154,21 @@ class CsvScheduleParser(private val context: Context) {
         }
     }
 
-    private fun findStationIndex(header: List<String>, stationName: String): Int {
-        // Try exact match first
-        var index = header.indexOf(stationName)
-        if (index != -1) return index
-
-        // Try normalized station name matching
-        val normalizedStation = normalizeStationName(stationName)
-        for (i in header.indices) {
-            if (normalizeStationName(header[i]) == normalizedStation) {
-                return i
-            }
-        }
-
-        return -1
+    private fun getStationIndex(stationName: String): Int {
+        return getStationList().indexOf(stationName)
     }
 
-    private fun normalizeStationName(name: String): String {
-        return name.lowercase()
-            .replace("–", "-")
-            .replace("&", "and")
-            .replace(" ", "")
-            .replace("-", "")
-    }
-
-    private fun determineDirection(fromStation: String, toStation: String): String {
-        val stations = listOf(
+    private fun getStationList(): List<String> {
+        return listOf(
             "Lindenwold", "Ashland", "Woodcrest", "Haddonfield", "Westmont",
             "Collingswood", "Ferry Avenue", "Broadway", "City Hall",
             "Franklin Square", "8th & Market", "9–10th & Locust",
             "12–13th & Locust", "15–16th & Locust"
         )
+    }
 
+    private fun determineDirection(fromStation: String, toStation: String): String {
+        val stations = getStationList()
         val fromIndex = stations.indexOf(fromStation)
         val toIndex = stations.indexOf(toStation)
 
