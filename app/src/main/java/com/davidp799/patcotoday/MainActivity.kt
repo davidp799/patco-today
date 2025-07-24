@@ -36,6 +36,7 @@ import com.davidp799.patcotoday.ui.components.TopNavigationBar
 import com.davidp799.patcotoday.ui.navigation.Navigation
 import com.davidp799.patcotoday.ui.screens.SchedulesScreenViewModel
 import com.davidp799.patcotoday.ui.theme.PatcoTodayTheme
+import com.davidp799.patcotoday.utils.NetworkUtils
 import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -143,12 +144,17 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                                 else "Server error. Using cached schedules."
                             } else {
                                 if (isFirstRun) "Failed to download schedules. Using offline data."
-                                else "Failed to update schedules. Using cached data."
+                                else if (
+                                    NetworkUtils.isOnMobileData(this@MainActivity)
+                                    && !NetworkUtils.isDownloadOnMobileDataEnabled(this@MainActivity)
+                                ) {
+                                    ""
+                                }
+                                else "Working offline."
                             }
                         }
                     }
-
-                    showToast(errorMessage)
+                    if (errorMessage.isNotEmpty()) showToast(errorMessage)
                 }
         }
 
@@ -176,7 +182,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private fun showToast(message: String) {
         runOnUiThread {
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
     }
 }

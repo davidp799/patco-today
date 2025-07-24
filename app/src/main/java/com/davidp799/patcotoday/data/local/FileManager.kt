@@ -2,6 +2,7 @@ package com.davidp799.patcotoday.data.local
 
 import android.content.Context
 import android.util.Log
+import com.davidp799.patcotoday.utils.NetworkUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -46,6 +47,15 @@ class FileManager(private val context: Context) {
     suspend fun downloadAndSaveFile(url: String, fileName: String, isSpecial: Boolean = false, date: String? = null): Boolean {
         return withContext(Dispatchers.IO) {
             try {
+                // Check if network operations are allowed based on mobile data settings
+                if (!NetworkUtils.shouldAllowNetworkOperation(context)) {
+                    Log.d("[ApiDebug]", "File download blocked - on mobile data and user has disabled mobile data downloads")
+                    withContext(Dispatchers.Main) {
+                        NetworkUtils.showMobileDataBlockedToast(context)
+                    }
+                    return@withContext false
+                }
+
                 Log.d("[ApiDebug]", "Starting file download - URL: $url, File: $fileName, Special: $isSpecial, Date: $date")
 
                 val request = Request.Builder().url(url).build()
