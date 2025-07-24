@@ -128,8 +128,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                     // Show appropriate error message based on error type
                     val errorMessage = when (error) {
                         is UnknownHostException -> {
-                            if (isFirstRun) "No internet connection. Using offline schedules."
-                            else "No internet connection. Using cached schedules."
+                            "No internet connection. Working offline."
                         }
                         is SocketTimeoutException -> {
                             if (isFirstRun) "Request timed out. Using offline schedules."
