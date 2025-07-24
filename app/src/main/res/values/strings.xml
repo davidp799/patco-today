@@ -8,13 +8,11 @@
     <string name="pref_title_feedback">Send feedback</string>
     <string name="pref_summary_feedback">Report bugs or suggest features</string>
     <string name="pref_title_version">Version</string>
-    <string name="pref_title_licenses">Open source licenses</string>
-    <string name="pref_summary_licenses">View open source licenses</string>
     <string name="pref_title_updates">Check for updates</string>
     <string name="pref_summary_updates">Check for schedule updates</string>
-    <string name="privacy_title">Privacy Policy</string>
+    <string name="privacy_title">Privacy policy</string>
     <string name="privacy_summary">View our privacy policy</string>
-    <string name="terms_title">Terms &amp; Conditions</string>
+    <string name="terms_title">Terms &amp; conditions</string>
     <string name="terms_summary">View our terms and conditions</string>
     <string name="download_on_mobile_data">Download on mobile data</string>
     <string name="download_on_mobile_data_summary">Allow downloading schedules using mobile data</string>
