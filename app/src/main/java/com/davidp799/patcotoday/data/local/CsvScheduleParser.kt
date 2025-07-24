@@ -75,7 +75,7 @@ class CsvScheduleParser(private val context: Context) {
     private fun parseSpecialSchedule(fromStation: String, toStation: String, date: String): List<Arrival> {
         Log.d("[ApiDebug]", "Checking for special schedule - Date: $date")
         val direction = determineDirection(fromStation, toStation)
-        val fileName = if (direction == "eastbound") {
+        val fileName = if (direction == "east") {
             "special_schedule_eastbound.csv"
         } else {
             "special_schedule_westbound.csv"
