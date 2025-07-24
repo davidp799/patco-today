@@ -11,6 +11,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+enum class SpecialScheduleState {
+    NONE,           // No special schedules found for today
+    AVAILABLE,      // Special schedules are available
+    NETWORK_ERROR,  // Failed to check for special schedules due to network issues
+    LOADING         // Currently checking for special schedules
+}
+
 data class SchedulesUiState(
     val isLoading: Boolean = true,
     val arrivals: List<Arrival> = emptyList(),
@@ -19,6 +26,7 @@ data class SchedulesUiState(
     val scrollToIndex: Int = 0,
     val errorMessage: String? = null,
     val hasSpecialSchedule: Boolean = false,
+    val specialScheduleState: SpecialScheduleState = SpecialScheduleState.LOADING,
     val isRefreshing: Boolean = false,
     val lastRefreshTime: Long = 0L,
     val isSpamming: Boolean = false,
@@ -117,15 +125,6 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-    // Call this method when the first-run API call completes successfully
-    fun onFirstRunDataAvailable() {
-        Log.d("[ApiDebug]", "onFirstRunDataAvailable called")
-        if (_uiState.value.isWaitingForFirstRunData) {
-            _uiState.value = _uiState.value.copy(isWaitingForFirstRunData = false)
-            loadScheduleData()
-        }
-    }
-
     private fun loadScheduleData() {
         viewModelScope.launch {
             Log.d("[ApiDebug]", "Starting to load schedule data for route: ${_uiState.value.fromStation} -> ${_uiState.value.toStation}")
@@ -137,39 +136,49 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                 toStation = _uiState.value.toStation
             )
 
-            // Check if special schedules exist for today
-            val hasSpecialSchedule = checkForSpecialSchedules()
+            // Check special schedule status
+            val specialScheduleState = checkSpecialScheduleStatus()
 
             Log.d("[ApiDebug]", "Retrieved ${arrivals.size} arrivals from local storage")
-            Log.d("[ApiDebug]", "Special schedules detected: $hasSpecialSchedule")
+            Log.d("[ApiDebug]", "Special schedule state: $specialScheduleState")
 
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
                 arrivals = arrivals,
-                hasSpecialSchedule = hasSpecialSchedule,
-                showSpecialScheduleSheet = hasSpecialSchedule && !_uiState.value.hasUserDismissedSheet,
+                hasSpecialSchedule = specialScheduleState == SpecialScheduleState.AVAILABLE,
+                specialScheduleState = specialScheduleState,
+                showSpecialScheduleSheet = !_uiState.value.hasUserDismissedSheet,
                 scrollToIndex = findNextArrival(arrivals),
                 errorMessage = if (arrivals.isEmpty()) "No schedule data available" else null
             )
         }
     }
 
-    private fun checkForSpecialSchedules(): Boolean {
-        val context = getApplication<Application>()
-        val currentDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+    private fun checkSpecialScheduleStatus(): SpecialScheduleState {
+        return try {
+            val context = getApplication<Application>()
+            val currentDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
 
-        // Check if special schedule files exist for today
-        val specialDir = java.io.File(context.filesDir, "schedules/special/$currentDate")
-        val pdfFile = java.io.File(specialDir, "special_schedule.pdf")
-        val eastboundFile = java.io.File(specialDir, "special_schedule_eastbound.csv")
-        val westboundFile = java.io.File(specialDir, "special_schedule_westbound.csv")
+            // Check if special schedule files exist for today
+            val specialDir = java.io.File(context.filesDir, "schedules/special/$currentDate")
+            val pdfFile = java.io.File(specialDir, "special_schedule.pdf")
+            val eastboundFile = java.io.File(specialDir, "special_schedule_eastbound.csv")
+            val westboundFile = java.io.File(specialDir, "special_schedule_westbound.csv")
 
-        val hasSpecialFiles = pdfFile.exists() || eastboundFile.exists() || westboundFile.exists()
+            val hasSpecialFiles = pdfFile.exists() || eastboundFile.exists() || westboundFile.exists()
 
-        Log.d("[ApiDebug]", "Checking for special schedules in: ${specialDir.absolutePath}")
-        Log.d("[ApiDebug]", "PDF exists: ${pdfFile.exists()}, Eastbound exists: ${eastboundFile.exists()}, Westbound exists: ${westboundFile.exists()}")
+            Log.d("[ApiDebug]", "Checking for special schedules in: ${specialDir.absolutePath}")
+            Log.d("[ApiDebug]", "PDF exists: ${pdfFile.exists()}, Eastbound exists: ${eastboundFile.exists()}, Westbound exists: ${westboundFile.exists()}")
 
-        return hasSpecialFiles
+            if (hasSpecialFiles) {
+                SpecialScheduleState.AVAILABLE
+            } else {
+                SpecialScheduleState.NONE
+            }
+        } catch (e: Exception) {
+            Log.e("[ApiDebug]", "Error checking special schedule status: ${e.message}")
+            SpecialScheduleState.NETWORK_ERROR
+        }
     }
 
     fun updateFromStation(station: String) {
@@ -341,13 +350,6 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
         )
     }
 
-    fun showSpecialScheduleSheet() {
-        _uiState.value = _uiState.value.copy(
-            showSpecialScheduleSheet = true,
-            hasUserDismissedSheet = false
-        )
-    }
-
     fun openSpecialSchedulePdf() {
         val context = getApplication<Application>()
         val currentDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
@@ -384,8 +386,11 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
     // Call this when user navigates to schedules screen
     fun onSchedulesScreenReselected() {
         val currentState = _uiState.value
-        if (currentState.hasSpecialSchedule && currentState.hasUserDismissedSheet) {
-            // Bring back the sheet in peeking state, not dismissed
+        if (currentState.hasUserDismissedSheet &&
+            (currentState.specialScheduleState == SpecialScheduleState.AVAILABLE ||
+             currentState.specialScheduleState == SpecialScheduleState.NONE ||
+             currentState.specialScheduleState == SpecialScheduleState.NETWORK_ERROR)) {
+            // Bring back the sheet in peeking state for any special schedule state, not dismissed
             _uiState.value = currentState.copy(
                 showSpecialScheduleSheet = true,
                 hasUserDismissedSheet = false

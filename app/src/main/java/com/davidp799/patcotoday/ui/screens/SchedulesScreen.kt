@@ -130,11 +130,10 @@ fun SchedulesScreen(
     BottomSheetScaffold(
         scaffoldState = bottomSheetState,
         sheetContent = {
-            if (uiState.hasSpecialSchedule) {
-                SpecialScheduleBottomSheet(
-                    onViewSchedule = { viewModel.openSpecialSchedulePdf() }
-                )
-            }
+            SpecialScheduleBottomSheet(
+                specialScheduleState = uiState.specialScheduleState,
+                onViewSchedule = { viewModel.openSpecialSchedulePdf() }
+            )
         },
         modifier = Modifier.fillMaxSize()
     ) {
