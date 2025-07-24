@@ -22,8 +22,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -49,6 +47,7 @@ import java.net.UnknownHostException
 import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -57,7 +56,14 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
     private var firstRunLoadingMessage = mutableStateOf("Loading schedules...")
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Install the splash screen
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        // Keep splash screen visible until app is ready (but not during first launch loading screen)
+        splashScreen.setKeepOnScreenCondition {
+            !isFirstRunComplete.value
+        }
 
         // Get theme preferences to configure system bars
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
@@ -114,8 +120,6 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val isFirstRun = !prefs.getBoolean("first_run_completed", false)
 
-        Log.d("[FirstRunDebug]", "MainActivity: First run detected: $isFirstRun")
-
         if (isFirstRun) {
             // Show appropriate loading message for first run
             firstRunLoadingMessage.value = "Downloading latest schedules..."
@@ -123,8 +127,6 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
             // Perform first run API call and wait for completion
             scheduleRepository.fetchAndUpdateSchedules()
                 .onSuccess { apiResponse ->
-                    Log.d("[FirstRunDebug]", "First run API call successful")
-
                     // Mark first run as completed
                     prefs.edit().putBoolean("first_run_completed", true).apply()
 
@@ -142,7 +144,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                     requestReview()
                 }
                 .onFailure { error ->
-                    Log.e("[FirstRunDebug]", "First run API call failed: ${error.message}")
+                    Log.e("[checkIfFirstRun]", "First run API call failed: ${error.message}")
 
                     // Mark first run as completed anyway so UI can proceed with fallback data
                     prefs.edit()
@@ -180,8 +182,6 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                 }
         } else {
             // Not first run, still make API call but don't block UI
-            Log.d("[FirstRunDebug]", "Not first run - making background API call")
-
             lifecycleScope.launch {
                 scheduleRepository.fetchAndUpdateSchedules()
                     .onSuccess { apiResponse ->

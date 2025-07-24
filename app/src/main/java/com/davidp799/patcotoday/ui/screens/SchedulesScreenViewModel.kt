@@ -248,7 +248,7 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                     if (errorMessage.isNotEmpty()) showToastCallback?.invoke(errorMessage)
                 }
             } catch (e: Exception) {
-                Log.e("[FirstRunDebug]", "Exception during manual refresh: ${e.message}", e)
+                Log.e("[refreshSchedules]", "Exception during manual refresh: ${e.message}", e)
 
                 // Determine the appropriate error message for exceptions
                 val context = getApplication<Application>()
@@ -342,13 +342,13 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
                 context.startActivity(intent)
             } catch (e: Exception) {
-                Log.e("[FirstRunDebug]", "Failed to open PDF: ${e.message}")
+                Log.e("[openSpecialSchedulePdf]", "Failed to open PDF: ${e.message}")
                 _uiState.value = _uiState.value.copy(
                     errorMessage = "Failed to open schedule PDF"
                 )
             }
         } else {
-            Log.e("[FirstRunDebug]", "PDF file not found: ${pdfFile.absolutePath}")
+            Log.e("[openSpecialSchedulePdf]", "PDF file not found: ${pdfFile.absolutePath}")
             _uiState.value = _uiState.value.copy(
                 errorMessage = "Schedule PDF not found"
             )

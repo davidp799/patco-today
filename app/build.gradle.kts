@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.material)
+    implementation(libs.androidx.core.splashscreen)
 
     // Google Play Store review dependency
     implementation(libs.play.review)
