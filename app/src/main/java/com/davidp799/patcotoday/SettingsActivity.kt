@@ -332,20 +332,6 @@ fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
                 )
             }
 
-            // Open Source Licenses
-            item {
-                SettingsItem(
-                    title = stringResource(R.string.pref_title_licenses),
-                    summary = stringResource(R.string.pref_summary_licenses),
-                    onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                            data = Uri.parse("https://www.gnu.org/licenses/")
-                        }
-                        context.startActivity(intent)
-                    }
-                )
-            }
-
             // Privacy Policy
             item {
                 SettingsItem(
