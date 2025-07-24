@@ -16,14 +16,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
@@ -48,6 +53,8 @@ import com.google.android.play.core.review.model.ReviewErrorCode
 class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var scheduleRepository: ScheduleRepository
+    private var isFirstRunComplete = mutableStateOf(false)
+    private var firstRunLoadingMessage = mutableStateOf("Loading schedules...")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,25 +94,45 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
         // Register preference change listener
         prefs.registerOnSharedPreferenceChangeListener(this)
 
-        // Make API call once on app start
+        // Handle first run logic completely before showing main UI
         lifecycleScope.launch {
-            // Check if this is a first run
-            val isFirstRun = !prefs.getBoolean("first_run_completed", false)
-            Log.d("[FirstRunDebug]", "MainActivity: First run detected: $isFirstRun")
+            handleFirstRunAndDataLoading()
+        }
 
+        setContent {
+            PatcoTodayTheme {
+                if (isFirstRunComplete.value) {
+                    MainScreen()
+                } else {
+                    FirstRunLoadingScreen(loadingMessage = firstRunLoadingMessage.value)
+                }
+            }
+        }
+    }
+
+    private suspend fun handleFirstRunAndDataLoading() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val isFirstRun = !prefs.getBoolean("first_run_completed", false)
+
+        Log.d("[FirstRunDebug]", "MainActivity: First run detected: $isFirstRun")
+
+        if (isFirstRun) {
+            // Show appropriate loading message for first run
+            firstRunLoadingMessage.value = "Downloading latest schedules..."
+
+            // Perform first run API call and wait for completion
             scheduleRepository.fetchAndUpdateSchedules()
                 .onSuccess { apiResponse ->
-                    // If this was a first run, notify any listening ViewModels that data is now available
-                    if (isFirstRun) {
-                        // Mark first run as completed
-                        prefs.edit().putBoolean("first_run_completed", true).apply()
-                    }
+                    Log.d("[FirstRunDebug]", "First run API call successful")
+
+                    // Mark first run as completed
+                    prefs.edit().putBoolean("first_run_completed", true).apply()
 
                     // Check if regular schedules were updated
                     val regularSchedules = apiResponse.regularSchedules
                     if (regularSchedules != null) {
                         if (regularSchedules.updated) {
-                            showToast("Schedule data updated successfully")
+                            showToast("Schedule data downloaded successfully")
                         }
                     } else {
                         showToast("Schedule data loaded from cache")
@@ -115,42 +142,34 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                     requestReview()
                 }
                 .onFailure { error ->
-                    Log.e("[checkIfFirstRun]", "MainActivity: Initial API call failed: ${error.message}")
+                    Log.e("[FirstRunDebug]", "First run API call failed: ${error.message}")
 
-                    // If this was a first run and the API failed, mark it completed anyway
-                    // so the UI can proceed with fallback CSV data from assets
-                    if (isFirstRun) {
-                        prefs.edit()
-                            .putBoolean("first_run_completed", true)
-                            .putBoolean("using_fallback_data", true)
-                            .apply()
-                    }
+                    // Mark first run as completed anyway so UI can proceed with fallback data
+                    prefs.edit()
+                        .putBoolean("first_run_completed", true)
+                        .putBoolean("using_fallback_data", true)
+                        .apply()
 
                     // Show appropriate error message based on error type
                     val errorMessage = when (error) {
                         is UnknownHostException -> {
-                            "No internet connection. Working offline."
+                            "No internet connection. Using offline schedules."
                         }
                         is SocketTimeoutException -> {
-                            if (isFirstRun) "Request timed out. Using offline schedules."
-                            else "Request timed out. Using cached schedules."
+                            "Request timed out. Using offline schedules."
                         }
                         else -> {
                             if (error.message?.contains("404") == true) {
-                                if (isFirstRun) "Schedule service unavailable. Using offline schedules."
-                                else "Schedule service unavailable. Using cached schedules."
+                                "Schedule service unavailable. Using offline schedules."
                             } else if (error.message?.contains("500") == true) {
-                                if (isFirstRun) "Server error. Using offline schedules."
-                                else "Server error. Using cached schedules."
+                                "Server error. Using offline schedules."
                             } else {
-                                if (isFirstRun) "Failed to download schedules. Using offline data."
-                                else if (
-                                    NetworkUtils.isOnMobileData(this@MainActivity)
-                                    && !NetworkUtils.isDownloadOnMobileDataEnabled(this@MainActivity)
-                                ) {
-                                    ""
+                                if (NetworkUtils.isOnMobileData(this@MainActivity) &&
+                                    !NetworkUtils.isDownloadOnMobileDataEnabled(this@MainActivity)) {
+                                    "Download on mobile data disabled. Using offline schedules."
+                                } else {
+                                    "Failed to download schedules. Using offline data."
                                 }
-                                else "Working offline."
                             }
                         }
                     }
@@ -159,13 +178,32 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                     // Request app review even on API failure to track visits
                     requestReview()
                 }
-        }
+        } else {
+            // Not first run, still make API call but don't block UI
+            Log.d("[FirstRunDebug]", "Not first run - making background API call")
 
-        setContent {
-            PatcoTodayTheme {
-                MainScreen()
+            lifecycleScope.launch {
+                scheduleRepository.fetchAndUpdateSchedules()
+                    .onSuccess { apiResponse ->
+                        // Check if regular schedules were updated
+                        val regularSchedules = apiResponse.regularSchedules
+                        if (regularSchedules != null) {
+                            if (regularSchedules.updated) {
+                                showToast("Schedule data updated successfully")
+                            }
+                        }
+                        requestReview()
+                    }
+                    .onFailure { error ->
+                        Log.e("[MainActivity]", "Background API call failed: ${error.message}")
+                        // Don't show error messages for background updates unless critical
+                        requestReview()
+                    }
             }
         }
+
+        // Mark first run as complete so UI can be shown
+        isFirstRunComplete.value = true
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -218,6 +256,33 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
             }
         } else {
             sharedPreferencesEditor.putInt(prefVisitNumber, visitNumber + 1).apply()
+        }
+    }
+}
+
+@Composable
+fun FirstRunLoadingScreen(loadingMessage: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(48.dp),
+                strokeWidth = 4.dp,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = loadingMessage,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.davidp799.patcotoday.ui.screens
 
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -11,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,16 +34,6 @@ fun SchedulesScreen(
             initialValue = if (uiState.showSpecialScheduleSheet) SheetValue.PartiallyExpanded else SheetValue.Hidden,
             skipHiddenState = false
         )
-    )
-
-    // Animate blur effect when refreshing schedules
-    val blurRadius by animateFloatAsState(
-        targetValue = if (uiState.isFirstRun && uiState.isWaitingForFirstRunData) 8f else 0f,
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        ),
-        label = "main_blur_effect"
     )
 
     // Handle bottom sheet state changes
@@ -153,13 +141,12 @@ fun SchedulesScreen(
 
             // Schedule list with animated shimmer loading
             Box(modifier = Modifier.fillMaxSize()) {
-                // Shimmer loading state (for both regular loading and first-run waiting)
-                if (uiState.isLoading || uiState.isWaitingForFirstRunData || shimmerAlpha > 0f) {
+                // Shimmer loading state
+                if (uiState.isLoading || shimmerAlpha > 0f) {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 8.dp)
-                            .blur(radius = blurRadius.dp), // Apply blur only to the shimmer content
+                            .padding(horizontal = 8.dp),
                         contentPadding = PaddingValues(bottom = 0.dp)
                     ) {
                         items(18) { index ->
@@ -175,7 +162,7 @@ fun SchedulesScreen(
                 }
 
                 // Actual content
-                if (!uiState.isLoading && !uiState.isWaitingForFirstRunData && (contentAlpha > 0f || uiState.arrivals.isNotEmpty())) {
+                if (!uiState.isLoading && (contentAlpha > 0f || uiState.arrivals.isNotEmpty())) {
                     LazyColumn(
                         state = listState,
                         modifier = Modifier
@@ -201,42 +188,21 @@ fun SchedulesScreen(
                     }
                 }
 
-                // Show "Loading initial data..." message for first run - positioned on top of blur
-                if (uiState.isFirstRun && uiState.isWaitingForFirstRunData) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)), // Semi-transparent overlay
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Card(
-                            modifier = Modifier
-                                .padding(32.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                // Show error message if no data available
+                if (!uiState.isLoading && uiState.arrivals.isEmpty()) {
+                    val errorMessage = uiState.errorMessage
+                    if (errorMessage != null) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Column(
-                                modifier = Modifier.padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(48.dp),
-                                    strokeWidth = 4.dp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Text(
-                                    text = "Loading schedule data...",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    textAlign = TextAlign.Center
-                                )
-                                Text(
-                                    text = "This may take a moment on first launch",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
+                            Text(
+                                text = errorMessage,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(16.dp)
+                            )
                         }
                     }
                 }

@@ -33,9 +33,7 @@ data class SchedulesUiState(
     val lastClickTime: Long = 0L,
     val spamModeStartTime: Long = 0L,
     val showSpecialScheduleSheet: Boolean = false,
-    val hasUserDismissedSheet: Boolean = false,
-    val isFirstRun: Boolean = false,
-    val isWaitingForFirstRunData: Boolean = false
+    val hasUserDismissedSheet: Boolean = false
 )
 
 class SchedulesScreenViewModel(application: Application) : AndroidViewModel(application) {
@@ -66,66 +64,7 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
     )
 
     init {
-        checkFirstRunAndLoadData()
-    }
-
-    private fun checkFirstRunAndLoadData() {
-        viewModelScope.launch {
-            val context = getApplication<Application>()
-            val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
-
-            // Check if first_run_completed is present and equals true
-            val firstRunCompleted = prefs.getBoolean("first_run_completed", false)
-            val isFirstRun = !firstRunCompleted // true if first_run_completed is not present or not true
-
-            Log.d("[FirstRunDebug]", "First run check - first_run_completed: $firstRunCompleted, isFirstRun: $isFirstRun")
-
-            if (isFirstRun) {
-                Log.d("[FirstRunDebug]", "First run detected - setting waiting state")
-                _uiState.value = _uiState.value.copy(
-                    isFirstRun = true,
-                    isWaitingForFirstRunData = true,
-                    isLoading = true
-                )
-                // Don't load schedule data yet, wait for first-run API call to complete
-                waitForFirstRunData()
-            } else {
-                Log.d("[FirstRunDebug]", "Not first run - loading schedule data normally")
-                _uiState.value = _uiState.value.copy(isFirstRun = false)
-                loadScheduleData()
-            }
-        }
-    }
-
-    private suspend fun waitForFirstRunData() {
-        val context = getApplication<Application>()
-        val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
-
-        // Poll every 500ms to check if data is available or if MainActivity signaled completion
-        while (_uiState.value.isWaitingForFirstRunData) {
-            kotlinx.coroutines.delay(500)
-
-            // Check if MainActivity signaled that first-run API completed
-            val firstRunCompleted = prefs.getBoolean("first_run_completed", false)
-            val firstRunFailed = prefs.getBoolean("first_run_failed", false)
-            val hasData = repository.hasScheduleData()
-
-            Log.d("[FirstRunDebug]", "Polling for first-run data - Has data: $hasData, API completed: $firstRunCompleted, API failed: $firstRunFailed")
-
-            if (hasData || firstRunCompleted || firstRunFailed) {
-                Log.d("[FirstRunDebug]", "First-run condition met - proceeding to load schedules")
-                _uiState.value = _uiState.value.copy(isWaitingForFirstRunData = false)
-
-                // Clear the signals to avoid confusion on future runs
-                prefs.edit()
-                    .remove("first_run_completed")
-                    .remove("first_run_failed")
-                    .apply()
-
-                loadScheduleData()
-                break
-            }
-        }
+        loadScheduleData()
     }
 
     private fun loadScheduleData() {
