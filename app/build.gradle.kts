@@ -43,7 +43,7 @@ android {
         release {
             // Use the production API key for release builds
             buildConfigField("String", "API_KEY", "\"ZMz6Y9oU9I9nfPK2PHuR09zN4lYrFdG49it2znq2\"")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
