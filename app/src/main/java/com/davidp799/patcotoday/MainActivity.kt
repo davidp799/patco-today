@@ -17,6 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -195,6 +196,14 @@ fun MainScreen() {
     // Create ViewModel instance once and reuse it
     val schedulesViewModel: SchedulesScreenViewModel = viewModel()
     val schedulesUiState by schedulesViewModel.uiState.collectAsState()
+
+    // Set up toast callback for the ViewModel
+    val context = androidx.compose.ui.platform.LocalContext.current
+    LaunchedEffect(Unit) {
+        schedulesViewModel.setShowToastCallback { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     // Animate blur effect when refreshing schedules
     val blurRadius by animateFloatAsState(

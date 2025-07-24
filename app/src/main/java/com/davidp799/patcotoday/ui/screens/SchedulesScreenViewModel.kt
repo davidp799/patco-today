@@ -45,6 +45,9 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
     private val _uiState = MutableStateFlow(SchedulesUiState())
     val uiState: StateFlow<SchedulesUiState> = _uiState.asStateFlow()
 
+    // Callback for showing toast messages
+    private var showToastCallback: ((String) -> Unit)? = null
+
     val stationOptions = listOf(
         "Lindenwold",
         "Ashland",
@@ -287,17 +290,64 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                     )
                 }.onFailure { error ->
                     Log.e("[ApiDebug]", "Manual refresh failed: ${error.message}")
+
+                    // Determine the appropriate error message based on the failure reason
+                    val context = getApplication<Application>()
+                    val errorMessage = when {
+                        // Check if failure is due to mobile data restrictions
+                        com.davidp799.patcotoday.utils.NetworkUtils.isOnMobileData(context) &&
+                        !com.davidp799.patcotoday.utils.NetworkUtils.isDownloadOnMobileDataEnabled(context) -> {
+                            ""
+                        }
+                        // Other network-related errors
+                        error is java.net.UnknownHostException -> {
+                            "No internet connection. Please check your network and try again."
+                        }
+                        error is java.net.SocketTimeoutException -> {
+                            "Request timed out. Please try again later."
+                        }
+                        error.message?.contains("404") == true -> {
+                            "Schedule service temporarily unavailable. Please try again later."
+                        }
+                        error.message?.contains("500") == true -> {
+                            "Server error occurred. Please try again later."
+                        }
+                        else -> {
+                            "Failed to update schedules. Please try again later."
+                        }
+                    }
+
                     _uiState.value = _uiState.value.copy(
                         isRefreshing = false,
                         errorMessage = "Failed to refresh schedules: ${error.message}"
                     )
+
+                    // Show specific toast message
+                    if (errorMessage.isNotEmpty()) showToastCallback?.invoke(errorMessage)
                 }
             } catch (e: Exception) {
                 Log.e("[ApiDebug]", "Exception during manual refresh: ${e.message}", e)
+
+                // Determine the appropriate error message for exceptions
+                val context = getApplication<Application>()
+                val errorMessage = when {
+                    // Check if exception is due to mobile data restrictions
+                    com.davidp799.patcotoday.utils.NetworkUtils.isOnMobileData(context) &&
+                    !com.davidp799.patcotoday.utils.NetworkUtils.isDownloadOnMobileDataEnabled(context) -> {
+                        "Download on mobile data is disabled. Enable it in settings or connect to Wi-Fi to refresh schedules."
+                    }
+                    else -> {
+                        "Failed to update schedules. Please try again later."
+                    }
+                }
+
                 _uiState.value = _uiState.value.copy(
                     isRefreshing = false,
                     errorMessage = "Failed to refresh schedules"
                 )
+
+                // Show specific toast message
+                showToastCallback?.invoke(errorMessage)
             }
         }
     }
@@ -398,4 +448,8 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
+    // Set the callback for showing toast messages
+    fun setShowToastCallback(callback: (String) -> Unit) {
+        showToastCallback = callback
+    }
 }

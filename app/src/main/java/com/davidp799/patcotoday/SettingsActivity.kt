@@ -172,6 +172,13 @@ fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
         PreferenceManager.getDefaultSharedPreferences(context)
     }
 
+    // Set up toast callback for the ViewModel when available
+    LaunchedEffect(schedulesViewModel) {
+        schedulesViewModel?.setShowToastCallback { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     // Get refresh state for blur effect
     val schedulesUiState by (schedulesViewModel?.uiState?.collectAsState() ?: remember {
         mutableStateOf(com.davidp799.patcotoday.ui.screens.SchedulesUiState())
