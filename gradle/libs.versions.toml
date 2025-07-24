@@ -1,5 +1,6 @@
 [versions]
 agp = "8.6.1"
+animation = "1.8.3"
 converterGson = "2.11.0"
 coreSplashscreen = "1.0.1"
 kotlin = "2.0.0"
@@ -12,6 +13,7 @@ activityCompose = "1.10.1"
 composeBom = "2025.07.00"
 loggingInterceptor = "4.12.0"
 materialIconsExtendedAndroid = "1.7.8"
+materialVersion = "1.8.3"
 navigationCompose = "2.9.2"
 okhttp = "4.12.0"
 preferenceKtx = "1.2.1"
@@ -20,9 +22,11 @@ retrofit = "2.11.0"
 playReview = "2.0.2"
 
 [libraries]
+androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
+androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 androidx-material-icons-extended-android = { module = "androidx.compose.material:material-icons-extended-android", version.ref = "materialIconsExtendedAndroid" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }

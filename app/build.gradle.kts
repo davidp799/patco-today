@@ -85,6 +85,10 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended.android)
 
+    // Add Material Compose animations for transitions
+    implementation(libs.androidx.animation)
+    implementation(libs.androidx.material)
+
     // Add networking and API dependencies
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
