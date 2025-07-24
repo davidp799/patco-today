@@ -78,10 +78,10 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
             val firstRunCompleted = prefs.getBoolean("first_run_completed", false)
             val isFirstRun = !firstRunCompleted // true if first_run_completed is not present or not true
 
-            Log.d("[ApiDebug]", "First run check - first_run_completed: $firstRunCompleted, isFirstRun: $isFirstRun")
+            Log.d("[FirstRunDebug]", "First run check - first_run_completed: $firstRunCompleted, isFirstRun: $isFirstRun")
 
             if (isFirstRun) {
-                Log.d("[ApiDebug]", "First run detected - setting waiting state")
+                Log.d("[FirstRunDebug]", "First run detected - setting waiting state")
                 _uiState.value = _uiState.value.copy(
                     isFirstRun = true,
                     isWaitingForFirstRunData = true,
@@ -90,7 +90,7 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                 // Don't load schedule data yet, wait for first-run API call to complete
                 waitForFirstRunData()
             } else {
-                Log.d("[ApiDebug]", "Not first run - loading schedule data normally")
+                Log.d("[FirstRunDebug]", "Not first run - loading schedule data normally")
                 _uiState.value = _uiState.value.copy(isFirstRun = false)
                 loadScheduleData()
             }
@@ -110,10 +110,10 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
             val firstRunFailed = prefs.getBoolean("first_run_failed", false)
             val hasData = repository.hasScheduleData()
 
-            Log.d("[ApiDebug]", "Polling for first-run data - Has data: $hasData, API completed: $firstRunCompleted, API failed: $firstRunFailed")
+            Log.d("[FirstRunDebug]", "Polling for first-run data - Has data: $hasData, API completed: $firstRunCompleted, API failed: $firstRunFailed")
 
             if (hasData || firstRunCompleted || firstRunFailed) {
-                Log.d("[ApiDebug]", "First-run condition met - proceeding to load schedules")
+                Log.d("[FirstRunDebug]", "First-run condition met - proceeding to load schedules")
                 _uiState.value = _uiState.value.copy(isWaitingForFirstRunData = false)
 
                 // Clear the signals to avoid confusion on future runs
@@ -309,7 +309,7 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                     if (errorMessage.isNotEmpty()) showToastCallback?.invoke(errorMessage)
                 }
             } catch (e: Exception) {
-                Log.e("[ApiDebug]", "Exception during manual refresh: ${e.message}", e)
+                Log.e("[FirstRunDebug]", "Exception during manual refresh: ${e.message}", e)
 
                 // Determine the appropriate error message for exceptions
                 val context = getApplication<Application>()
@@ -403,13 +403,13 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
                 context.startActivity(intent)
             } catch (e: Exception) {
-                Log.e("[ApiDebug]", "Failed to open PDF: ${e.message}")
+                Log.e("[FirstRunDebug]", "Failed to open PDF: ${e.message}")
                 _uiState.value = _uiState.value.copy(
                     errorMessage = "Failed to open schedule PDF"
                 )
             }
         } else {
-            Log.e("[ApiDebug]", "PDF file not found: ${pdfFile.absolutePath}")
+            Log.e("[FirstRunDebug]", "PDF file not found: ${pdfFile.absolutePath}")
             _uiState.value = _uiState.value.copy(
                 errorMessage = "Schedule PDF not found"
             )
