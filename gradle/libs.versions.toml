@@ -1,6 +1,6 @@
 [versions]
 agp = "8.6.1"
-converterGson = "2.9.0"
+converterGson = "2.10.1"
 coreSplashscreen = "1.0.1"
 kotlin = "2.0.0"
 coreKtx = "1.16.0"
@@ -16,7 +16,7 @@ navigationCompose = "2.9.2"
 okhttp = "4.12.0"
 preferenceKtx = "1.2.1"
 material = "1.12.0"
-retrofit = "2.9.0"
+retrofit = "2.11.0"
 playReview = "2.0.2"
 
 [libraries]
