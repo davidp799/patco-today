@@ -94,6 +94,9 @@ dependencies {
     implementation(libs.androidx.preference.ktx)
     implementation(libs.material)
 
+    // Google Play Store review dependency
+    implementation(libs.play.review)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -41,6 +41,9 @@ import com.davidp799.patcotoday.utils.NetworkUtils
 import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import com.google.android.play.core.review.ReviewException
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.google.android.play.core.review.model.ReviewErrorCode
 
 class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -112,6 +115,9 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                     } else {
                         showToast("Schedule data loaded from cache")
                     }
+
+                    // Request app review after successful data load
+                    requestReview()
                 }
                 .onFailure { error ->
                     Log.e("[ApiDebug]", "MainActivity: Initial API call failed: ${error.message}")
@@ -155,6 +161,9 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                         }
                     }
                     if (errorMessage.isNotEmpty()) showToast(errorMessage)
+
+                    // Request app review even on API failure to track visits
+                    requestReview()
                 }
         }
 
@@ -183,6 +192,39 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
     private fun showToast(message: String) {
         runOnUiThread {
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Request Google Play Store app review
+    private fun requestReview() {
+        Log.d("[requestReview]", "started...")
+        val prefVisitNumber = "visit_number"
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val visitNumber = prefs.getInt(prefVisitNumber, 0)
+        val sharedPreferencesEditor = prefs.edit()
+
+        if (visitNumber % 10 == 0) {
+            val reviewManager = ReviewManagerFactory.create(this)
+            val requestReviewFlow = reviewManager.requestReviewFlow()
+            requestReviewFlow.addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val reviewInfo = it.result
+                    val reviewFlow = reviewManager.launchReviewFlow(this, reviewInfo)
+                    reviewFlow.addOnCompleteListener {
+                        sharedPreferencesEditor.putInt(prefVisitNumber, visitNumber + 1).apply()
+                    }
+                } else {
+                    @ReviewErrorCode val reviewErrorCode = (it.exception as? ReviewException)?.errorCode
+                    Log.e(
+                        "[requestReview]",
+                        "reviewErrorCode = $reviewErrorCode"
+                    )
+                    // Still increment visit number even if review request failed
+                    sharedPreferencesEditor.putInt(prefVisitNumber, visitNumber + 1).apply()
+                }
+            }
+        } else {
+            sharedPreferencesEditor.putInt(prefVisitNumber, visitNumber + 1).apply()
         }
     }
 }
