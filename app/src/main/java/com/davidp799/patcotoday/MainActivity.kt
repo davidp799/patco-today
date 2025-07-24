@@ -22,6 +22,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -41,13 +43,15 @@ import com.davidp799.patcotoday.ui.navigation.Navigation
 import com.davidp799.patcotoday.ui.screens.SchedulesScreenViewModel
 import com.davidp799.patcotoday.ui.theme.PatcoTodayTheme
 import com.davidp799.patcotoday.utils.NetworkUtils
-import kotlinx.coroutines.launch
+import com.davidp799.patcotoday.utils.VersionCodeStore
+import com.davidp799.patcotoday.ui.whatsnew.WhatsNewScreen
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -107,10 +111,26 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
 
         setContent {
             PatcoTodayTheme {
-                if (isFirstRunComplete.value) {
-                    MainScreen()
+                var showWhatsNew by remember { mutableStateOf(false) }
+                val context = this
+                LaunchedEffect(Unit) {
+                    val currentVersionCode = BuildConfig.VERSION_CODE
+                    val savedVersionCode = VersionCodeStore.getVersionCode(context)
+                    if (currentVersionCode > savedVersionCode) {
+                        showWhatsNew = true
+                    }
+                }
+                if (showWhatsNew) {
+                    WhatsNewScreen(onDismiss = {
+                        showWhatsNew = false
+                        VersionCodeStore.setVersionCode(context, BuildConfig.VERSION_CODE)
+                    })
                 } else {
-                    FirstRunLoadingScreen(loadingMessage = firstRunLoadingMessage.value)
+                    if (isFirstRunComplete.value) {
+                        MainScreen()
+                    } else {
+                        FirstRunLoadingScreen(loadingMessage = firstRunLoadingMessage.value)
+                    }
                 }
             }
         }
