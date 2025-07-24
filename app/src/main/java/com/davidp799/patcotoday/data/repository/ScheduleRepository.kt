@@ -7,6 +7,7 @@ import com.davidp799.patcotoday.data.local.FileManager
 import com.davidp799.patcotoday.data.local.CsvScheduleParser
 import com.davidp799.patcotoday.data.models.ApiResponse
 import com.davidp799.patcotoday.utils.Arrival
+import com.davidp799.patcotoday.utils.NetworkUtils
 import com.davidp799.patcotoday.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,6 +37,15 @@ class ScheduleRepository(private val context: Context) {
     suspend fun fetchAndUpdateSchedules(): Result<ApiResponse> {
         return withContext(Dispatchers.IO) {
             try {
+                // Check if network operations are allowed based on mobile data settings
+                if (!NetworkUtils.shouldAllowNetworkOperation(context)) {
+                    Log.d("[ApiDebug]", "Network operation blocked - on mobile data and user has disabled mobile data downloads")
+                    withContext(Dispatchers.Main) {
+                        NetworkUtils.showMobileDataBlockedToast(context)
+                    }
+                    return@withContext Result.failure(Exception("Network operation blocked due to mobile data restrictions"))
+                }
+
                 val today = getCurrentDate()
                 val lastUpdated = fileManager.getOldestLastModified()
 
