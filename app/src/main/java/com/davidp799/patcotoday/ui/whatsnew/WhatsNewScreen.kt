@@ -14,7 +14,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.buildAnnotatedString
@@ -31,7 +30,7 @@ fun WhatsNewScreen(onDismiss: () -> Unit) {
 
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background.copy(alpha = 0.95f)
+            color = MaterialTheme.colorScheme.background.copy(alpha = 0.70f) // Reduced from 0.95f to allow fairies to show through
         ) {
             Column(
                 modifier = Modifier
@@ -89,7 +88,10 @@ private fun AnimatedBackground() {
     val primaryColor = MaterialTheme.colorScheme.primary
     val secondaryColor = MaterialTheme.colorScheme.secondary
     val tertiaryColor = MaterialTheme.colorScheme.tertiary
-    val isDarkMode = MaterialTheme.colorScheme.background.luminance() < 0.5f
+
+    // More reliable dark mode detection using background luminance
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val isDarkMode = (backgroundColor.red + backgroundColor.green + backgroundColor.blue) / 3f < 0.5f
 
     // Animation states with varied, fairy-like timing
     val infiniteTransition = rememberInfiniteTransition(label = "background_animation")
@@ -263,8 +265,8 @@ private fun DrawScope.drawFairyLikeBackground(
     val centerY = size.height / 2
     val maxRadius = size.width.coerceAtLeast(size.height) * 0.4f
 
-    // Adjust alpha multiplier based on theme - brighter fairies in dark mode
-    val alphaMultiplier = if (isDarkMode) 1.8f else 1.0f
+    // Adjust alpha multiplier based on theme - more visible fairies in both modes
+    val alphaMultiplier = if (isDarkMode) 2.5f else 2.0f
 
     // Fairy 1 - Primary color, top-left quadrant wandering
     val fairy1X = size.width * 0.25f + floatX1 + cos(Math.toRadians(rotation1.toDouble())).toFloat() * 50f
@@ -274,11 +276,11 @@ private fun DrawScope.drawFairyLikeBackground(
     drawCircle(
         brush = Brush.radialGradient(
             colors = listOf(
-                primaryColor.copy(alpha = 0.20f * pulse1 * alphaMultiplier),
+                primaryColor.copy(alpha = 0.35f * pulse1 * alphaMultiplier),
+                primaryColor.copy(alpha = 0.30f * pulse1 * alphaMultiplier),
+                primaryColor.copy(alpha = 0.25f * pulse1 * alphaMultiplier),
                 primaryColor.copy(alpha = 0.18f * pulse1 * alphaMultiplier),
-                primaryColor.copy(alpha = 0.15f * pulse1 * alphaMultiplier),
                 primaryColor.copy(alpha = 0.10f * pulse1 * alphaMultiplier),
-                primaryColor.copy(alpha = 0.05f * pulse1 * alphaMultiplier),
                 Color.Transparent
             ),
             center = Offset(fairy1X, fairy1Y),
@@ -296,11 +298,11 @@ private fun DrawScope.drawFairyLikeBackground(
     drawCircle(
         brush = Brush.radialGradient(
             colors = listOf(
-                secondaryColor.copy(alpha = 0.22f * pulse2 * alphaMultiplier),
+                secondaryColor.copy(alpha = 0.38f * pulse2 * alphaMultiplier),
+                secondaryColor.copy(alpha = 0.32f * pulse2 * alphaMultiplier),
+                secondaryColor.copy(alpha = 0.27f * pulse2 * alphaMultiplier),
                 secondaryColor.copy(alpha = 0.20f * pulse2 * alphaMultiplier),
-                secondaryColor.copy(alpha = 0.17f * pulse2 * alphaMultiplier),
                 secondaryColor.copy(alpha = 0.12f * pulse2 * alphaMultiplier),
-                secondaryColor.copy(alpha = 0.07f * pulse2 * alphaMultiplier),
                 Color.Transparent
             ),
             center = Offset(fairy2X, fairy2Y),
@@ -318,11 +320,11 @@ private fun DrawScope.drawFairyLikeBackground(
     drawCircle(
         brush = Brush.radialGradient(
             colors = listOf(
-                tertiaryColor.copy(alpha = 0.18f * pulse3 * alphaMultiplier),
-                tertiaryColor.copy(alpha = 0.16f * pulse3 * alphaMultiplier),
-                tertiaryColor.copy(alpha = 0.14f * pulse3 * alphaMultiplier),
-                tertiaryColor.copy(alpha = 0.10f * pulse3 * alphaMultiplier),
-                tertiaryColor.copy(alpha = 0.06f * pulse3 * alphaMultiplier),
+                tertiaryColor.copy(alpha = 0.33f * pulse3 * alphaMultiplier),
+                tertiaryColor.copy(alpha = 0.28f * pulse3 * alphaMultiplier),
+                tertiaryColor.copy(alpha = 0.24f * pulse3 * alphaMultiplier),
+                tertiaryColor.copy(alpha = 0.17f * pulse3 * alphaMultiplier),
+                tertiaryColor.copy(alpha = 0.09f * pulse3 * alphaMultiplier),
                 Color.Transparent
             ),
             center = Offset(fairy3X, fairy3Y),
@@ -340,10 +342,10 @@ private fun DrawScope.drawFairyLikeBackground(
     drawCircle(
         brush = Brush.radialGradient(
             colors = listOf(
-                primaryColor.copy(alpha = 0.15f * pulse1 * alphaMultiplier),
-                primaryColor.copy(alpha = 0.13f * pulse1 * alphaMultiplier),
-                primaryColor.copy(alpha = 0.10f * pulse1 * alphaMultiplier),
-                primaryColor.copy(alpha = 0.06f * pulse1 * alphaMultiplier),
+                primaryColor.copy(alpha = 0.28f * pulse1 * alphaMultiplier),
+                primaryColor.copy(alpha = 0.23f * pulse1 * alphaMultiplier),
+                primaryColor.copy(alpha = 0.18f * pulse1 * alphaMultiplier),
+                primaryColor.copy(alpha = 0.11f * pulse1 * alphaMultiplier),
                 Color.Transparent
             ),
             center = Offset(fairy4X, fairy4Y),
@@ -361,10 +363,10 @@ private fun DrawScope.drawFairyLikeBackground(
     drawCircle(
         brush = Brush.radialGradient(
             colors = listOf(
-                secondaryColor.copy(alpha = 0.16f * pulse2 * alphaMultiplier),
-                secondaryColor.copy(alpha = 0.14f * pulse2 * alphaMultiplier),
-                secondaryColor.copy(alpha = 0.11f * pulse2 * alphaMultiplier),
-                secondaryColor.copy(alpha = 0.07f * pulse2 * alphaMultiplier),
+                secondaryColor.copy(alpha = 0.30f * pulse2 * alphaMultiplier),
+                secondaryColor.copy(alpha = 0.25f * pulse2 * alphaMultiplier),
+                secondaryColor.copy(alpha = 0.20f * pulse2 * alphaMultiplier),
+                secondaryColor.copy(alpha = 0.13f * pulse2 * alphaMultiplier),
                 Color.Transparent
             ),
             center = Offset(fairy5X, fairy5Y),
@@ -382,10 +384,10 @@ private fun DrawScope.drawFairyLikeBackground(
     drawCircle(
         brush = Brush.radialGradient(
             colors = listOf(
-                tertiaryColor.copy(alpha = 0.13f * pulse3 * alphaMultiplier),
-                tertiaryColor.copy(alpha = 0.11f * pulse3 * alphaMultiplier),
-                tertiaryColor.copy(alpha = 0.08f * pulse3 * alphaMultiplier),
-                tertiaryColor.copy(alpha = 0.05f * pulse3 * alphaMultiplier),
+                tertiaryColor.copy(alpha = 0.25f * pulse3 * alphaMultiplier),
+                tertiaryColor.copy(alpha = 0.21f * pulse3 * alphaMultiplier),
+                tertiaryColor.copy(alpha = 0.16f * pulse3 * alphaMultiplier),
+                tertiaryColor.copy(alpha = 0.10f * pulse3 * alphaMultiplier),
                 Color.Transparent
             ),
             center = Offset(fairy6X, fairy6Y),
@@ -399,7 +401,7 @@ private fun DrawScope.drawFairyLikeBackground(
     drawRect(
         brush = Brush.radialGradient(
             colors = listOf(
-                primaryColor.copy(alpha = 0.005f * alphaMultiplier),
+                primaryColor.copy(alpha = 0.01f * alphaMultiplier),
                 Color.Transparent
             ),
             center = Offset(centerX, centerY),
