@@ -49,19 +49,14 @@ class FileManager(private val context: Context) {
             try {
                 // Check if network operations are allowed based on mobile data settings
                 if (!NetworkUtils.shouldAllowNetworkOperation(context)) {
-                    Log.d("[ApiDebug]", "File download blocked - on mobile data and user has disabled mobile data downloads")
                     withContext(Dispatchers.Main) {
                         NetworkUtils.showMobileDataBlockedToast(context)
                     }
                     return@withContext false
                 }
 
-                Log.d("[ApiDebug]", "Starting file download - URL: $url, File: $fileName, Special: $isSpecial, Date: $date")
-
                 val request = Request.Builder().url(url).build()
                 val response = client.newCall(request).execute()
-
-                Log.d("[ApiDebug]", "File download response - Success: ${response.isSuccessful}, Code: ${response.code}, Content Length: ${response.body?.contentLength()}")
 
                 if (response.isSuccessful) {
                     val directory = if (isSpecial && date != null) {
@@ -71,8 +66,6 @@ class FileManager(private val context: Context) {
                     }
 
                     val file = File(directory, fileName)
-                    Log.d("[ApiDebug]", "Saving file to: ${file.absolutePath}")
-
                     val inputStream = response.body?.byteStream()
                     val outputStream = FileOutputStream(file)
 
@@ -80,14 +73,13 @@ class FileManager(private val context: Context) {
                     inputStream?.close()
                     outputStream.close()
 
-                    Log.d("[ApiDebug]", "File saved successfully - Size: ${file.length()} bytes, Path: ${file.absolutePath}")
                     true
                 } else {
-                    Log.e("[ApiDebug]", "File download failed - Code: ${response.code}, URL: $url")
+                    Log.e("[downloadAndSaveFile]", "File download failed - Code: ${response.code}, URL: $url")
                     false
                 }
             } catch (e: Exception) {
-                Log.e("[ApiDebug]", "File download exception for $fileName: ${e.message}", e)
+                Log.e("[downloadAndSaveFile]", "File download exception for $fileName: ${e.message}", e)
                 e.printStackTrace()
                 false
             }
@@ -128,10 +120,8 @@ class FileManager(private val context: Context) {
     }
 
     fun getSpecialScheduleFile(date: String, fileName: String): File? {
-        Log.d("[ApiDebug]", "Looking for special schedule file - Date: $date, File: $fileName")
         val file = File(getSpecialSchedulesDirectory(date), fileName)
         val exists = file.exists()
-        Log.d("[ApiDebug]", "Special schedule file exists: $exists, Path: ${file.absolutePath}")
         return if (exists) file else null
     }
 
@@ -148,7 +138,6 @@ class FileManager(private val context: Context) {
         val regularDir = getRegularSchedulesDirectory()
         return requiredFiles.all { fileName ->
             val file = File(regularDir, fileName)
-            Log.d("[ApiDebug]", "Checking file: ${file.absolutePath}, Exists: ${file.exists()}, Size: ${file.length()}")
             file.exists() && file.length() > 0
         }
     }

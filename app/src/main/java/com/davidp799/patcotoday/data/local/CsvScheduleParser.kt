@@ -22,22 +22,17 @@ class CsvScheduleParser(private val context: Context) {
     ): List<Arrival> {
         return withContext(Dispatchers.IO) {
             try {
-                Log.d("[ApiDebug]", "Parsing schedule for route: $fromStation -> $toStation on $date")
-
                 // Check for special schedule first
                 val specialSchedule = parseSpecialSchedule(fromStation, toStation, date)
                 if (specialSchedule.isNotEmpty()) {
-                    Log.d("[ApiDebug]", "Using special schedule - Found ${specialSchedule.size} arrivals")
                     return@withContext specialSchedule
                 }
 
-                Log.d("[ApiDebug]", "No special schedule found, falling back to regular schedule")
                 // Fall back to regular schedule
                 val regularSchedule = parseRegularSchedule(fromStation, toStation)
-                Log.d("[ApiDebug]", "Regular schedule parsed - Found ${regularSchedule.size} arrivals")
                 regularSchedule
             } catch (e: Exception) {
-                Log.e("[ApiDebug]", "Exception parsing schedule for route $fromStation -> $toStation: ${e.message}", e)
+                Log.e("[CsvScheduleParser]", "Exception parsing schedule for route $fromStation -> $toStation: ${e.message}", e)
                 e.printStackTrace()
                 emptyList()
             }
@@ -53,19 +48,13 @@ class CsvScheduleParser(private val context: Context) {
     ): List<Arrival> {
         return withContext(Dispatchers.IO) {
             try {
-                Log.d("[ApiDebug]", "Parsing schedule from assets for route: $fromStation -> $toStation")
-
                 val dayType = getCurrentDayType()
                 val direction = determineDirection(fromStation, toStation)
                 val fileName = "${dayType}-${direction}.csv"
-
-                Log.d("[ApiDebug]", "Reading from assets file: $fileName")
-
                 val arrivals = parseCsvFromAssets(fileName, fromStation, toStation)
-                Log.d("[ApiDebug]", "Assets schedule parsed - Found ${arrivals.size} arrivals")
                 arrivals
             } catch (e: Exception) {
-                Log.e("[ApiDebug]", "Exception parsing schedule from assets for route $fromStation -> $toStation: ${e.message}", e)
+                Log.e("[parseScheduleFromAssets]", "Exception parsing schedule from assets for route $fromStation -> $toStation: ${e.message}", e)
                 e.printStackTrace()
                 emptyList()
             }
@@ -73,7 +62,6 @@ class CsvScheduleParser(private val context: Context) {
     }
 
     private fun parseSpecialSchedule(fromStation: String, toStation: String, date: String): List<Arrival> {
-        Log.d("[ApiDebug]", "Checking for special schedule - Date: $date")
         val direction = determineDirection(fromStation, toStation)
         val fileName = if (direction == "east") {
             "special_schedule_eastbound.csv"
@@ -81,14 +69,10 @@ class CsvScheduleParser(private val context: Context) {
             "special_schedule_westbound.csv"
         }
 
-        Log.d("[ApiDebug]", "Looking for special schedule file: $fileName for direction: $direction")
-
         val specialFile = fileManager.getSpecialScheduleFile(date, fileName)
         return if (specialFile != null && specialFile.exists()) {
-            Log.d("[ApiDebug]", "Special schedule file found, parsing arrivals")
             parseCsvFile(specialFile, fromStation, toStation)
         } else {
-            Log.d("[ApiDebug]", "No special schedule file found")
             emptyList()
         }
     }
@@ -98,16 +82,13 @@ class CsvScheduleParser(private val context: Context) {
         val direction = determineDirection(fromStation, toStation)
         val fileName = "${dayType}_${direction}.csv"
 
-        Log.d("[ApiDebug]", "Parsing regular schedule - Day type: $dayType, Direction: $direction, File: $fileName")
-
         val schedulesDir = File(context.filesDir, "schedules/regular")
         val file = File(schedulesDir, fileName)
 
         return if (file.exists()) {
-            Log.d("[ApiDebug]", "Regular schedule file found, parsing arrivals from: ${file.absolutePath}")
             parseCsvFile(file, fromStation, toStation)
         } else {
-            Log.w("[ApiDebug]", "Regular schedule file not found: ${file.absolutePath}")
+            Log.w("[parseRegularSchedule]", "Regular schedule file not found: ${file.absolutePath}")
             emptyList()
         }
     }
@@ -117,26 +98,21 @@ class CsvScheduleParser(private val context: Context) {
         val isSpecialScheduleFile = file.name.contains("special_schedule")
 
         try {
-            Log.d("[ApiDebug]", "Starting CSV parsing for file: ${file.name} (Special: $isSpecialScheduleFile)")
             val reader = BufferedReader(FileReader(file))
             val lines = reader.readLines()
             reader.close()
 
             if (lines.isEmpty()) {
-                Log.w("[ApiDebug]", "CSV file is empty: ${file.name}")
+                Log.w("[parseCsvFile]", "CSV file is empty: ${file.name}")
                 return emptyList()
             }
-
-            Log.d("[ApiDebug]", "CSV file has ${lines.size} lines")
 
             // Get station indices from predefined station list instead of CSV header
             val fromStationIndex = getStationIndex(fromStation)
             val toStationIndex = getStationIndex(toStation)
 
-            Log.d("[ApiDebug]", "Station indices - From '$fromStation': $fromStationIndex, To '$toStation': $toStationIndex")
-
             if (fromStationIndex == -1 || toStationIndex == -1) {
-                Log.e("[ApiDebug]", "Could not find station indices for the given stations")
+                Log.e("[parseCsvFile]", "Could not find station indices for the given stations")
                 return emptyList()
             }
 
@@ -164,7 +140,6 @@ class CsvScheduleParser(private val context: Context) {
                             val isSpecialLine = specialFlag == "true"
                             if (isSpecialLine) {
                                 specialArrivals++
-                                Log.d("[ApiDebug]", "Found special arrival: $formattedFromTime -> $formattedToTime")
                             }
                             isSpecialLine
                         } else {
@@ -181,19 +156,12 @@ class CsvScheduleParser(private val context: Context) {
                 }
             }
 
-            Log.d("[ApiDebug]", "Parsed $validArrivals valid arrivals from ${lines.size} data rows")
-            if (isSpecialScheduleFile) {
-                Log.d("[ApiDebug]", "Found $specialArrivals special schedule arrivals out of $validArrivals total")
-            }
-
             // Filter future arrivals and sort by time
             val filteredArrivals = filterAndSortArrivals(arrivals)
-            Log.d("[ApiDebug]", "After filtering for future arrivals: ${filteredArrivals.size} arrivals remaining")
-
             return filteredArrivals
 
         } catch (e: Exception) {
-            Log.e("[ApiDebug]", "Exception parsing CSV file ${file.name}: ${e.message}", e)
+            Log.e("[parseCsvFile]", "Exception parsing CSV file ${file.name}: ${e.message}", e)
             e.printStackTrace()
             return emptyList()
         }
@@ -203,26 +171,21 @@ class CsvScheduleParser(private val context: Context) {
         val arrivals = mutableListOf<Arrival>()
 
         try {
-            Log.d("[ApiDebug]", "Starting CSV parsing from assets for file: $fileName")
             val inputStream = context.assets.open(fileName)
             val lines = inputStream.bufferedReader().readLines()
             inputStream.close()
 
             if (lines.isEmpty()) {
-                Log.w("[ApiDebug]", "Assets CSV file is empty: $fileName")
+                Log.w("[parseCsvFromAssets]", "Assets CSV file is empty: $fileName")
                 return emptyList()
             }
-
-            Log.d("[ApiDebug]", "Assets CSV file has ${lines.size} lines")
 
             // Get station indices from predefined station list
             val fromStationIndex = getStationIndex(fromStation)
             val toStationIndex = getStationIndex(toStation)
 
-            Log.d("[ApiDebug]", "Station indices - From '$fromStation': $fromStationIndex, To '$toStation': $toStationIndex")
-
             if (fromStationIndex == -1 || toStationIndex == -1) {
-                Log.e("[ApiDebug]", "Could not find station indices for the given stations")
+                Log.e("[parseCsvFromAssets]", "Could not find station indices for the given stations")
                 return emptyList()
             }
 
@@ -251,11 +214,8 @@ class CsvScheduleParser(private val context: Context) {
                     }
                 }
             }
-
-            Log.d("[ApiDebug]", "Successfully parsed $validArrivals arrivals from assets file: $fileName")
-
         } catch (e: Exception) {
-            Log.e("[ApiDebug]", "Error parsing CSV from assets file $fileName: ${e.message}", e)
+            Log.e("[parseCsvFromAssets]", "Error parsing CSV from assets file $fileName: ${e.message}", e)
         }
 
         return arrivals
@@ -351,19 +311,12 @@ class CsvScheduleParser(private val context: Context) {
                 cleanTime
             }
         } catch (e: Exception) {
-            Log.e("[ApiDebug]", "Error formatting time $time: ${e.message}")
+            Log.e("[formatTime]", "Error formatting time $time: ${e.message}")
             time // Return original if parsing fails
         }
     }
 
     private fun filterAndSortArrivals(arrivals: List<Arrival>): List<Arrival> {
-        val currentTime = Calendar.getInstance()
-        val currentHour = currentTime.get(Calendar.HOUR_OF_DAY)
-        val currentMinute = currentTime.get(Calendar.MINUTE)
-        val currentTotalMinutes = currentHour * 60 + currentMinute
-
-        Log.d("[ApiDebug]", "Filtering arrivals - Current time: $currentHour:$currentMinute ($currentTotalMinutes minutes)")
-
         // Sort all arrivals by time (don't filter out past arrivals anymore)
         val sortedArrivals = arrivals.sortedBy { arrival ->
             try {
@@ -382,12 +335,10 @@ class CsvScheduleParser(private val context: Context) {
                 }
                 hour24 * 60 + minute
             } catch (e: Exception) {
-                Log.e("[ApiDebug]", "Error sorting arrival time ${arrival.arrivalTime}: ${e.message}")
+                Log.e("[filterAndSortArrivals]", "Error sorting arrival time ${arrival.arrivalTime}: ${e.message}")
                 0
             }
         }
-
-        Log.d("[ApiDebug]", "Sorted all arrivals: ${sortedArrivals.size} total arrivals")
         return sortedArrivals
     }
 }

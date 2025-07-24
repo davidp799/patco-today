@@ -130,7 +130,6 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
     private fun loadScheduleData() {
         viewModelScope.launch {
-            Log.d("[ApiDebug]", "Starting to load schedule data for route: ${_uiState.value.fromStation} -> ${_uiState.value.toStation}")
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
             // Only get schedule data from local storage, no API call
@@ -141,10 +140,6 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
             // Check special schedule status
             val specialScheduleState = checkSpecialScheduleStatus()
-
-            Log.d("[ApiDebug]", "Retrieved ${arrivals.size} arrivals from local storage")
-            Log.d("[ApiDebug]", "Special schedule state: $specialScheduleState")
-
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
                 arrivals = arrivals,
@@ -170,29 +165,24 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
             val hasSpecialFiles = pdfFile.exists() || eastboundFile.exists() || westboundFile.exists()
 
-            Log.d("[ApiDebug]", "Checking for special schedules in: ${specialDir.absolutePath}")
-            Log.d("[ApiDebug]", "PDF exists: ${pdfFile.exists()}, Eastbound exists: ${eastboundFile.exists()}, Westbound exists: ${westboundFile.exists()}")
-
             if (hasSpecialFiles) {
                 SpecialScheduleState.AVAILABLE
             } else {
                 SpecialScheduleState.NONE
             }
         } catch (e: Exception) {
-            Log.e("[ApiDebug]", "Error checking special schedule status: ${e.message}")
+            Log.e("[checkSpecialScheduleStatus]", "Error checking special schedule status: ${e.message}")
             SpecialScheduleState.NETWORK_ERROR
         }
     }
 
     fun updateFromStation(station: String) {
-        Log.d("[ApiDebug]", "Updating from station: ${_uiState.value.fromStation} -> $station")
         _uiState.value = _uiState.value.copy(fromStation = station)
         // Reload schedule data when stations change
         loadScheduleData()
     }
 
     fun updateToStation(station: String) {
-        Log.d("[ApiDebug]", "Updating to station: ${_uiState.value.toStation} -> $station")
         _uiState.value = _uiState.value.copy(toStation = station)
         // Reload schedule data when stations change
         loadScheduleData()
@@ -201,7 +191,6 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
     fun reverseStations() {
         val currentFrom = _uiState.value.fromStation
         val currentTo = _uiState.value.toStation
-        Log.d("[ApiDebug]", "Reversing stations: $currentFrom <-> $currentTo")
 
         _uiState.value = _uiState.value.copy(
             fromStation = currentTo,
@@ -219,14 +208,12 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
         if (currentState.isSpamming) {
             val timeSinceSpamStart = currentTime - currentState.spamModeStartTime
             if (timeSinceSpamStart >= 5000L) {
-                Log.d("[ApiDebug]", "Spam mode timeout reached - exiting spam mode")
                 _uiState.value = currentState.copy(
                     isSpamming = false,
                     lastClickTime = currentTime
                 )
                 // Continue with normal refresh logic below
             } else {
-                Log.d("[ApiDebug]", "Still in spam mode - performing fake refresh")
                 _uiState.value = currentState.copy(isRefreshing = true)
 
                 // Fake loading time (1-2 seconds)
@@ -248,7 +235,6 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
         // If spam clicking detected, enter spam mode
         if (isSpamClick && !currentState.isSpamming) {
-            Log.d("[ApiDebug]", "Spam clicking detected - entering spam mode for 5 seconds")
             _uiState.value = _uiState.value.copy(
                 isSpamming = true,
                 spamModeStartTime = currentTime,
@@ -265,7 +251,6 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
         // Normal refresh logic
         viewModelScope.launch {
-            Log.d("[ApiDebug]", "Performing real refresh")
             _uiState.value = _uiState.value.copy(isRefreshing = true, errorMessage = null)
 
             try {
@@ -273,8 +258,6 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                 val result = repository.fetchAndUpdateSchedules()
 
                 result.onSuccess {
-                    Log.d("[ApiDebug]", "Manual refresh successful, reloading schedule data")
-
                     // After API call, reload the schedule data from local storage
                     val arrivals = repository.getScheduleForRoute(
                         fromStation = _uiState.value.fromStation,
@@ -289,7 +272,7 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                         lastRefreshTime = System.currentTimeMillis()
                     )
                 }.onFailure { error ->
-                    Log.e("[ApiDebug]", "Manual refresh failed: ${error.message}")
+                    Log.e("[refreshSchedules]", "Manual refresh failed: ${error.message}")
 
                     // Determine the appropriate error message based on the failure reason
                     val context = getApplication<Application>()

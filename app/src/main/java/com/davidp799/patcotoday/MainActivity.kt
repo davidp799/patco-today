@@ -89,19 +89,14 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
 
         // Make API call once on app start
         lifecycleScope.launch {
-            Log.d("[ApiDebug]", "MainActivity: Starting initial API call on app startup")
-
             // Check if this is a first run
             val isFirstRun = !prefs.getBoolean("first_run_completed", false)
-            Log.d("[ApiDebug]", "MainActivity: First run detected: $isFirstRun")
+            Log.d("[FirstRunDebug]", "MainActivity: First run detected: $isFirstRun")
 
             scheduleRepository.fetchAndUpdateSchedules()
                 .onSuccess { apiResponse ->
-                    Log.d("[ApiDebug]", "MainActivity: Initial API call successful, schedules updated")
-
                     // If this was a first run, notify any listening ViewModels that data is now available
                     if (isFirstRun) {
-                        Log.d("[ApiDebug]", "MainActivity: Notifying ViewModels that first-run data is available")
                         // Mark first run as completed
                         prefs.edit().putBoolean("first_run_completed", true).apply()
                     }
@@ -120,12 +115,11 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                     requestReview()
                 }
                 .onFailure { error ->
-                    Log.e("[ApiDebug]", "MainActivity: Initial API call failed: ${error.message}")
+                    Log.e("[checkIfFirstRun]", "MainActivity: Initial API call failed: ${error.message}")
 
                     // If this was a first run and the API failed, mark it completed anyway
                     // so the UI can proceed with fallback CSV data from assets
                     if (isFirstRun) {
-                        Log.d("[ApiDebug]", "MainActivity: First-run API failed, marking as completed to enable CSV fallback")
                         prefs.edit()
                             .putBoolean("first_run_completed", true)
                             .putBoolean("using_fallback_data", true)
@@ -197,7 +191,6 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
 
     // Request Google Play Store app review
     private fun requestReview() {
-        Log.d("[requestReview]", "started...")
         val prefVisitNumber = "visit_number"
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val visitNumber = prefs.getInt(prefVisitNumber, 0)
