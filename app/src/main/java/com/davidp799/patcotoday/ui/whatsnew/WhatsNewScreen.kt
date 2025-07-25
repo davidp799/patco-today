@@ -24,13 +24,18 @@ import kotlin.math.sin
 
 @Composable
 fun WhatsNewScreen(onDismiss: () -> Unit) {
+    // Detect dark mode using background luminance
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val isDarkMode = (backgroundColor.red + backgroundColor.green + backgroundColor.blue) / 3f < 0.5f
+    val overlayAlpha = if (isDarkMode) 0.80f else 0.70f
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Animated background
         AnimatedBackground()
 
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background.copy(alpha = 0.70f) // Reduced from 0.95f to allow fairies to show through
+            color = MaterialTheme.colorScheme.background.copy(alpha = overlayAlpha)
         ) {
             Column(
                 modifier = Modifier
@@ -40,7 +45,7 @@ fun WhatsNewScreen(onDismiss: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "What's New",
+                    text = "What's New ✨",
                     style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
