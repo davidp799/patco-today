@@ -59,7 +59,7 @@ fun WhatsNewScreen(onDismiss: () -> Unit) {
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                             append("Bottom Sheet:")
                         }
-                        append("\nThe bottom sheet on the 'Schedules' screen now displays general scheduling information and a link to any PDF attachments.\n\n")
+                        append("\nThe bottom sheet on the schedules screen now displays general scheduling information and a link to any PDF attachments.\n\n")
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                             append("Refresh button:")
                         }
