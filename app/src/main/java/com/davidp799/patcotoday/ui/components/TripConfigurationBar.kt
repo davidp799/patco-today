@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -26,6 +27,9 @@ fun TripConfigurationBar(
 ) {
     var fromExpanded by remember { mutableStateOf(false) }
     var toExpanded by remember { mutableStateOf(false) }
+
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.screenWidthDp > configuration.screenHeightDp
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -60,91 +64,184 @@ fun TripConfigurationBar(
                 )
             }
 
-            Column(
-                modifier = Modifier
-                    .weight(0.70f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // From Station Dropdown
-                ExposedDropdownMenuBox(
-                    expanded = fromExpanded,
-                    onExpandedChange = { fromExpanded = !fromExpanded },
+            // Conditional layout based on orientation
+            if (isLandscape) {
+                // Landscape: Side by side layout
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp)
+                        .weight(0.70f)
+                        .padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedTextField(
-                        value = fromStation,
-                        onValueChange = onFromStationChange,
-                        label = { Text("From") },
-                        shape = RoundedCornerShape(12.dp),
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                expanded = fromExpanded
-                            )
-                        },
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor()
-                    )
-
-                    ExposedDropdownMenu(
+                    // From Station Dropdown
+                    ExposedDropdownMenuBox(
                         expanded = fromExpanded,
-                        onDismissRequest = { fromExpanded = false },
-                        modifier = Modifier.exposedDropdownSize()
+                        onExpandedChange = { fromExpanded = !fromExpanded },
+                        modifier = Modifier.weight(1f)
                     ) {
-                        stations.forEach { station ->
-                            DropdownMenuItem(
-                                text = { Text(station) },
-                                onClick = {
-                                    onFromStationChange(station)
-                                    fromExpanded = false
-                                }
-                            )
+                        OutlinedTextField(
+                            value = fromStation,
+                            onValueChange = onFromStationChange,
+                            label = { Text("From") },
+                            shape = RoundedCornerShape(12.dp),
+                            readOnly = true,
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = fromExpanded
+                                )
+                            },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = fromExpanded,
+                            onDismissRequest = { fromExpanded = false },
+                            modifier = Modifier.exposedDropdownSize()
+                        ) {
+                            stations.forEach { station ->
+                                DropdownMenuItem(
+                                    text = { Text(station) },
+                                    onClick = {
+                                        onFromStationChange(station)
+                                        fromExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    // To Station Dropdown
+                    ExposedDropdownMenuBox(
+                        expanded = toExpanded,
+                        onExpandedChange = { toExpanded = !toExpanded },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        OutlinedTextField(
+                            value = toStation,
+                            onValueChange = onToStationChange,
+                            label = { Text("To") },
+                            shape = RoundedCornerShape(12.dp),
+                            readOnly = true,
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = toExpanded
+                                )
+                            },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = toExpanded,
+                            onDismissRequest = { toExpanded = false },
+                            modifier = Modifier.exposedDropdownSize()
+                        ) {
+                            stations.forEach { station ->
+                                DropdownMenuItem(
+                                    text = { Text(station) },
+                                    onClick = {
+                                        onToStationChange(station)
+                                        toExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
-
-                // To Station Dropdown
-                ExposedDropdownMenuBox(
-                    expanded = toExpanded,
-                    onExpandedChange = { toExpanded = !toExpanded },
+            } else {
+                // Portrait: Vertical layout (original)
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp)
+                        .weight(0.70f),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    OutlinedTextField(
-                        value = toStation,
-                        onValueChange = onToStationChange,
-                        label = { Text("To") },
-                        shape = RoundedCornerShape(12.dp),
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                expanded = toExpanded
-                            )
-                        },
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                    // From Station Dropdown
+                    ExposedDropdownMenuBox(
+                        expanded = fromExpanded,
+                        onExpandedChange = { fromExpanded = !fromExpanded },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor()
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = toExpanded,
-                        onDismissRequest = { toExpanded = false },
-                        modifier = Modifier.exposedDropdownSize()
+                            .padding(horizontal = 10.dp)
                     ) {
-                        stations.forEach { station ->
-                            DropdownMenuItem(
-                                text = { Text(station) },
-                                onClick = {
-                                    onToStationChange(station)
-                                    toExpanded = false
-                                }
-                            )
+                        OutlinedTextField(
+                            value = fromStation,
+                            onValueChange = onFromStationChange,
+                            label = { Text("From") },
+                            shape = RoundedCornerShape(12.dp),
+                            readOnly = true,
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = fromExpanded
+                                )
+                            },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = fromExpanded,
+                            onDismissRequest = { fromExpanded = false },
+                            modifier = Modifier.exposedDropdownSize()
+                        ) {
+                            stations.forEach { station ->
+                                DropdownMenuItem(
+                                    text = { Text(station) },
+                                    onClick = {
+                                        onFromStationChange(station)
+                                        fromExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    // To Station Dropdown
+                    ExposedDropdownMenuBox(
+                        expanded = toExpanded,
+                        onExpandedChange = { toExpanded = !toExpanded },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 10.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = toStation,
+                            onValueChange = onToStationChange,
+                            label = { Text("To") },
+                            shape = RoundedCornerShape(12.dp),
+                            readOnly = true,
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = toExpanded
+                                )
+                            },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = toExpanded,
+                            onDismissRequest = { toExpanded = false },
+                            modifier = Modifier.exposedDropdownSize()
+                        ) {
+                            stations.forEach { station ->
+                                DropdownMenuItem(
+                                    text = { Text(station) },
+                                    onClick = {
+                                        onToStationChange(station)
+                                        toExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
