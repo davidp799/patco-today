@@ -1,5 +1,6 @@
 package com.davidp799.patcotoday.ui.components
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
@@ -38,7 +39,7 @@ fun TripConfigurationBar(
     val rotationAngle by animateFloatAsState(
         targetValue = if (isReversed) 180f else 0f,
         animationSpec = tween(
-            durationMillis = 400,
+            durationMillis = 200,
             easing = androidx.compose.animation.core.FastOutSlowInEasing
         ),
         label = "reverse_button_rotation"
@@ -96,22 +97,28 @@ fun TripConfigurationBar(
                         onExpandedChange = { fromExpanded = !fromExpanded },
                         modifier = Modifier.weight(1f)
                     ) {
-                        OutlinedTextField(
-                            value = fromStation,
-                            onValueChange = onFromStationChange,
-                            label = { Text("From") },
-                            shape = RoundedCornerShape(12.dp),
-                            readOnly = true,
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(
-                                    expanded = fromExpanded
-                                )
-                            },
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor()
-                        )
+                        Crossfade(
+                            targetState = fromStation,
+                            animationSpec = tween(durationMillis = 200),
+                            label = "from_station_crossfade"
+                        ) { station ->
+                            OutlinedTextField(
+                                value = station,
+                                onValueChange = onFromStationChange,
+                                label = { Text("From") },
+                                shape = RoundedCornerShape(12.dp),
+                                readOnly = true,
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(
+                                        expanded = fromExpanded
+                                    )
+                                },
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor()
+                            )
+                        }
 
                         ExposedDropdownMenu(
                             expanded = fromExpanded,
@@ -136,22 +143,28 @@ fun TripConfigurationBar(
                         onExpandedChange = { toExpanded = !toExpanded },
                         modifier = Modifier.weight(1f)
                     ) {
-                        OutlinedTextField(
-                            value = toStation,
-                            onValueChange = onToStationChange,
-                            label = { Text("To") },
-                            shape = RoundedCornerShape(12.dp),
-                            readOnly = true,
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(
-                                    expanded = toExpanded
-                                )
-                            },
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor()
-                        )
+                        Crossfade(
+                            targetState = toStation,
+                            animationSpec = tween(durationMillis = 200),
+                            label = "to_station_crossfade"
+                        ) { station ->
+                            OutlinedTextField(
+                                value = station,
+                                onValueChange = onToStationChange,
+                                label = { Text("To") },
+                                shape = RoundedCornerShape(12.dp),
+                                readOnly = true,
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(
+                                        expanded = toExpanded
+                                    )
+                                },
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor()
+                            )
+                        }
 
                         ExposedDropdownMenu(
                             expanded = toExpanded,
@@ -185,22 +198,28 @@ fun TripConfigurationBar(
                             .fillMaxWidth()
                             .padding(horizontal = 10.dp)
                     ) {
-                        OutlinedTextField(
-                            value = fromStation,
-                            onValueChange = onFromStationChange,
-                            label = { Text("From") },
-                            shape = RoundedCornerShape(12.dp),
-                            readOnly = true,
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(
-                                    expanded = fromExpanded
-                                )
-                            },
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor()
-                        )
+                        Crossfade(
+                            targetState = fromStation,
+                            animationSpec = tween(durationMillis = 200),
+                            label = "from_station_crossfade_portrait"
+                        ) { station ->
+                            OutlinedTextField(
+                                value = station,
+                                onValueChange = onFromStationChange,
+                                label = { Text("From") },
+                                shape = RoundedCornerShape(12.dp),
+                                readOnly = true,
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(
+                                        expanded = fromExpanded
+                                    )
+                                },
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor()
+                            )
+                        }
 
                         ExposedDropdownMenu(
                             expanded = fromExpanded,
@@ -227,22 +246,28 @@ fun TripConfigurationBar(
                             .fillMaxWidth()
                             .padding(horizontal = 10.dp)
                     ) {
-                        OutlinedTextField(
-                            value = toStation,
-                            onValueChange = onToStationChange,
-                            label = { Text("To") },
-                            shape = RoundedCornerShape(12.dp),
-                            readOnly = true,
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(
-                                    expanded = toExpanded
-                                )
-                            },
-                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .menuAnchor()
-                        )
+                        Crossfade(
+                            targetState = toStation,
+                            animationSpec = tween(durationMillis = 200),
+                            label = "to_station_crossfade_portrait"
+                        ) { station ->
+                            OutlinedTextField(
+                                value = station,
+                                onValueChange = onToStationChange,
+                                label = { Text("To") },
+                                shape = RoundedCornerShape(12.dp),
+                                readOnly = true,
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(
+                                        expanded = toExpanded
+                                    )
+                                },
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor()
+                            )
+                        }
 
                         ExposedDropdownMenu(
                             expanded = toExpanded,
