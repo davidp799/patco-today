@@ -19,11 +19,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
+import androidx.activity.ComponentActivity
 import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
 fun WhatsNewScreen(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+
     // Detect dark mode using background luminance
     val backgroundColor = MaterialTheme.colorScheme.background
     val isDarkMode = (backgroundColor.red + backgroundColor.green + backgroundColor.blue) / 3f < 0.5f
@@ -80,7 +85,17 @@ fun WhatsNewScreen(onDismiss: () -> Unit) {
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(32.dp))
-                Button(onClick = onDismiss) {
+                Button(onClick = {
+                    onDismiss()
+                    // Restart the MainActivity to refresh schedules
+                    val activity = context as? ComponentActivity
+                    activity?.let {
+                        val intent = Intent(context, context::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        context.startActivity(intent)
+                        it.finish()
+                    }
+                }) {
                     Text("Great!")
                 }
             }
