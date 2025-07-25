@@ -46,6 +46,7 @@ import com.davidp799.patcotoday.ui.theme.PatcoTodayTheme
 import com.davidp799.patcotoday.utils.NetworkUtils
 import com.davidp799.patcotoday.utils.VersionCodeStore
 import com.davidp799.patcotoday.ui.whatsnew.WhatsNewScreen
+import com.davidp799.patcotoday.ui.welcome.WelcomeScreen
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import com.google.android.play.core.review.ReviewException
@@ -113,24 +114,79 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
         setContent {
             PatcoTodayTheme {
                 var showWhatsNew by remember { mutableStateOf(false) }
+                var showWelcome by remember { mutableStateOf(false) }
                 val context = this
+
                 LaunchedEffect(Unit) {
                     val currentVersionCode = BuildConfig.VERSION_CODE
                     val savedVersionCode = VersionCodeStore.getVersionCode(context)
-                    if (currentVersionCode > savedVersionCode) {
+
+                    // Check if this is a first-time user (no version saved)
+                    if (savedVersionCode == -1) {
+                        showWelcome = true
+                        // Start API call immediately for first-time users
+                        lifecycleScope.launch {
+                            scheduleRepository.fetchAndUpdateSchedules()
+                                .onSuccess { apiResponse ->
+                                    // Check if regular schedules were updated
+                                    val regularSchedules = apiResponse.regularSchedules
+                                    if (regularSchedules == null) {
+                                        showToast("Schedule data loaded from cache")
+                                    }
+                                }
+                                .onFailure { error ->
+                                    Log.e("[WelcomeScreen]", "API call failed: ${error.message}")
+                                    // Show appropriate error message based on error type
+                                    val errorMessage = when (error) {
+                                        is UnknownHostException -> {
+                                            "No internet connection. Using offline schedules."
+                                        }
+                                        is SocketTimeoutException -> {
+                                            "Request timed out. Using offline schedules."
+                                        }
+                                        else -> {
+                                            if (error.message?.contains("404") == true) {
+                                                "Schedule service unavailable. Using offline schedules."
+                                            } else if (error.message?.contains("500") == true) {
+                                                "Server error. Using offline schedules."
+                                            } else {
+                                                if (NetworkUtils.isOnMobileData(this@MainActivity) &&
+                                                    !NetworkUtils.isDownloadOnMobileDataEnabled(this@MainActivity)) {
+                                                    "Download on mobile data disabled. Using offline schedules."
+                                                } else {
+                                                    "Failed to download schedules. Using offline data."
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (errorMessage.isNotEmpty()) showToast(errorMessage)
+                                }
+                        }
+                    } else if (currentVersionCode > savedVersionCode) {
+                        // Existing user with an update
                         showWhatsNew = true
                     }
                 }
-                if (showWhatsNew) {
-                    WhatsNewScreen(onDismiss = {
-                        showWhatsNew = false
-                        VersionCodeStore.setVersionCode(context, BuildConfig.VERSION_CODE)
-                    })
-                } else {
-                    if (isFirstRunComplete.value) {
-                        MainScreen()
-                    } else {
-                        FirstRunLoadingScreen(loadingMessage = firstRunLoadingMessage.value)
+
+                when {
+                    showWelcome -> {
+                        WelcomeScreen(onGetStarted = {
+                            showWelcome = false
+                            VersionCodeStore.setVersionCode(context, BuildConfig.VERSION_CODE)
+                        })
+                    }
+                    showWhatsNew -> {
+                        WhatsNewScreen(onDismiss = {
+                            showWhatsNew = false
+                            VersionCodeStore.setVersionCode(context, BuildConfig.VERSION_CODE)
+                        })
+                    }
+                    else -> {
+                        if (isFirstRunComplete.value) {
+                            MainScreen()
+                        } else {
+                            FirstRunLoadingScreen(loadingMessage = firstRunLoadingMessage.value)
+                        }
                     }
                 }
             }
