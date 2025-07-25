@@ -207,12 +207,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                 scheduleRepository.fetchAndUpdateSchedules()
                     .onSuccess { apiResponse ->
                         // Check if regular schedules were updated
-                        val regularSchedules = apiResponse.regularSchedules
-                        if (regularSchedules != null) {
-                            if (regularSchedules.updated) {
-                                showToast("Schedule data updated successfully")
-                            }
-                        }
+                        apiResponse.regularSchedules
                         requestReview()
                     }
                     .onFailure { error ->
