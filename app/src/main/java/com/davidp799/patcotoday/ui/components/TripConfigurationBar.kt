@@ -1,5 +1,7 @@
 package com.davidp799.patcotoday.ui.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -11,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,6 +30,19 @@ fun TripConfigurationBar(
 ) {
     var fromExpanded by remember { mutableStateOf(false) }
     var toExpanded by remember { mutableStateOf(false) }
+
+    // Track rotation state for the reverse button animation
+    var isReversed by remember { mutableStateOf(false) }
+
+    // Animate rotation based on isReversed state
+    val rotationAngle by animateFloatAsState(
+        targetValue = if (isReversed) 180f else 0f,
+        animationSpec = tween(
+            durationMillis = 400,
+            easing = androidx.compose.animation.core.FastOutSlowInEasing
+        ),
+        label = "reverse_button_rotation"
+    )
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.screenWidthDp > configuration.screenHeightDp
@@ -252,11 +268,19 @@ fun TripConfigurationBar(
                     .weight(0.15f),
                 contentAlignment = Alignment.Center
             ) {
-                IconButton(onClick = onReverseStationsClick) {
+                IconButton(
+                    onClick = {
+                        // Toggle rotation state and call the original callback
+                        isReversed = !isReversed
+                        onReverseStationsClick()
+                    }
+                ) {
                     Icon(
                         imageVector = Icons.Rounded.SwapVert,
                         contentDescription = "Reverse Stations",
-                        modifier = Modifier.size(48.dp)
+                        modifier = Modifier
+                            .size(48.dp)
+                            .rotate(rotationAngle)
                     )
                 }
             }
