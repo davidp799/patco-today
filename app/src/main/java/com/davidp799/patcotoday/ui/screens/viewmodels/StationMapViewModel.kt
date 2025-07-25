@@ -17,7 +17,7 @@ class StationMapViewModel : ViewModel() {
             fullName = "Lindenwold Station",
             address = "901 N. Berlin Road, Lindenwold, NJ 08021",
             amenities = StationAmenities(
-                elevator = "Elevator",
+                elevator = "Elevator (Out of Service)",
                 escalator = "Escalator",
                 bikeRacks = "Bike Racks",
                 taxiService = "Taxi Service",
