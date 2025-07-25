@@ -45,12 +45,17 @@ fun WelcomeScreen(onGetStarted: () -> Unit) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Welcome to Patco Today! 🚆",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Welcome to Patco Today!",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center
+                    )
+                }
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     text = buildAnnotatedString {
@@ -72,7 +77,7 @@ fun WelcomeScreen(onGetStarted: () -> Unit) {
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                             append("🔍 Find anything and everything Patco.")
                         }
-                        append("\nYour complete guide to the PATCO Hi-Speedline system.\n\n")
+                        append("\nYour complete guide to the PATCO High Speed Line.\n\n")
 
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                             append("⚙️ Make Patco Today yours.")
