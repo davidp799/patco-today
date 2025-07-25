@@ -93,45 +93,6 @@ class ScheduleRepository(private val context: Context) {
         return assetArrivals
     }
 
-    fun hasScheduleData(): Boolean {
-        // First check if we have downloaded files
-        val hasLocalData = fileManager.hasScheduleData()
-
-        if (hasLocalData) {
-            return true
-        }
-
-        // If no local data, check if we have fallback CSV files in assets
-        return hasAssetScheduleData()
-    }
-
-    private fun hasAssetScheduleData(): Boolean {
-        return try {
-            val assetFiles = listOf(
-                "weekdays-east.csv",
-                "weekdays-west.csv",
-                "saturdays-east.csv",
-                "saturdays-west.csv",
-                "sundays-east.csv",
-                "sundays-west.csv"
-            )
-
-            // Check if at least some essential asset files exist
-            val existingFiles = assetFiles.count { fileName ->
-                try {
-                    context.assets.open(fileName).use { true }
-                } catch (e: Exception) {
-                    false
-                }
-            }
-
-            existingFiles >= 4 // Need at least weekdays and one weekend day type
-        } catch (e: Exception) {
-            Log.e("[hasAssetScheduleData]", "Error checking asset schedule data: ${e.message}")
-            false
-        }
-    }
-
     private suspend fun downloadSpecialSchedules(date: String, eastboundUrl: String, westboundUrl: String, pdfUrl: String) {
         fileManager.downloadAndSaveFile(
             url = eastboundUrl,
@@ -172,5 +133,9 @@ class ScheduleRepository(private val context: Context) {
     private fun getCurrentDate(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return dateFormat.format(Date())
+    }
+
+    fun getLastUpdateTimeFormatted(): String {
+        return fileManager.getLastUpdateTimeFormatted()
     }
 }

@@ -153,11 +153,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
 
                     // Check if regular schedules were updated
                     val regularSchedules = apiResponse.regularSchedules
-                    if (regularSchedules != null) {
-                        if (regularSchedules.updated) {
-                            showToast("Schedule data downloaded successfully")
-                        }
-                    } else {
+                    if (regularSchedules == null) {
                         showToast("Schedule data loaded from cache")
                     }
 

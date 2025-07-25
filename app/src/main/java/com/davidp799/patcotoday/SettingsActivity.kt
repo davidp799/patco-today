@@ -172,6 +172,19 @@ fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
         PreferenceManager.getDefaultSharedPreferences(context)
     }
 
+    // Create repository instance to get last update time
+    val scheduleRepository = remember {
+        com.davidp799.patcotoday.data.repository.ScheduleRepository(context)
+    }
+
+    // State for last update time
+    var lastUpdateTime by remember { mutableStateOf("Checking...") }
+
+    // Get the last update time when the composable is first created
+    LaunchedEffect(Unit) {
+        lastUpdateTime = scheduleRepository.getLastUpdateTimeFormatted()
+    }
+
     // Set up toast callback for the ViewModel when available
     LaunchedEffect(schedulesViewModel) {
         schedulesViewModel?.setShowToastCallback { message ->
@@ -183,6 +196,14 @@ fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
     val schedulesUiState by (schedulesViewModel?.uiState?.collectAsState() ?: remember {
         mutableStateOf(com.davidp799.patcotoday.ui.screens.SchedulesUiState())
     })
+
+    // Update last update time when refresh completes
+    LaunchedEffect(schedulesUiState.isRefreshing) {
+        if (!schedulesUiState.isRefreshing) {
+            // Refresh completed, update the last update time
+            lastUpdateTime = scheduleRepository.getLastUpdateTimeFormatted()
+        }
+    }
 
     // Animate blur effect
     val blurRadius by animateFloatAsState(
@@ -283,7 +304,7 @@ fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
             item {
                 SettingsItem(
                     title = stringResource(R.string.pref_title_updates),
-                    summary = stringResource(R.string.pref_summary_updates),
+                    summary = lastUpdateTime,
                     onClick = {
                         schedulesViewModel?.refreshSchedules()
                     }

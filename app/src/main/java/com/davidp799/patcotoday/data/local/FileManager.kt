@@ -119,14 +119,8 @@ class FileManager(private val context: Context) {
         }
     }
 
-    fun getSpecialScheduleFile(date: String, fileName: String): File? {
-        val file = File(getSpecialSchedulesDirectory(date), fileName)
-        val exists = file.exists()
-        return if (exists) file else null
-    }
-
-    fun hasScheduleData(): Boolean {
-        val requiredFiles = listOf(
+    fun getLastUpdateTimeFormatted(): String {
+        val files = listOf(
             "weekdays_east.csv",
             "weekdays_west.csv",
             "saturdays_east.csv",
@@ -135,10 +129,29 @@ class FileManager(private val context: Context) {
             "sundays_west.csv"
         )
 
-        val regularDir = getRegularSchedulesDirectory()
-        return requiredFiles.all { fileName ->
-            val file = File(regularDir, fileName)
-            file.exists() && file.length() > 0
+        var oldestTime = Long.MAX_VALUE
+        files.forEach { fileName ->
+            val file = File(getRegularSchedulesDirectory(), fileName)
+            if (file.exists()) {
+                oldestTime = minOf(oldestTime, file.lastModified())
+            } else {
+                // If any file doesn't exist, return a message indicating no updates
+                return "Never updated"
+            }
+        }
+
+        return if (oldestTime == Long.MAX_VALUE) {
+            "Never updated"
+        } else {
+            val dateFormat = SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", Locale.getDefault())
+            "Last updated: ${dateFormat.format(Date(oldestTime))}"
         }
     }
+
+    fun getSpecialScheduleFile(date: String, fileName: String): File? {
+        val file = File(getSpecialSchedulesDirectory(date), fileName)
+        val exists = file.exists()
+        return if (exists) file else null
+    }
+
 }

@@ -196,7 +196,10 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                 // Make API call to fetch and update schedules
                 val result = repository.fetchAndUpdateSchedules()
 
-                result.onSuccess {
+                result.onSuccess { apiResponse ->
+                    // Check if schedules were actually updated
+                    val schedulesWereUpdated = apiResponse.regularSchedules?.updated == true
+
                     // After API call, reload the schedule data from local storage
                     val arrivals = repository.getScheduleForRoute(
                         fromStation = _uiState.value.fromStation,
@@ -210,6 +213,11 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                         errorMessage = if (arrivals.isEmpty()) "No schedule data available" else null,
                         lastRefreshTime = System.currentTimeMillis()
                     )
+
+                    // Show appropriate toast message
+                    if (!schedulesWereUpdated) {
+                        showToastCallback?.invoke("Your schedules are up to date.")
+                    }
                 }.onFailure { error ->
                     Log.e("[refreshSchedules]", "Manual refresh failed: ${error.message}")
 
