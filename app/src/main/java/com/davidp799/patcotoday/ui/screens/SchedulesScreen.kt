@@ -3,6 +3,7 @@ package com.davidp799.patcotoday.ui.screens
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
@@ -23,32 +24,38 @@ import com.davidp799.patcotoday.utils.Arrival
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SchedulesScreen(
-    viewModel: SchedulesScreenViewModel = viewModel()
+    viewModel: SchedulesScreenViewModel = viewModel(),
+    useInternalBottomSheet: Boolean = false
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val listState = rememberLazyListState()
 
-    // Bottom sheet state
-    val bottomSheetState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = if (uiState.showSpecialScheduleSheet) SheetValue.PartiallyExpanded else SheetValue.Hidden,
-            skipHiddenState = false
+    // Bottom sheet state - only when using internal bottom sheet (portrait mode)
+    val bottomSheetState = if (useInternalBottomSheet) {
+        rememberBottomSheetScaffoldState(
+            bottomSheetState = rememberStandardBottomSheetState(
+                initialValue = if (uiState.showSpecialScheduleSheet) SheetValue.PartiallyExpanded else SheetValue.Hidden,
+                skipHiddenState = false
+            )
         )
-    )
+    } else null
 
-    // Handle bottom sheet state changes
-    LaunchedEffect(uiState.showSpecialScheduleSheet) {
-        if (uiState.showSpecialScheduleSheet && !uiState.hasUserDismissedSheet) {
-            // Show as peeking by default, not fully expanded
-            bottomSheetState.bottomSheetState.partialExpand()
-        } else if (!uiState.showSpecialScheduleSheet) {
-            bottomSheetState.bottomSheetState.hide()
+    // Handle bottom sheet state changes - only in portrait mode
+    LaunchedEffect(uiState.showSpecialScheduleSheet, useInternalBottomSheet) {
+        if (useInternalBottomSheet && bottomSheetState != null) {
+            if (uiState.showSpecialScheduleSheet && !uiState.hasUserDismissedSheet) {
+                bottomSheetState.bottomSheetState.partialExpand()
+            } else {
+                bottomSheetState.bottomSheetState.hide()
+            }
         }
     }
 
-    // Handle when user manually dismisses sheet
-    LaunchedEffect(bottomSheetState.bottomSheetState.targetValue) {
-        if (bottomSheetState.bottomSheetState.targetValue == SheetValue.Hidden && uiState.showSpecialScheduleSheet) {
+    // Handle when user manually dismisses sheet - only in portrait mode
+    LaunchedEffect(bottomSheetState?.bottomSheetState?.targetValue, useInternalBottomSheet) {
+        if (useInternalBottomSheet && bottomSheetState != null &&
+            bottomSheetState.bottomSheetState.targetValue == SheetValue.Hidden &&
+            uiState.showSpecialScheduleSheet) {
             viewModel.dismissSpecialScheduleSheet()
         }
     }
@@ -115,95 +122,127 @@ fun SchedulesScreen(
         }
     }
 
-    BottomSheetScaffold(
-        scaffoldState = bottomSheetState,
-        sheetContent = {
-            SpecialScheduleBottomSheet(
-                specialScheduleState = uiState.specialScheduleState,
-                onViewSchedule = { viewModel.openSpecialSchedulePdf() }
-            )
-        },
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(0.dp)
+    if (useInternalBottomSheet && bottomSheetState != null) {
+        // Portrait mode: Use BottomSheetScaffold
+        BottomSheetScaffold(
+            scaffoldState = bottomSheetState,
+            sheetContent = {
+                SpecialScheduleBottomSheet(
+                    specialScheduleState = uiState.specialScheduleState,
+                    onViewSchedule = { viewModel.openSpecialSchedulePdf() }
+                )
+            },
+            modifier = Modifier.fillMaxSize()
         ) {
-            TripConfigurationBar(
-                fromStation = uiState.fromStation,
-                toStation = uiState.toStation,
-                onFromStationChange = { viewModel.updateFromStation(it) },
-                onToStationChange = { viewModel.updateToStation(it) },
-                onReverseStationsClick = { viewModel.reverseStations() },
-                stations = viewModel.stationOptions
+            ScheduleContent(
+                uiState = uiState,
+                viewModel = viewModel,
+                listState = listState,
+                shimmerAlpha = shimmerAlpha,
+                contentAlpha = contentAlpha,
+                isArrivalInPast = ::isArrivalInPast
             )
+        }
+    } else {
+        // Landscape mode: Just show content without bottom sheet
+        ScheduleContent(
+            uiState = uiState,
+            viewModel = viewModel,
+            listState = listState,
+            shimmerAlpha = shimmerAlpha,
+            contentAlpha = contentAlpha,
+            isArrivalInPast = ::isArrivalInPast
+        )
+    }
+}
 
-            // Schedule list with animated shimmer loading
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Shimmer loading state
-                if (uiState.isLoading || shimmerAlpha > 0f) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 8.dp),
-                        contentPadding = PaddingValues(bottom = 0.dp)
-                    ) {
-                        items(18) { index ->
-                            ScheduleItemShimmer(alpha = shimmerAlpha)
-                            if (index < 17) { // Don't add divider after last item
-                                HorizontalDivider(
-                                    modifier = Modifier.alpha(shimmerAlpha),
-                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                                )
-                            }
+@Composable
+private fun ScheduleContent(
+    uiState: SchedulesUiState,
+    viewModel: SchedulesScreenViewModel,
+    listState: LazyListState,
+    shimmerAlpha: Float,
+    contentAlpha: Float,
+    isArrivalInPast: (Arrival) -> Boolean
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(0.dp)
+    ) {
+        TripConfigurationBar(
+            fromStation = uiState.fromStation,
+            toStation = uiState.toStation,
+            onFromStationChange = { viewModel.updateFromStation(it) },
+            onToStationChange = { viewModel.updateToStation(it) },
+            onReverseStationsClick = { viewModel.reverseStations() },
+            stations = viewModel.stationOptions
+        )
+
+        // Schedule list with animated shimmer loading
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Shimmer loading state
+            if (uiState.isLoading || shimmerAlpha > 0f) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 8.dp),
+                    contentPadding = PaddingValues(bottom = 0.dp)
+                ) {
+                    items(18) { index ->
+                        ScheduleItemShimmer(alpha = shimmerAlpha)
+                        if (index < 17) { // Don't add divider after last item
+                            HorizontalDivider(
+                                modifier = Modifier.alpha(shimmerAlpha),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                            )
                         }
                     }
                 }
+            }
 
-                // Actual content
-                if (!uiState.isLoading && (contentAlpha > 0f || uiState.arrivals.isNotEmpty())) {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 8.dp)
-                            .alpha(contentAlpha),
-                        contentPadding = PaddingValues(bottom = 0.dp)
-                    ) {
-                        itemsIndexed(uiState.arrivals) { index, arrival ->
-                            val isPast = isArrivalInPast(arrival)
-                            ScheduleItem(
-                                arrival = arrival,
-                                isHighlighted = index == uiState.scrollToIndex,
-                                isPast = isPast,
-                                modifier = Modifier.fillMaxWidth()
+            // Actual content
+            if (!uiState.isLoading && (contentAlpha > 0f || uiState.arrivals.isNotEmpty())) {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 8.dp)
+                        .alpha(contentAlpha),
+                    contentPadding = PaddingValues(bottom = 0.dp)
+                ) {
+                    itemsIndexed(uiState.arrivals) { index, arrival ->
+                        val isPast = isArrivalInPast(arrival)
+                        ScheduleItem(
+                            arrival = arrival,
+                            isHighlighted = index == uiState.scrollToIndex,
+                            isPast = isPast,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        if (index < uiState.arrivals.size - 1) { // Don't add divider after last item
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                             )
-                            if (index < uiState.arrivals.size - 1) { // Don't add divider after last item
-                                HorizontalDivider(
-                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                                )
-                            }
                         }
                     }
                 }
+            }
 
-                // Show error message if no data available
-                if (!uiState.isLoading && uiState.arrivals.isEmpty()) {
-                    val errorMessage = uiState.errorMessage
-                    if (errorMessage != null) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = errorMessage,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
+            // Show error message if no data available
+            if (!uiState.isLoading && uiState.arrivals.isEmpty()) {
+                val errorMessage = uiState.errorMessage
+                if (errorMessage != null) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = errorMessage,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(16.dp)
+                        )
                     }
                 }
             }

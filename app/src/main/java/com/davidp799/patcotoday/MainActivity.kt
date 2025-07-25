@@ -14,10 +14,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +38,7 @@ import androidx.preference.PreferenceManager
 import com.davidp799.patcotoday.data.repository.ScheduleRepository
 import com.davidp799.patcotoday.ui.components.BottomNavigationBar
 import com.davidp799.patcotoday.ui.components.SideNavigationRail
+import com.davidp799.patcotoday.ui.components.SpecialScheduleBottomSheet
 import com.davidp799.patcotoday.ui.components.TopNavigationBar
 import com.davidp799.patcotoday.ui.navigation.Navigation
 import com.davidp799.patcotoday.ui.screens.SchedulesScreenViewModel
@@ -310,6 +308,7 @@ fun FirstRunLoadingScreen(loadingMessage: String) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
@@ -352,9 +351,33 @@ fun MainScreen() {
     val configuration = LocalConfiguration.current
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (isPortrait) {
-            // Portrait layout with bottom navigation
+    // Bottom sheet state - for landscape mode only
+    val landscapeBottomSheetState = rememberStandardBottomSheetState(
+        initialValue = if (!isPortrait && currentRoute == "schedules" && schedulesUiState.showSpecialScheduleSheet)
+            SheetValue.PartiallyExpanded else SheetValue.Hidden,
+        skipHiddenState = false
+    )
+
+    // Handle bottom sheet state changes for landscape
+    LaunchedEffect(isPortrait, currentRoute, schedulesUiState.showSpecialScheduleSheet) {
+        if (!isPortrait && currentRoute == "schedules" && schedulesUiState.showSpecialScheduleSheet && !schedulesUiState.hasUserDismissedSheet) {
+            landscapeBottomSheetState.partialExpand()
+        } else {
+            landscapeBottomSheetState.hide()
+        }
+    }
+
+    // Handle when user manually dismisses sheet in landscape
+    LaunchedEffect(landscapeBottomSheetState.targetValue) {
+        if (landscapeBottomSheetState.targetValue == SheetValue.Hidden &&
+            !isPortrait && currentRoute == "schedules" && schedulesUiState.showSpecialScheduleSheet) {
+            schedulesViewModel.dismissSpecialScheduleSheet()
+        }
+    }
+
+    if (isPortrait) {
+        // Portrait mode: Bottom sheet contained within main content area
+        Box(modifier = Modifier.fillMaxSize()) {
             Scaffold(
                 topBar = {
                     TopNavigationBar(
@@ -373,69 +396,115 @@ fun MainScreen() {
                 },
                 modifier = Modifier.blur(radius = blurRadius.dp)
             ) { innerPadding ->
+                // Portrait mode: Use SchedulesScreen with its own bottom sheet for schedules screen
                 Navigation(
                     navController = navController,
                     modifier = Modifier.padding(innerPadding),
-                    schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null
+                    schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null,
+                    useInternalBottomSheet = true // Flag to tell SchedulesScreen to use its own bottom sheet
                 )
             }
-        } else {
-            // Landscape layout with side navigation rail
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .blur(radius = blurRadius.dp)
-            ) {
-                // Side navigation rail
-                SideNavigationRail(
-                    navController = navController,
-                    onSchedulesReselected = { schedulesViewModel.onSchedulesScreenReselected() }
-                )
 
-                // Main content area
-                Scaffold(
-                    topBar = {
-                        TopNavigationBar(
-                            navController = navController,
-                            onRefreshClick = if (currentRoute == "schedules") {
-                                { schedulesViewModel.refreshSchedules() }
-                            } else null,
-                            isRefreshing = schedulesUiState.isRefreshing
+            // Blur overlay when refreshing schedules
+            if (overlayAlpha > 0f) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Color.Black.copy(alpha = overlayAlpha)
                         )
-                    },
-                    modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
-                    Navigation(
-                        navController = navController,
-                        modifier = Modifier.padding(innerPadding),
-                        schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null
+                )
+            }
+
+            // Loading indicator on top of blur
+            if (schedulesUiState.isRefreshing) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(48.dp),
+                        strokeWidth = 4.dp,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
         }
-
-        // Blur overlay when refreshing schedules
-        if (overlayAlpha > 0f) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Color.Black.copy(alpha = overlayAlpha)
+    } else {
+        // Landscape mode: Bottom sheet at top level spans full screen
+        BottomSheetScaffold(
+            scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = landscapeBottomSheetState),
+            sheetContent = {
+                if (currentRoute == "schedules") {
+                    SpecialScheduleBottomSheet(
+                        specialScheduleState = schedulesUiState.specialScheduleState,
+                        onViewSchedule = { schedulesViewModel.openSpecialSchedulePdf() }
                     )
-            )
-        }
+                } else {
+                    // Empty content when not on schedules screen
+                    Spacer(modifier = Modifier.height(1.dp))
+                }
+            },
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .blur(radius = blurRadius.dp)
+                ) {
+                    // Side navigation rail
+                    SideNavigationRail(
+                        navController = navController,
+                        onSchedulesReselected = { schedulesViewModel.onSchedulesScreenReselected() }
+                    )
 
-        // Loading indicator on top of blur
-        if (schedulesUiState.isRefreshing) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(48.dp),
-                    strokeWidth = 4.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                    // Main content area
+                    Scaffold(
+                        topBar = {
+                            TopNavigationBar(
+                                navController = navController,
+                                onRefreshClick = if (currentRoute == "schedules") {
+                                    { schedulesViewModel.refreshSchedules() }
+                                } else null,
+                                isRefreshing = schedulesUiState.isRefreshing
+                            )
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    ) { innerPadding ->
+                        Navigation(
+                            navController = navController,
+                            modifier = Modifier.padding(innerPadding),
+                            schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null,
+                            useInternalBottomSheet = false // Flag to tell SchedulesScreen NOT to use its own bottom sheet
+                        )
+                    }
+                }
+
+                // Blur overlay when refreshing schedules
+                if (overlayAlpha > 0f) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Color.Black.copy(alpha = overlayAlpha)
+                            )
+                    )
+                }
+
+                // Loading indicator on top of blur
+                if (schedulesUiState.isRefreshing) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(48.dp),
+                            strokeWidth = 4.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
         }
     }

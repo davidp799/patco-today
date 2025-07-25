@@ -24,7 +24,8 @@ private const val SCALE_FACTOR = 0.96f
 fun Navigation(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    schedulesViewModel: SchedulesScreenViewModel? = null
+    schedulesViewModel: SchedulesScreenViewModel? = null,
+    useInternalBottomSheet: Boolean = false
 ) {
     NavHost(
         navController = navController,
@@ -57,9 +58,12 @@ fun Navigation(
             }
         ) {
             if (schedulesViewModel != null) {
-                SchedulesScreen(viewModel = schedulesViewModel)
+                SchedulesScreen(
+                    viewModel = schedulesViewModel,
+                    useInternalBottomSheet = useInternalBottomSheet
+                )
             } else {
-                SchedulesScreen()
+                SchedulesScreen(useInternalBottomSheet = useInternalBottomSheet)
             }
         }
         composable(
