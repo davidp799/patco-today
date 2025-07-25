@@ -1,6 +1,7 @@
 package com.davidp799.patcotoday
 
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.preference.PreferenceManager
 import com.davidp799.patcotoday.data.repository.ScheduleRepository
 import com.davidp799.patcotoday.ui.components.BottomNavigationBar
+import com.davidp799.patcotoday.ui.components.SideNavigationRail
 import com.davidp799.patcotoday.ui.components.TopNavigationBar
 import com.davidp799.patcotoday.ui.navigation.Navigation
 import com.davidp799.patcotoday.ui.screens.SchedulesScreenViewModel
@@ -73,8 +76,8 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val themePreference = prefs.getString("device_theme", "3")?.toInt() ?: 3
         val isSystemInDarkTheme = resources.configuration.uiMode and
-            android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
-            android.content.res.Configuration.UI_MODE_NIGHT_YES
+            Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
 
         // Determine if we should use dark theme
         val useDarkTheme = when (themePreference) {
@@ -345,30 +348,70 @@ fun MainScreen() {
         label = "main_overlay_fade"
     )
 
+    // Detect screen orientation
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
     Box(modifier = Modifier.fillMaxSize()) {
-        Scaffold(
-            topBar = {
-                TopNavigationBar(
+        if (isPortrait) {
+            // Portrait layout with bottom navigation
+            Scaffold(
+                topBar = {
+                    TopNavigationBar(
+                        navController = navController,
+                        onRefreshClick = if (currentRoute == "schedules") {
+                            { schedulesViewModel.refreshSchedules() }
+                        } else null,
+                        isRefreshing = schedulesUiState.isRefreshing
+                    )
+                },
+                bottomBar = {
+                    BottomNavigationBar(
+                        navController = navController,
+                        onSchedulesReselected = { schedulesViewModel.onSchedulesScreenReselected() }
+                    )
+                },
+                modifier = Modifier.blur(radius = blurRadius.dp)
+            ) { innerPadding ->
+                Navigation(
                     navController = navController,
-                    onRefreshClick = if (currentRoute == "schedules") {
-                        { schedulesViewModel.refreshSchedules() }
-                    } else null,
-                    isRefreshing = schedulesUiState.isRefreshing
+                    modifier = Modifier.padding(innerPadding),
+                    schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null
                 )
-            },
-            bottomBar = {
-                BottomNavigationBar(
+            }
+        } else {
+            // Landscape layout with side navigation rail
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(radius = blurRadius.dp)
+            ) {
+                // Side navigation rail
+                SideNavigationRail(
                     navController = navController,
                     onSchedulesReselected = { schedulesViewModel.onSchedulesScreenReselected() }
                 )
-            },
-            modifier = Modifier.blur(radius = blurRadius.dp)
-        ) { innerPadding ->
-            Navigation(
-                navController = navController,
-                modifier = Modifier.padding(innerPadding),
-                schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null
-            )
+
+                // Main content area
+                Scaffold(
+                    topBar = {
+                        TopNavigationBar(
+                            navController = navController,
+                            onRefreshClick = if (currentRoute == "schedules") {
+                                { schedulesViewModel.refreshSchedules() }
+                            } else null,
+                            isRefreshing = schedulesUiState.isRefreshing
+                        )
+                    },
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+                    Navigation(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding),
+                        schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null
+                    )
+                }
+            }
         }
 
         // Blur overlay when refreshing schedules
