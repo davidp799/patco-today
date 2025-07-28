@@ -2,7 +2,7 @@
     <string-array name="pref_theme_entries">
         <item>Light</item>
         <item>Dark</item>
-        <item>Follow system</item>
+        <item>Follow device theme</item>
     </string-array>
 
     <string-array name="pref_theme_values">
