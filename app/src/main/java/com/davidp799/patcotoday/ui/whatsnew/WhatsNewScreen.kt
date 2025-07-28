@@ -20,15 +20,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalContext
-import android.content.Intent
-import androidx.activity.ComponentActivity
 import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
 fun WhatsNewScreen(onDismiss: () -> Unit) {
-    val context = LocalContext.current
-
     // Detect dark mode using background luminance
     val backgroundColor = MaterialTheme.colorScheme.background
     val isDarkMode = (backgroundColor.red + backgroundColor.green + backgroundColor.blue) / 3f < 0.5f
