@@ -202,9 +202,14 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
             return
         }
 
-        // Normal refresh logic
+        // Normal refresh logic - clear arrivals and show loading shimmer
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isRefreshing = true, errorMessage = null)
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                isRefreshing = true,
+                arrivals = emptyList(), // Clear old arrivals immediately
+                errorMessage = null
+            )
 
             try {
                 // Make API call to fetch and update schedules
@@ -212,7 +217,8 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
 
                 result.onSuccess { apiResponse ->
                     // Check if schedules were actually updated
-                    val schedulesWereUpdated = apiResponse.regularSchedules?.updated == true
+                    val schedulesWereUpdated = apiResponse.regularSchedules?.updated == true ||
+                                               apiResponse.specialSchedules != null
 
                     // After API call, reload the schedule data from local storage
                     val arrivals = repository.getScheduleForRoute(
@@ -220,20 +226,36 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                         toStation = _uiState.value.toStation
                     )
 
+                    // Check special schedule status after refresh
+                    val specialScheduleState = checkSpecialScheduleStatus()
+
                     _uiState.value = _uiState.value.copy(
+                        isLoading = false,
                         isRefreshing = false,
                         arrivals = arrivals,
+                        hasSpecialSchedule = specialScheduleState == SpecialScheduleState.AVAILABLE,
+                        specialScheduleState = specialScheduleState,
+                        showSpecialScheduleSheet = !_uiState.value.hasUserDismissedSheet &&
+                                                    specialScheduleState == SpecialScheduleState.AVAILABLE,
                         scrollToIndex = findNextArrival(arrivals),
                         errorMessage = if (arrivals.isEmpty()) "No schedule data available" else null,
                         lastRefreshTime = System.currentTimeMillis()
                     )
 
                     // Show appropriate toast message
-                    if (!schedulesWereUpdated) {
+                    if (schedulesWereUpdated) {
+                        showToastCallback?.invoke("Schedules updated successfully!")
+                    } else {
                         showToastCallback?.invoke("Your schedules are up to date.")
                     }
                 }.onFailure { error ->
                     Log.e("[refreshSchedules]", "Manual refresh failed: ${error.message}")
+
+                    // On failure, restore the previous arrivals
+                    val arrivals = repository.getScheduleForRoute(
+                        fromStation = _uiState.value.fromStation,
+                        toStation = _uiState.value.toStation
+                    )
 
                     // Determine the appropriate error message based on the failure reason
                     val context = getApplication<Application>()
@@ -262,8 +284,10 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                     }
 
                     _uiState.value = _uiState.value.copy(
+                        isLoading = false,
                         isRefreshing = false,
-                        errorMessage = "Failed to refresh schedules: ${error.message}"
+                        arrivals = arrivals, // Restore arrivals on failure
+                        errorMessage = if (arrivals.isEmpty()) "No schedule data available" else null
                     )
 
                     // Show specific toast message
@@ -271,6 +295,12 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                 }
             } catch (e: Exception) {
                 Log.e("[refreshSchedules]", "Exception during manual refresh: ${e.message}", e)
+
+                // On exception, restore the previous arrivals
+                val arrivals = repository.getScheduleForRoute(
+                    fromStation = _uiState.value.fromStation,
+                    toStation = _uiState.value.toStation
+                )
 
                 // Determine the appropriate error message for exceptions
                 val context = getApplication<Application>()
@@ -286,8 +316,10 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                 }
 
                 _uiState.value = _uiState.value.copy(
+                    isLoading = false,
                     isRefreshing = false,
-                    errorMessage = "Failed to refresh schedules"
+                    arrivals = arrivals, // Restore arrivals on exception
+                    errorMessage = if (arrivals.isEmpty()) "No schedule data available" else null
                 )
 
                 // Show specific toast message
