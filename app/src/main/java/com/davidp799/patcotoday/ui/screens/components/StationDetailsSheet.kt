@@ -28,6 +28,7 @@ import com.davidp799.patcotoday.ui.screens.models.Station
 import com.davidp799.patcotoday.ui.screens.models.StationAmenities
 import com.davidp799.patcotoday.ui.screens.models.FareInfo
 import com.davidp799.patcotoday.ui.screens.models.FareZone
+import androidx.core.net.toUri
 
 @Composable
 fun StationDetailsSheet(
@@ -354,7 +355,7 @@ private fun StationInfoSection(title: String, content: String) {
 }
 
 private fun openAddress(context: Context, address: String) {
-    val gmmIntentUri = Uri.parse("geo:0,0?q=${Uri.encode(address)}")
+    val gmmIntentUri = "geo:0,0?q=${Uri.encode(address)}".toUri()
     val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri).apply {
         setPackage("com.google.android.apps.maps")
     }

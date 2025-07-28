@@ -15,13 +15,13 @@ if (localPropertiesFile.exists()) {
 
 android {
     namespace = "com.davidp799.patcotoday"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.davidp799.patcotoday"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
+        versionCode = 21
         versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
