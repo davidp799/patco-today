@@ -349,6 +349,7 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
                     return i
                 }
             } catch (e: Exception) {
+                Log.e("[findNextArrival]", "Error parsing arrival time: ${arrivals[i].arrivalTime}, error: ${e.message}")
                 continue
             }
         }
