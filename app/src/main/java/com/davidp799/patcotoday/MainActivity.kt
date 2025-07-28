@@ -1,204 +1,322 @@
 package com.davidp799.patcotoday
 
-import android.app.AlertDialog
-import android.app.Dialog
-import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
-import androidx.fragment.app.DialogFragment
+import androidx.activity.SystemBarStyle
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.davidp799.patcotoday.databinding.ActivityMainBinding
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.navigationrail.NavigationRailView
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.preference.PreferenceManager
+import com.davidp799.patcotoday.data.repository.ScheduleRepository
+import com.davidp799.patcotoday.ui.components.BottomNavigationBar
+import com.davidp799.patcotoday.ui.components.SideNavigationRail
+import com.davidp799.patcotoday.ui.components.SpecialScheduleBottomSheet
+import com.davidp799.patcotoday.ui.components.TopNavigationBar
+import com.davidp799.patcotoday.ui.navigation.Navigation
+import com.davidp799.patcotoday.ui.screens.SchedulesScreenViewModel
+import com.davidp799.patcotoday.ui.theme.PatcoTodayTheme
+import com.davidp799.patcotoday.utils.NetworkUtils
+import com.davidp799.patcotoday.utils.VersionCodeStore
+import com.davidp799.patcotoday.ui.whatsnew.WhatsNewScreen
+import com.davidp799.patcotoday.ui.welcome.WelcomeScreen
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
-import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.Main
-import java.io.*
-import java.net.HttpURLConnection
-import java.net.URL
-import java.text.SimpleDateFormat
-import java.util.*
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
-    // View Binding & Data Store
-    private lateinit var binding: ActivityMainBinding
-    // ViewModel
-    private val viewModel: MainViewModel by viewModels()
-    // Shared Preferences
-    private val preferencesName = "com.davidp799.patcotoday_preferences"
-    private lateinit var sharedPreferences: SharedPreferences
-    // Schedule Handling
-    private val urlString
-        = "https://www.ridepatco.org/developers/PortAuthorityTransitCorporation.zip"
-    private val gtfsFileName = "gtfs.zip"
-    // Orientation
-    private var currentOrientation: Int = Configuration.ORIENTATION_PORTRAIT
+class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private lateinit var scheduleRepository: ScheduleRepository
+    private var isFirstRunComplete = mutableStateOf(false)
+    private var firstRunLoadingMessage = mutableStateOf("Loading schedules...")
+    // Add a CompletableDeferred to track API call completion
+    private val apiCallCompletion = CompletableDeferred<Boolean>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Install the splash screen
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setAppLayout()
-        setNavView(setOf( R.id.navigation_schedules, R.id.navigation_map, R.id.navigation_info ))
-        lifecycleScope.launch(Dispatchers.IO) {
-            checkIfFirstRun()
-            requestReview()
-            runBackgroundTasks()
+
+        // Keep splash screen visible until app is ready (but not during first launch loading screen)
+        splashScreen.setKeepOnScreenCondition {
+            !isFirstRunComplete.value
         }
-        setupNavigationForOrientation(resources.configuration.orientation)
-    }
-    // Handle orientation change
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        currentOrientation = newConfig.orientation
-        setupNavigationForOrientation(newConfig.orientation)
-    }
-    // Handle back button
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_activity_main)
-        return navController.navigateUp() || super.onSupportNavigateUp()
-    }
-    // Set App Layout
-    private fun setAppLayout() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        setSupportActionBar(findViewById<MaterialToolbar>(R.id.topAppBar))
-        enableEdgeToEdge()
-    }
-    // Set Navigation View
-    private fun setNavView(configurationSet: Set<Int>) {
-        // Initialize nav components for landscape and portrait modes
-        val bottomNavView: BottomNavigationView = binding.bottomNavView
-        val navRailView: NavigationRailView = binding.navRailView
-        val navViews = listOf(bottomNavView, navRailView)
 
-        // Each menu should be considered as top level destinations.
-        val navController = findNavController(R.id.nav_host_fragment_activity_main)
-        navViews.forEach { it.setupWithNavController(navController) }
+        // Get theme preferences to configure system bars
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val themePreference = prefs.getString("device_theme", "3")?.toInt() ?: 3
+        val isSystemInDarkTheme = resources.configuration.uiMode and
+            Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
 
-        // set up action bar
-        val appBarConfiguration = AppBarConfiguration(configurationSet)
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        // Determine if we should use dark theme
+        val useDarkTheme = when (themePreference) {
+            1 -> false // Light theme
+            2 -> true  // Dark theme
+            3 -> isSystemInDarkTheme // Follow system
+            else -> isSystemInDarkTheme
+        }
 
-        // Set item click actions for nav components
-        navViews.forEach {
-            it.setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.navigation_schedules -> {
-                        if (navController.currentDestination?.id == R.id.navigation_schedules) {
-                            val bottomSheetLayout =
-                                findViewById<LinearLayout>(R.id.bottom_sheet_layout)
-                            val bottomSheetBehavior: BottomSheetBehavior<LinearLayout> =
-                                BottomSheetBehavior.from(bottomSheetLayout)
-                            bottomSheetLayout.visibility = View.VISIBLE
-                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        // Configure edge-to-edge with proper system bar styles
+        enableEdgeToEdge(
+            statusBarStyle = if (useDarkTheme) {
+                SystemBarStyle.dark(android.graphics.Color.BLACK)
+            } else {
+                SystemBarStyle.light(android.graphics.Color.WHITE, android.graphics.Color.BLACK)
+            },
+            navigationBarStyle = if (useDarkTheme) {
+                SystemBarStyle.dark(android.graphics.Color.BLACK)
+            } else {
+                SystemBarStyle.light(android.graphics.Color.WHITE, android.graphics.Color.BLACK)
+            }
+        )
+
+        // Initialize repository
+        scheduleRepository = ScheduleRepository(this)
+
+        // Register preference change listener
+        prefs.registerOnSharedPreferenceChangeListener(this)
+
+        // Handle first run logic completely before showing main UI
+        lifecycleScope.launch {
+            handleFirstRunAndDataLoading()
+        }
+
+        setContent {
+            PatcoTodayTheme {
+                var showWhatsNew by remember { mutableStateOf(false) }
+                var showWelcome by remember { mutableStateOf(false) }
+                val context = this
+
+                LaunchedEffect(Unit) {
+                    val currentVersionCode = BuildConfig.VERSION_CODE
+                    val savedVersionCode = VersionCodeStore.getVersionCode(context)
+
+                    // Check if this is a first-time user (no version saved)
+                    if (savedVersionCode == -1) {
+                        showWelcome = true
+                        // Start API call immediately for first-time users
+                        lifecycleScope.launch {
+                            scheduleRepository.fetchAndUpdateSchedules()
+                                .onSuccess { apiResponse ->
+                                    // Check if regular schedules were updated
+                                    val regularSchedules = apiResponse.regularSchedules
+                                    if (regularSchedules == null) {
+                                        showToast("Schedule data loaded from cache")
+                                    }
+                                }
+                                .onFailure { error ->
+                                    Log.e("[WelcomeScreen]", "API call failed: ${error.message}")
+                                    // Show appropriate error message based on error type
+                                    val errorMessage = when (error) {
+                                        is UnknownHostException -> {
+                                            "No internet connection. Using offline schedules."
+                                        }
+                                        is SocketTimeoutException -> {
+                                            "Request timed out. Using offline schedules."
+                                        }
+                                        else -> {
+                                            if (error.message?.contains("404") == true) {
+                                                "Schedule service unavailable. Using offline schedules."
+                                            } else if (error.message?.contains("500") == true) {
+                                                "Server error. Using offline schedules."
+                                            } else {
+                                                if (NetworkUtils.isOnMobileData(this@MainActivity) &&
+                                                    !NetworkUtils.isDownloadOnMobileDataEnabled(this@MainActivity)) {
+                                                    "Download on mobile data disabled. Using offline schedules."
+                                                } else {
+                                                    "Failed to download schedules. Using offline data."
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (errorMessage.isNotEmpty()) showToast(errorMessage)
+                                }
+                        }
+                    } else if (currentVersionCode > savedVersionCode) {
+                        // Existing user with an update
+                        showWhatsNew = true
+                    }
+                }
+
+                when {
+                    showWelcome -> {
+                        WelcomeScreen(onGetStarted = {
+                            showWelcome = false
+                            VersionCodeStore.setVersionCode(context, BuildConfig.VERSION_CODE)
+                        })
+                    }
+                    showWhatsNew -> {
+                        WhatsNewScreen(onDismiss = {
+                            showWhatsNew = false
+                            VersionCodeStore.setVersionCode(context, BuildConfig.VERSION_CODE)
+                        })
+                    }
+                    else -> {
+                        if (isFirstRunComplete.value) {
+                            MainScreen()
                         } else {
-                            navController.navigate(R.id.navigation_schedules)
+                            FirstRunLoadingScreen(loadingMessage = firstRunLoadingMessage.value)
                         }
-                        true
                     }
-                    R.id.navigation_map -> {
-                        if (navController.currentDestination?.id != R.id.navigation_map) {
-                            navController.navigate(R.id.navigation_map)
-                        } else if (navController.currentDestination?.id == R.id.navigation_station_details) {
-                            navController.navigateUp() // Go back to map page
-                        }
-                        true
-                    }
-                    R.id.navigation_info -> {
-                        if (navController.currentDestination?.id != R.id.navigation_info) {
-                            navController.navigate(R.id.navigation_info)
-                        }
-                        true
-                    }
-                    else -> false
                 }
             }
         }
-
     }
 
-    private fun setupNavigationForOrientation(orientation: Int) {
-        binding.bottomNavView.visibility = if (orientation == Configuration.ORIENTATION_PORTRAIT) View.VISIBLE else View.GONE
-        binding.navRailView.visibility = if (orientation == Configuration.ORIENTATION_LANDSCAPE) View.VISIBLE else View.GONE
-    }
+    private suspend fun handleFirstRunAndDataLoading() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val isFirstRun = !prefs.getBoolean("first_run_completed", false)
 
-    // Set Settings Menu
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.menu_settings, menu)
-        return true
-    }
-    // Handle Settings Menu action
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.settings) {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-            return true
+        if (isFirstRun) {
+            // Show appropriate loading message for first run
+            firstRunLoadingMessage.value = "Downloading latest schedules..."
+
+            // Perform first run API call and wait for completion
+            scheduleRepository.fetchAndUpdateSchedules()
+                .onSuccess { apiResponse ->
+                    // Mark first run as completed
+                    prefs.edit().putBoolean("first_run_completed", true).apply()
+
+                    // Check if regular schedules were updated
+                    val regularSchedules = apiResponse.regularSchedules
+                    if (regularSchedules == null) {
+                        showToast("Schedule data loaded from cache")
+                    }
+
+                    // Request app review after successful data load
+                    requestReview()
+
+                    // Signal API call completion
+                    apiCallCompletion.complete(true)
+                }
+                .onFailure { error ->
+                    Log.e("[checkIfFirstRun]", "First run API call failed: ${error.message}")
+
+                    // Mark first run as completed anyway so UI can proceed with fallback data
+                    prefs.edit()
+                        .putBoolean("first_run_completed", true)
+                        .putBoolean("using_fallback_data", true)
+                        .apply()
+
+                    // Show appropriate error message based on error type
+                    val errorMessage = when (error) {
+                        is UnknownHostException -> {
+                            "No internet connection. Using offline schedules."
+                        }
+                        is SocketTimeoutException -> {
+                            "Request timed out. Using offline schedules."
+                        }
+                        else -> {
+                            if (error.message?.contains("404") == true) {
+                                "Schedule service unavailable. Using offline schedules."
+                            } else if (error.message?.contains("500") == true) {
+                                "Server error. Using offline schedules."
+                            } else {
+                                if (NetworkUtils.isOnMobileData(this@MainActivity) &&
+                                    !NetworkUtils.isDownloadOnMobileDataEnabled(this@MainActivity)) {
+                                    "Download on mobile data disabled. Using offline schedules."
+                                } else {
+                                    "Failed to download schedules. Using offline data."
+                                }
+                            }
+                        }
+                    }
+                    if (errorMessage.isNotEmpty()) showToast(errorMessage)
+
+                    // Request app review even on API failure to track visits
+                    requestReview()
+
+                    // Signal API call completion even on failure
+                    apiCallCompletion.complete(false)
+                }
+        } else {
+            // Not first run, but still wait for API call to complete before showing UI
+            scheduleRepository.fetchAndUpdateSchedules()
+                .onSuccess { apiResponse ->
+                    // Check if regular schedules were updated
+                    apiResponse.regularSchedules
+                    requestReview()
+
+                    // Signal API call completion
+                    apiCallCompletion.complete(true)
+                }
+                .onFailure { error ->
+                    Log.e("[MainActivity]", "Background API call failed: ${error.message}")
+                    // Don't show error messages for background updates unless critical
+                    requestReview()
+
+                    // Signal API call completion even on failure
+                    apiCallCompletion.complete(false)
+                }
         }
-        return super.onOptionsItemSelected(item)
-    }
-    // Check if first run
-    private fun checkIfFirstRun() {
-        Log.d("[checkIfFirstRun]", "started...")
-        val prefVersionKeyCode = "version_code"
-        val currentVersionCode = BuildConfig.VERSION_CODE
-        sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
-        val sharedPreferencesEditor = sharedPreferences.edit()
-        val savedVersionCode = sharedPreferences.getInt(prefVersionKeyCode, -1)
-        val showChangelog = true;
 
-        if (showChangelog && ((currentVersionCode > savedVersionCode) || (savedVersionCode.equals(-1)))) {
-            Log.d(
-                "[checkIfFirstRun]",
-                "true: current = $currentVersionCode && saved = $savedVersionCode"
-            )
-            ChangeLogDialogFragment().show(this.supportFragmentManager, ChangeLogDialogFragment.TAG)
-            sharedPreferencesEditor.putInt(prefVersionKeyCode, currentVersionCode).apply()
+        // Mark first run as complete so UI can be shown
+        isFirstRunComplete.value = true
+    }
+
+    // Add method to get API call completion status
+    fun getApiCallCompletion(): CompletableDeferred<Boolean> = apiCallCompletion
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            "device_theme", "dynamic_colors" -> {
+                // Recreate activity to apply theme changes
+                recreate()
+            }
         }
     }
-    // Show changelog dialog
-    class ChangeLogDialogFragment : DialogFragment() {
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
-            AlertDialog.Builder(requireContext())
-                .setTitle(R.string.changelog_title)
-                .setMessage(R.string.changelog_message)
-                .setPositiveButton(getString(R.string.changelog_ok_button)) { _,_ -> }
-                .create()
-        companion object {
-            const val TAG = "ChangeLogDialog"
+
+    override fun onDestroy() {
+        super.onDestroy()
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    private fun showToast(message: String) {
+        runOnUiThread {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
     }
+
     // Request Google Play Store app review
     private fun requestReview() {
-        Log.d("[requestReview]", "started...")
         val prefVisitNumber = "visit_number"
-        sharedPreferences = getSharedPreferences(preferencesName, MODE_PRIVATE)
-        val visitNumber = sharedPreferences.getInt(prefVisitNumber, 0)
-        val sharedPreferencesEditor = sharedPreferences.edit()
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val visitNumber = prefs.getInt(prefVisitNumber, 0)
+        val sharedPreferencesEditor = prefs.edit()
 
         if (visitNumber % 10 == 0) {
             val reviewManager = ReviewManagerFactory.create(this)
@@ -216,212 +334,249 @@ class MainActivity : AppCompatActivity() {
                         "[requestReview]",
                         "reviewErrorCode = $reviewErrorCode"
                     )
+                    // Still increment visit number even if review request failed
+                    sharedPreferencesEditor.putInt(prefVisitNumber, visitNumber + 1).apply()
                 }
             }
         } else {
             sharedPreferencesEditor.putInt(prefVisitNumber, visitNumber + 1).apply()
         }
     }
-    // Run background tasks
-    private suspend fun runBackgroundTasks() {
-        Log.d("[runBackgroundTasks]", "started...")
-        cleanUpFiles()
-        val internetAvailable = checkInternet(this) // wait until job is done
-        setStatusOnMainThread("internetAvailable", internetAvailable)
-        if (internetAvailable) {
-            setStatusOnMainThread("updateFiles", updateFiles())
-            if (!viewModel.updated) {
-                val downloaded = downloadZip()
-                setStatusOnMainThread("downloadedStatus", downloaded)
-                if (downloaded) {
-                    val extracted = extractZip()
-                    setStatusOnMainThread("extractedStatus", extracted)
-                }
-            }
-        }
-    }
-    // Set status on main thread for background tasks
-    private suspend fun setStatusOnMainThread(key: String, value: Boolean) {
-        withContext(Main) {
-            when (key) {
-                "internetAvailable" -> {
-                    viewModel.internet = value
-                    if (!viewModel.internet) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "No internet connection. Working offline",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-                "updateFiles" -> {
-                    viewModel.updated = value
-                }
-                "downloadedStatus" -> {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Downloading new schedules",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    viewModel.downloaded = value
-                    if (!viewModel.downloaded) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Unable to download schedules",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-                "extractedStatus" -> {
-                    viewModel.extracted = value
-                    if (!viewModel.extracted) {
-                        Toast.makeText(
-                            this@MainActivity,
-                            "Unable to configure schedule data",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-                else -> {
-                    println("$key, $value")
-                }
-            }
-        }
-    }
-    // Check internet connection availability
-    private fun checkInternet(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetwork ?: return false
-        val activeNetworkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-        return when {
-            activeNetworkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-            activeNetworkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-            else -> false
-        }
-    }
-    // Clean up old files
-    private fun cleanUpFiles() {
-        Log.d("[cleanUpFiles]", "started...")
-        val dataDirectory = File(filesDir, "data/special/")
-        dataDirectory.listFiles()?.filter { it.lastModified() < Date().time }?.forEach { it.delete() }
-    }
-    // Update data files
-    private fun updateFiles(): Boolean {
-        Log.d("[updateFiles]", "started...")
-        val dataDirectory = this.filesDir.absolutePath + "/data/"
-        val dataFiles = resources.getStringArray(R.array.data_files).toList()
+}
 
-        return try {
-            // check if new version released
-            var updatedCount = 0
-            val zipFile = File(dataDirectory + gtfsFileName)
-            val lastModified = Date(zipFile.lastModified())
-            val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.US)
-            val latestRelease = dateFormat.parse("11/25/2023")
-
-            if (lastModified < latestRelease) {
-                updatedCount++
-                Log.d("[updateFiles]", "Files not up to date!")
-            } else {
-                Log.d("[updateFiles]", "Files up to date...")
-                return true
-            }
-            // Check if all files exist
-            var notFound = 0
-            for (fileName in dataFiles) {
-                val tempFile = File(dataDirectory + fileName)
-                if (!tempFile.exists()) notFound++
-            }
-            notFound += updatedCount
-            notFound <= 0
-        } catch (e: Exception) {
-            Log.e("[updateFiles]", "Files not up to date!")
-            false
-        }
-    }
-    // Download GTFS zip file
-    private fun downloadZip(): Boolean {
-        val dataDirectory = this.filesDir.absolutePath + "/data/"
-        var input: InputStream? = null
-        var output: OutputStream? = null
-        var connection: HttpURLConnection? = null
-        try {
-            val url = URL(urlString)
-            connection = url.openConnection() as HttpURLConnection
-            connection.connect()
-            if (connection.responseCode != HttpURLConnection.HTTP_OK) {
-                Log.d(
-                    "downloadZipFile",
-                    "Server ResponseCode="
-                            + connection.responseCode
-                            + " ResponseMessage="
-                            + connection.responseMessage
-                )
-            }
-            // download the file
-            input = connection.inputStream
-            Log.d(
-                "[downloadZipFile]: ",
-                "destinationFilePath=$dataDirectory + $gtfsFileName"
+@Composable
+fun FirstRunLoadingScreen(loadingMessage: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(48.dp),
+                strokeWidth = 4.dp,
+                color = MaterialTheme.colorScheme.primary
             )
-            val newFile = File(dataDirectory+gtfsFileName)
-            newFile.parentFile?.mkdirs()
-            newFile.createNewFile()
-            output = FileOutputStream(dataDirectory+gtfsFileName)
-            val data = ByteArray(4096)
-            var count: Int
-            while (input.read(data).also { count = it } != -1) {
-                output.write(data, 0, count)
-            }
-            return true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
-        } finally {
-            try {
-                output?.close()
-                input?.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-            connection?.disconnect()
+            Text(
+                text = loadingMessage,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
+            )
         }
     }
-    // Extract zip file
-    private fun extractZip(): Boolean {
-        val dataDirectory = this.filesDir.absolutePath + "/data/"
-        val inputStream: InputStream
-        val zipInputStream: ZipInputStream
-        try {
-            val zipFile = File(dataDirectory+gtfsFileName)
-            val parentFolder = zipFile.parentFile?.path
-            var fileName: String
-            inputStream = FileInputStream(dataDirectory+gtfsFileName)
-            zipInputStream = ZipInputStream(BufferedInputStream(inputStream))
-            var zipEntry: ZipEntry?
-            val buffer = ByteArray(1024)
-            var count: Int
-            while (zipInputStream.nextEntry.also { zipEntry = it } != null) {
-                fileName = zipEntry!!.name
-                if (zipEntry!!.isDirectory) {
-                    val fmd = File("$parentFolder/$fileName")
-                    fmd.mkdirs()
-                    continue
-                }
-                val fileOut = FileOutputStream(
-                    "$parentFolder/$fileName"
-                )
-                while (zipInputStream.read(buffer).also { count = it } != -1) {
-                    fileOut.write(buffer, 0, count)
-                }
-                fileOut.close()
-                zipInputStream.closeEntry()
-            }
-            zipInputStream.close()
-            return true
-        } catch (e: IOException) {
-            e.printStackTrace()
-            return false
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen() {
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    // Create ViewModel instance once and reuse it
+    val schedulesViewModel: SchedulesScreenViewModel = viewModel()
+    val schedulesUiState by schedulesViewModel.uiState.collectAsState()
+
+    // Set up toast callback for the ViewModel
+    val context = androidx.compose.ui.platform.LocalContext.current
+    LaunchedEffect(Unit) {
+        schedulesViewModel.setShowToastCallback { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    // Animate blur effect when refreshing schedules
+    val blurRadius by animateFloatAsState(
+        targetValue = if (currentRoute == "schedules" && schedulesUiState.isRefreshing) 8f else 0f,
+        animationSpec = tween(
+            durationMillis = 300,
+            easing = FastOutSlowInEasing
+        ),
+        label = "main_blur_effect"
+    )
+
+    // Animate overlay alpha when refreshing schedules
+    val overlayAlpha by animateFloatAsState(
+        targetValue = if (currentRoute == "schedules" && schedulesUiState.isRefreshing) 0.3f else 0f,
+        animationSpec = tween(
+            durationMillis = 300,
+            easing = FastOutSlowInEasing
+        ),
+        label = "main_overlay_fade"
+    )
+
+    // Detect screen orientation
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+    // Bottom sheet state - for landscape mode only
+    val landscapeBottomSheetState = rememberStandardBottomSheetState(
+        initialValue = if (!isPortrait && currentRoute == "schedules" && schedulesUiState.showSpecialScheduleSheet)
+            SheetValue.PartiallyExpanded else SheetValue.Hidden,
+        skipHiddenState = false
+    )
+
+    // Handle bottom sheet state changes for landscape
+    LaunchedEffect(isPortrait, currentRoute, schedulesUiState.showSpecialScheduleSheet) {
+        if (!isPortrait && currentRoute == "schedules" && schedulesUiState.showSpecialScheduleSheet && !schedulesUiState.hasUserDismissedSheet) {
+            landscapeBottomSheetState.partialExpand()
+        } else {
+            landscapeBottomSheetState.hide()
+        }
+    }
+
+    // Handle when user manually dismisses sheet in landscape
+    LaunchedEffect(landscapeBottomSheetState.targetValue) {
+        if (landscapeBottomSheetState.targetValue == SheetValue.Hidden &&
+            !isPortrait && currentRoute == "schedules" && schedulesUiState.showSpecialScheduleSheet) {
+            schedulesViewModel.dismissSpecialScheduleSheet()
+        }
+    }
+
+    if (isPortrait) {
+        // Portrait mode: Bottom sheet contained within main content area
+        Box(modifier = Modifier.fillMaxSize()) {
+            Scaffold(
+                topBar = {
+                    TopNavigationBar(
+                        navController = navController,
+                        onRefreshClick = if (currentRoute == "schedules") {
+                            { schedulesViewModel.refreshSchedules() }
+                        } else null,
+                        isRefreshing = schedulesUiState.isRefreshing
+                    )
+                },
+                bottomBar = {
+                    BottomNavigationBar(
+                        navController = navController,
+                        onSchedulesReselected = { schedulesViewModel.onSchedulesScreenReselected() }
+                    )
+                },
+                modifier = Modifier.blur(radius = blurRadius.dp)
+            ) { innerPadding ->
+                // Portrait mode: Use SchedulesScreen with its own bottom sheet for schedules screen
+                Navigation(
+                    navController = navController,
+                    modifier = Modifier.padding(innerPadding),
+                    schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null,
+                    useInternalBottomSheet = true // Flag to tell SchedulesScreen to use its own bottom sheet
+                )
+            }
+
+            // Blur overlay when refreshing schedules
+            if (overlayAlpha > 0f) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Color.Black.copy(alpha = overlayAlpha)
+                        )
+                )
+            }
+
+            // Loading indicator on top of blur
+            if (schedulesUiState.isRefreshing) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(48.dp),
+                        strokeWidth = 4.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+    } else {
+        // Landscape mode: Bottom sheet at top level spans full screen
+        BottomSheetScaffold(
+            scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = landscapeBottomSheetState),
+            sheetContent = {
+                if (currentRoute == "schedules") {
+                    SpecialScheduleBottomSheet(
+                        specialScheduleState = schedulesUiState.specialScheduleState,
+                        onViewSchedule = { schedulesViewModel.openSpecialSchedulePdf() }
+                    )
+                } else {
+                    // Empty content when not on schedules screen
+                    Spacer(modifier = Modifier.height(1.dp))
+                }
+            },
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .blur(radius = blurRadius.dp)
+                ) {
+                    // Side navigation rail
+                    SideNavigationRail(
+                        navController = navController,
+                        onSchedulesReselected = { schedulesViewModel.onSchedulesScreenReselected() }
+                    )
+
+                    // Main content area
+                    Scaffold(
+                        topBar = {
+                            TopNavigationBar(
+                                navController = navController,
+                                onRefreshClick = if (currentRoute == "schedules") {
+                                    { schedulesViewModel.refreshSchedules() }
+                                } else null,
+                                isRefreshing = schedulesUiState.isRefreshing
+                            )
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    ) { innerPadding ->
+                        Navigation(
+                            navController = navController,
+                            modifier = Modifier.padding(innerPadding),
+                            schedulesViewModel = if (currentRoute == "schedules") schedulesViewModel else null,
+                            useInternalBottomSheet = false // Flag to tell SchedulesScreen NOT to use its own bottom sheet
+                        )
+                    }
+                }
+
+                // Blur overlay when refreshing schedules
+                if (overlayAlpha > 0f) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Color.Black.copy(alpha = overlayAlpha)
+                            )
+                    )
+                }
+
+                // Loading indicator on top of blur
+                if (schedulesUiState.isRefreshing) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(48.dp),
+                            strokeWidth = 4.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    PatcoTodayTheme {
+        MainScreen()
     }
 }
