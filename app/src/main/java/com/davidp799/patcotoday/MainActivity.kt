@@ -53,6 +53,7 @@ import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -60,6 +61,8 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
     private lateinit var scheduleRepository: ScheduleRepository
     private var isFirstRunComplete = mutableStateOf(false)
     private var firstRunLoadingMessage = mutableStateOf("Loading schedules...")
+    // Add a CompletableDeferred to track API call completion
+    private val apiCallCompletion = CompletableDeferred<Boolean>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Install the splash screen
@@ -215,6 +218,9 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
 
                     // Request app review after successful data load
                     requestReview()
+
+                    // Signal API call completion
+                    apiCallCompletion.complete(true)
                 }
                 .onFailure { error ->
                     Log.e("[checkIfFirstRun]", "First run API call failed: ${error.message}")
@@ -252,27 +258,37 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
 
                     // Request app review even on API failure to track visits
                     requestReview()
+
+                    // Signal API call completion even on failure
+                    apiCallCompletion.complete(false)
                 }
         } else {
-            // Not first run, still make API call but don't block UI
-            lifecycleScope.launch {
-                scheduleRepository.fetchAndUpdateSchedules()
-                    .onSuccess { apiResponse ->
-                        // Check if regular schedules were updated
-                        apiResponse.regularSchedules
-                        requestReview()
-                    }
-                    .onFailure { error ->
-                        Log.e("[MainActivity]", "Background API call failed: ${error.message}")
-                        // Don't show error messages for background updates unless critical
-                        requestReview()
-                    }
-            }
+            // Not first run, but still wait for API call to complete before showing UI
+            scheduleRepository.fetchAndUpdateSchedules()
+                .onSuccess { apiResponse ->
+                    // Check if regular schedules were updated
+                    apiResponse.regularSchedules
+                    requestReview()
+
+                    // Signal API call completion
+                    apiCallCompletion.complete(true)
+                }
+                .onFailure { error ->
+                    Log.e("[MainActivity]", "Background API call failed: ${error.message}")
+                    // Don't show error messages for background updates unless critical
+                    requestReview()
+
+                    // Signal API call completion even on failure
+                    apiCallCompletion.complete(false)
+                }
         }
 
         // Mark first run as complete so UI can be shown
         isFirstRunComplete.value = true
     }
+
+    // Add method to get API call completion status
+    fun getApiCallCompletion(): CompletableDeferred<Boolean> = apiCallCompletion
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {

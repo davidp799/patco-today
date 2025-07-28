@@ -64,7 +64,21 @@ class SchedulesScreenViewModel(application: Application) : AndroidViewModel(appl
     )
 
     init {
-        loadScheduleData()
+        // Wait for API call completion before loading schedule data
+        viewModelScope.launch {
+            try {
+                val mainActivity = getApplication<Application>() as? com.davidp799.patcotoday.MainActivity
+                if (mainActivity != null) {
+                    // Wait for the API call to complete
+                    mainActivity.getApiCallCompletion().await()
+                }
+            } catch (e: Exception) {
+                Log.e("[SchedulesScreenViewModel]", "Error waiting for API completion: ${e.message}")
+            }
+
+            // Now load the schedule data (which should include any newly downloaded special schedules)
+            loadScheduleData()
+        }
     }
 
     private fun loadScheduleData() {

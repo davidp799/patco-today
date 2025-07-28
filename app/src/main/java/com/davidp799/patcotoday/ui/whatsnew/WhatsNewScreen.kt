@@ -87,14 +87,14 @@ fun WhatsNewScreen(onDismiss: () -> Unit) {
                 Spacer(modifier = Modifier.height(32.dp))
                 Button(onClick = {
                     onDismiss()
-                    // Restart the MainActivity to refresh schedules
-                    val activity = context as? ComponentActivity
-                    activity?.let {
-                        val intent = Intent(context, context::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                        context.startActivity(intent)
-                        it.finish()
-                    }
+//                    // Restart the MainActivity to refresh schedules
+//                    val activity = context as? ComponentActivity
+//                    activity?.let {
+//                        val intent = Intent(context, context::class.java)
+//                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+//                        context.startActivity(intent)
+//                        it.finish()
+//                    }
                 }) {
                     Text("Great!")
                 }
