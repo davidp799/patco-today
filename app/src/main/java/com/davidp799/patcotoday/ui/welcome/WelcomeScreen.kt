@@ -97,7 +97,7 @@ fun WelcomeScreen(onGetStarted: () -> Unit) {
                         color = MaterialTheme.colorScheme.onBackground,
                         textAlign = TextAlign.Start
                     )
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(96.dp))
                 }
                 // Button always at the bottom center, above system nav bar
                 Box(
