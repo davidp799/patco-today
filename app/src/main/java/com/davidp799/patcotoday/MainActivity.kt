@@ -55,6 +55,8 @@ import com.google.android.play.core.review.model.ReviewErrorCode
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
+import com.davidp799.patcotoday.utils.PreferenceMigration
+import androidx.core.content.edit
 
 class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -68,6 +70,9 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
         // Install the splash screen
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        // Migrate preferences from version 1.x.x to 2.0 before any other preference operations
+        PreferenceMigration.migratePreferencesIfNeeded(this)
 
         // Keep splash screen visible until app is ready (but not during first launch loading screen)
         splashScreen.setKeepOnScreenCondition {
@@ -208,7 +213,7 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
             scheduleRepository.fetchAndUpdateSchedules()
                 .onSuccess { apiResponse ->
                     // Mark first run as completed
-                    prefs.edit().putBoolean("first_run_completed", true).apply()
+                    prefs.edit { putBoolean("first_run_completed", true) }
 
                     // Check if regular schedules were updated
                     val regularSchedules = apiResponse.regularSchedules
@@ -226,10 +231,10 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                     Log.e("[checkIfFirstRun]", "First run API call failed: ${error.message}")
 
                     // Mark first run as completed anyway so UI can proceed with fallback data
-                    prefs.edit()
-                        .putBoolean("first_run_completed", true)
-                        .putBoolean("using_fallback_data", true)
-                        .apply()
+                    prefs.edit {
+                        putBoolean("first_run_completed", true)
+                            .putBoolean("using_fallback_data", true)
+                    }
 
                     // Show appropriate error message based on error type
                     val errorMessage = when (error) {
@@ -286,9 +291,6 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
         // Mark first run as complete so UI can be shown
         isFirstRunComplete.value = true
     }
-
-    // Add method to get API call completion status
-    fun getApiCallCompletion(): CompletableDeferred<Boolean> = apiCallCompletion
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
