@@ -3,6 +3,7 @@ package com.davidp799.patcotoday.ui.welcome
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -49,7 +50,7 @@ fun WelcomeScreen(onGetStarted: () -> Unit) {
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.Top,
+                    verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Spacer(modifier = Modifier.height(32.dp))

@@ -3,6 +3,7 @@ package com.davidp799.patcotoday.ui.whatsnew
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -48,7 +50,7 @@ fun WhatsNewScreen(onDismiss: () -> Unit) {
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.Top,
+                    verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Spacer(modifier = Modifier.height(32.dp))
@@ -85,7 +87,8 @@ fun WhatsNewScreen(onDismiss: () -> Unit) {
                             }
                         },
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(32.dp))
                 }
