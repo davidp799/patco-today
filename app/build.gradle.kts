@@ -23,7 +23,7 @@ android {
         applicationId = "com.davidp799.patcotoday"
         minSdk = 26
         targetSdk = 36
-        versionCode = 22
+        versionCode = 23
         versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -53,6 +53,10 @@ android {
             // Use the production API key for release builds
             buildConfigField("String", "API_KEY", "\"ZMz6Y9oU9I9nfPK2PHuR09zN4lYrFdG49it2znq2\"")
             isMinifyEnabled = true
+            isShrinkResources = true
+            ndk {
+                debugSymbolLevel = "FULL" // Or 'SYMBOL_TABLE'
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
