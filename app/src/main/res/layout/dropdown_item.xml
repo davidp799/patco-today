@@ -1,8 +1,0 @@
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/textView"
-    android:layout_width="match_parent"
-    android:textColor="?android:textColorPrimary"
-    android:textStyle="bold"
-    android:padding="11sp"
-    android:layout_height="wrap_content"/>
