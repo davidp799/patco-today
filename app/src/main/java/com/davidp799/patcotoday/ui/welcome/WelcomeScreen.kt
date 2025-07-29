@@ -3,6 +3,8 @@ package com.davidp799.patcotoday.ui.welcome
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -38,59 +40,75 @@ fun WelcomeScreen(onGetStarted: () -> Unit) {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background.copy(alpha = overlayAlpha)
         ) {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(32.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(32.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Welcome to Patco Today!",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = "Welcome to Patco Today!",
-                        style = MaterialTheme.typography.headlineMedium,
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("🕒 View accurate schedules anytime, anywhere.")
+                            }
+                            append("\nNever miss your train with real-time schedule information at your fingertips.\n\n")
+
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("⚠️ See special schedules as soon as they appear.")
+                            }
+                            append("\nStay informed about service changes, holiday schedules, and special events.\n\n")
+
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("ℹ️ View information about every Patco Station.")
+                            }
+                            append("\nExplore comprehensive details about all stations along the line.\n\n")
+
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("🔍 Find anything and everything Patco.")
+                            }
+                            append("\nYour complete guide to the PATCO High Speed Line.\n\n")
+
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("⚙️ Make Patco Today yours.")
+                            }
+                            append("\nCustomize your experience with theme settings, schedule preferences, and more.")
+                        },
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Start
                     )
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("🕒 View accurate schedules anytime, anywhere.")
-                        }
-                        append("\nNever miss your train with real-time schedule information at your fingertips.\n\n")
-
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("⚠️ See special schedules as soon as they appear.")
-                        }
-                        append("\nStay informed about service changes, holiday schedules, and special events.\n\n")
-
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("ℹ️ View information about every Patco Station.")
-                        }
-                        append("\nExplore comprehensive details about all stations along the line.\n\n")
-
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("🔍 Find anything and everything Patco.")
-                        }
-                        append("\nYour complete guide to the PATCO High Speed Line.\n\n")
-
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("⚙️ Make Patco Today yours.")
-                        }
-                        append("\nCustomize your experience with theme settings, schedule preferences, and more.")
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Start
-                )
-                Spacer(modifier = Modifier.height(32.dp))
-                Button(onClick = onGetStarted) {
-                    Text("Get Started! 🚀")
+                // Button always at the bottom center, above system nav bar
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(onClick = onGetStarted) {
+                        Text("Get Started! 🚀")
+                    }
                 }
             }
         }

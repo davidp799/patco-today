@@ -3,6 +3,8 @@ package com.davidp799.patcotoday.ui.whatsnew
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -37,61 +39,69 @@ fun WhatsNewScreen(onDismiss: () -> Unit) {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background.copy(alpha = overlayAlpha)
         ) {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(32.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(32.dp)
             ) {
-                Text(
-                    text = "What's New ✨",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("App revamp:")
-                        }
-                        append("\nPatco Today has been rewritten to be faster, cleaner, and even more useful than before.\n\n")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("Bottom Sheet:")
-                        }
-                        append("\nThe bottom sheet on the schedules screen now displays general scheduling information and a link to any PDF attachments.\n\n")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("Refresh button:")
-                        }
-                        append("\nYou can now refresh the schedules manually by tapping the refresh button.\n\n")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("Special schedules:")
-                        }
-                        append("\nSpecial schedules are now displayed in the main arrivals view and are tagged with a 'Special Schedule' label.\n\n")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("Station Map:")
-                        }
-                        append("\nThe station map has been revamped to have a cleaner look and resolves prior bugs.\n\n")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("So many more bug fixes and improvements!")
-                        }
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Spacer(modifier = Modifier.height(32.dp))
-                Button(onClick = {
-                    onDismiss()
-//                    // Restart the MainActivity to refresh schedules
-//                    val activity = context as? ComponentActivity
-//                    activity?.let {
-//                        val intent = Intent(context, context::class.java)
-//                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-//                        context.startActivity(intent)
-//                        it.finish()
-//                    }
-                }) {
-                    Text("Great!")
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Text(
+                        text = "What's New ✨",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("App revamp:")
+                            }
+                            append("\nPatco Today has been rewritten to be faster, cleaner, and even more useful than before.\n\n")
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Bottom Sheet:")
+                            }
+                            append("\nThe bottom sheet on the schedules screen now displays general scheduling information and a link to any PDF attachments.\n\n")
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Refresh button:")
+                            }
+                            append("\nYou can now refresh the schedules manually by tapping the refresh button.\n\n")
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Special schedules:")
+                            }
+                            append("\nSpecial schedules are now displayed in the main arrivals view and are tagged with a 'Special Schedule' label.\n\n")
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("Station Map:")
+                            }
+                            append("\nThe station map has been revamped to have a cleaner look and resolves prior bugs.\n\n")
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("So many more bug fixes and improvements!")
+                            }
+                        },
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
+                // Button always at the bottom center, above system nav bar
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(onClick = {
+                        onDismiss()
+                    }) {
+                        Text("Great!")
+                    }
                 }
             }
         }
