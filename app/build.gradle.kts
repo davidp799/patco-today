@@ -34,6 +34,13 @@ android {
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
 
+    // Disable baseline profiles to avoid installation conflicts
+    androidComponents {
+        beforeVariants { variantBuilder ->
+            variantBuilder.enableAndroidTest = false
+        }
+    }
+
     buildTypes {
         debug {
             // Use local.properties for development
@@ -65,6 +72,9 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            // Exclude baseline profile files
+            excludes += "**/baseline.prof"
+            excludes += "**/baseline.profm"
         }
     }
 }
