@@ -60,7 +60,7 @@ import androidx.core.content.edit
 
 class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
     // Developer togglable boolean to suppress What's New screen even on version change
-    private val SUPPRESS_WHATS_NEW_SCREEN = false // Set to true to suppress, false for normal behavior
+    private val SUPPRESS_WHATS_NEW_SCREEN = true // Set to true to suppress, false for normal behavior
 
     private lateinit var scheduleRepository: ScheduleRepository
     private var isFirstRunComplete = mutableStateOf(false)
