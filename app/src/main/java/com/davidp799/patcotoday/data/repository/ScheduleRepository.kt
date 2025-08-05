@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ScheduleRepository(private val context: Context) {
-    private val fileManager = FileManager(context)
+    val fileManager = FileManager(context)
     private val csvParser = CsvScheduleParser(context)
     private val apiService: ScheduleApiService
 

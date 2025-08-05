@@ -111,6 +111,10 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
         // Initialize repository
         scheduleRepository = ScheduleRepository(this)
 
+        // Clean up old special schedule files (keep only today's)
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+        scheduleRepository.fileManager.cleanupOldSpecialSchedules(today)
+
         // Register preference change listener
         prefs.registerOnSharedPreferenceChangeListener(this)
 

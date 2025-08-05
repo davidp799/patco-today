@@ -66,11 +66,11 @@ class FileManager(private val context: Context) {
                     }
 
                     val file = File(directory, fileName)
-                    val inputStream = response.body?.byteStream()
+                    val inputStream = response.body.byteStream()
                     val outputStream = FileOutputStream(file)
 
-                    inputStream?.copyTo(outputStream)
-                    inputStream?.close()
+                    inputStream.copyTo(outputStream)
+                    inputStream.close()
                     outputStream.close()
 
                     true
@@ -152,6 +152,21 @@ class FileManager(private val context: Context) {
         val file = File(getSpecialSchedulesDirectory(date), fileName)
         val exists = file.exists()
         return if (exists) file else null
+    }
+
+    fun cleanupOldSpecialSchedules(currentDate: String) {
+        val specialDir = File(getSchedulesDirectory(), "special")
+        if (specialDir.exists() && specialDir.isDirectory) {
+            specialDir.listFiles()?.forEach { subDir ->
+                if (subDir.isDirectory && subDir.name != currentDate) {
+                    try {
+                        subDir.deleteRecursively()
+                    } catch (e: Exception) {
+                        Log.e("[cleanupOldSpecialSchedules]", "Failed to delete ${subDir.absolutePath}: ", e)
+                    }
+                }
+            }
+        }
     }
 
 }
