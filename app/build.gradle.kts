@@ -23,7 +23,7 @@ android {
         applicationId = "com.davidp799.patcotoday"
         minSdk = 26
         targetSdk = 36
-        versionCode = 24
+        versionCode = 25
         versionName = "2.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
