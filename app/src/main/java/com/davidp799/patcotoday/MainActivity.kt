@@ -59,6 +59,8 @@ import com.davidp799.patcotoday.utils.PreferenceMigration
 import androidx.core.content.edit
 
 class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+    // Developer togglable boolean to suppress What's New screen even on version change
+    private val SUPPRESS_WHATS_NEW_SCREEN = false // Set to true to suppress, false for normal behavior
 
     private lateinit var scheduleRepository: ScheduleRepository
     private var isFirstRunComplete = mutableStateOf(false)
@@ -174,8 +176,8 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
                                     if (errorMessage.isNotEmpty()) showToast(errorMessage)
                                 }
                         }
-                    } else if (currentVersionCode > savedVersionCode) {
-                        // Existing user with an update
+                    } else if (!SUPPRESS_WHATS_NEW_SCREEN && currentVersionCode > savedVersionCode) {
+                        // Show What's New only if not suppressed and version changed
                         showWhatsNew = true
                     }
                 }
