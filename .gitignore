@@ -112,3 +112,4 @@ Desktop.ini
 *.tmp
 .idea/copilotDiffState.xml
 .idea/deploymentTargetSelector.xml
+.idea/misc.xml
