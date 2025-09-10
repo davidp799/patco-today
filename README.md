@@ -5,7 +5,7 @@ width="200" hspace="10" vspace="10">
 
 Patco Today is a free, open-source transit app for Android. Primarily utilizing the Google Transit Feed Specification (GTFS) API, it provides the most up-to-date scheduling information for PATCO Transit.
 
-Patco Today is available on the Google Play Store and will soon be available on F-Droid.
+Patco Today is available on the Google Play Store.
 
 <p align="left">
 	<a href="https://play.google.com/store/apps/details?id=com.davidp799.patcotoday">
@@ -13,11 +13,6 @@ Patco Today is available on the Google Play Store and will soon be available on 
 		height="80"
 		src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" />
 	</a>  
-	<a href="https://f-droid.org/app/NOT_YET">
-	    <img alt="Get it on F-Droid"
-		height="80"
-		src="https://f-droid.org/badge/get-it-on.png" />
-	</a>
 </p>
         
 ## Features
