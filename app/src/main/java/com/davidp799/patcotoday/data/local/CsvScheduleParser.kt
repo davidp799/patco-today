@@ -13,7 +13,7 @@ import java.util.*
 
 class CsvScheduleParser(private val context: Context) {
 
-    private val fileManager = FileManager(context)
+    val fileManager = FileManager(context)
 
     suspend fun parseScheduleForRoute(
         fromStation: String,
