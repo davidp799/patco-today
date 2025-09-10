@@ -10,6 +10,14 @@ data class ApiResponse(
     val message: String?
 )
 
+data class FeedbackRequest(
+    @SerializedName("feedbackType") val feedbackType: String,
+    @SerializedName("rating") val rating: String,
+    @SerializedName("description") val description: String,
+    @SerializedName("contactInfo") val contactInfo: String? = null,
+    @SerializedName("submittedAt") val submittedAt: String
+)
+
 data class SpecialSchedules(
     @SerializedName("schedule_date")
     val scheduleDate: String,
