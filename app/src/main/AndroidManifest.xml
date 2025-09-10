@@ -60,10 +60,10 @@
             android:name=".FeedbackActivity"
             android:exported="false"
             android:theme="@style/Theme.PatcoToday"
-            android:parentActivityName=".SettingsActivity">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".SettingsActivity" />
+                android:value=".MainActivity" />
         </activity>
 
         <activity

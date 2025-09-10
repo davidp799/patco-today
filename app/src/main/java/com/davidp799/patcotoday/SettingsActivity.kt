@@ -2,7 +2,6 @@ package com.davidp799.patcotoday
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -39,6 +38,8 @@ import androidx.preference.PreferenceManager
 import com.davidp799.patcotoday.ui.screens.SchedulesScreenViewModel
 import com.davidp799.patcotoday.ui.theme.PatcoTodayTheme
 import kotlin.random.Random
+import androidx.core.content.edit
+import androidx.core.net.toUri
 
 class SettingsActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -288,7 +289,7 @@ fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
                         checked = dynamicColors,
                         onCheckedChange = { checked ->
                             dynamicColors = checked
-                            sharedPrefs.edit().putBoolean("dynamic_colors", checked).apply()
+                            sharedPrefs.edit { putBoolean("dynamic_colors", checked) }
                         }
                     )
                 }
@@ -319,7 +320,7 @@ fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
                     checked = downloadOnMobileData,
                     onCheckedChange = { checked ->
                         downloadOnMobileData = checked
-                        sharedPrefs.edit().putBoolean("download_on_mobile_data", checked).apply()
+                        sharedPrefs.edit { putBoolean("download_on_mobile_data", checked) }
                     }
                 )
             }
@@ -330,9 +331,7 @@ fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
                     title = stringResource(R.string.pref_title_feedback),
                     summary = stringResource(R.string.pref_summary_feedback),
                     onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                            data = Uri.parse("mailto:david.r.pape@gmail.com")
-                        }
+                        val intent = Intent(context, FeedbackActivity::class.java)
                         context.startActivity(intent)
                     }
                 )
@@ -367,7 +366,8 @@ fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
                     summary = stringResource(R.string.privacy_summary),
                     onClick = {
                         val intent = Intent(Intent.ACTION_VIEW).apply {
-                            data = Uri.parse("https://www.termsfeed.com/live/7267d0fc-3b09-435a-bf45-71ead0cc1494")
+                            data =
+                                "https://www.termsfeed.com/live/7267d0fc-3b09-435a-bf45-71ead0cc1494".toUri()
                         }
                         context.startActivity(intent)
                     }
@@ -381,7 +381,8 @@ fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
                     summary = stringResource(R.string.terms_summary),
                     onClick = {
                         val intent = Intent(Intent.ACTION_VIEW).apply {
-                            data = Uri.parse("https://www.termsfeed.com/live/e56e7ea1-704d-45cf-9b6c-36c786290c1b")
+                            data =
+                                "https://www.termsfeed.com/live/e56e7ea1-704d-45cf-9b6c-36c786290c1b".toUri()
                         }
                         context.startActivity(intent)
                     }
@@ -396,7 +397,7 @@ fun SettingsScreen(schedulesViewModel: SchedulesScreenViewModel? = null) {
             selectedTheme = selectedTheme,
             onThemeSelected = { theme ->
                 selectedTheme = theme
-                sharedPrefs.edit().putString("device_theme", theme.toString()).apply()
+                sharedPrefs.edit { putString("device_theme", theme.toString()) }
                 showThemeDialog = false
             },
             onDismiss = { showThemeDialog = false }
